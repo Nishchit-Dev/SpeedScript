@@ -72,7 +72,7 @@ export async function POST(req: Request) {
             firstName: first_name,
             lastName: last_name,
             username: username!,
-            photo: image_url,
+            Photo: image_url,
         }
 
         console.log(user)

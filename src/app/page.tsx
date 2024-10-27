@@ -1,26 +1,32 @@
 'use client'
-import { createUser } from '@/lib/actions/user.actions'
-import Image from 'next/image'
+
+import { addNewScore } from '@/lib/actions/score.actions'
+import { useUser } from '@clerk/nextjs'
+
+import { useEffect } from 'react'
 
 export default function Home() {
+    const { user } = useUser()
+
+    useEffect(() => {
+        console.log(user?.id)
+    }, [])
+
     return (
         <div className="flex flex-1 justify-center items-center h-screen">
             <button
-                className="px-5 py-2 bg-blue-600 rounded-full"
-                onClick={async (e) => {
-                    const user = {
-                        clerkId: 'user_2ntbtJ8eeRbMSbWsXUShY5nvigG',
-                        email: 'nishchitpatel84@gmail.com',
-                        firstName: 'Nishchit',
-                        lastName: 'Malasana',
-                        username: null,
-                        Photo: 'https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18ybnRidE45QkN4dEoyS0ZPYUwwbXViM09kZUMifQ',
-                    }
-                    console.log('clicked')
-                    await createUser(user)
+                className="bg-blue-600 px-5 py-3 rounded-full"
+                onClick={async () => {
+                    console.log(user?.id)
+                    await addNewScore(
+                        user?.id || 'aa',
+                        user?.id || 'bb',
+                        '100',
+                        '100'
+                    )
                 }}
             >
-                create user
+                Add Score
             </button>
         </div>
     )

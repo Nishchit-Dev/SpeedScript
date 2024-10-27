@@ -1,6 +1,6 @@
 'use server'
 
-import User from '@/lib/models/user.models'
+import User from '@/lib/models/user.modals'
 import { connect } from '@/lib/db'
 
 export async function createUser(user: any) {

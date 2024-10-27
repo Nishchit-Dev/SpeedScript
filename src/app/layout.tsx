@@ -3,6 +3,15 @@ import localFont from 'next/font/local'
 import './globals.css'
 import { ClerkProvider, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 
+import { JetBrains_Mono } from 'next/font/google'
+
+const jetBrainsMono = JetBrains_Mono({
+    subsets: ['latin'],
+    preload: true,
+    variable: '--font-jetbrains',
+    weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
+})
+
 const geistSans = localFont({
     src: './fonts/GeistVF.woff',
     variable: '--font-geist-sans',
@@ -26,17 +35,26 @@ export default function RootLayout({
 }>) {
     return (
         <ClerkProvider>
-            <html lang="en">
+            <html lang="en" suppressHydrationWarning>
                 <body
-                    className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+                    className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased `}
+                    cz-shortcut-listen="true"
                 >
-                    <SignedIn>
-                        <UserButton />
-                    </SignedIn>
-                    <SignedOut>
-                        <SignedIn />
-                    </SignedOut>
-                    {children}
+                    <div className="flex flex-1 justify-between items-center p-3 px-10 ">
+                        <div></div>
+                        <div>
+                            <p className="text-4xl font-jetBrainsMono italic font-semibold">
+                                SpeedScript<span className='text-green-400'>.</span>
+                            </p>
+                        </div>
+                        <SignedIn>
+                            <UserButton />
+                        </SignedIn>
+                        <SignedOut>
+                            <SignedIn />
+                        </SignedOut>
+                    </div>
+                    <div className="py-10">{children}</div>
                 </body>
             </html>
         </ClerkProvider>

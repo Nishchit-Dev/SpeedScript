@@ -25,6 +25,10 @@ const UserSchema = new Schema({
     lastName: {
         type: String,
     },
+    highestWpm: {
+        type: Number,
+        default: -Infinity,
+    },
 })
 const User = models?.User || model('User', UserSchema)
 

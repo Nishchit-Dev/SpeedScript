@@ -1,14 +1,21 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 import useListenTyping, { calculateTimeGap } from '../hooks/useTyping'
 import clsx from 'clsx'
 import useTimer from '../hooks/useTimer'
-import useCalculateScore from '../hooks/usCalculateScore'
+import useCalculateScore from '../hooks/useCalculateScore'
 import Image from 'next/image'
 import Score from '@/components/ScoreCard/Score'
 import { ModalProvider } from '@/components/ui/animated-modal'
 import useGenerateTypingText from '../hooks/useGenerateTypingText'
+import { addNewScore } from '@/lib/actions/score.actions'
+import { currentUser } from '@clerk/nextjs/server'
+import { useUser } from '@clerk/nextjs'
+
+import useAddNewScore from '../hooks/useAddNewScore'
+import { useCookiesScore } from '../hooks/cookies/useCookies'
+import { useTimexWpm } from '../hooks/useTimeXWpm'
+import TimexWpm from '@/components/graph/timexwpmGraph'
 
 const TypingText =
     'The quick brown fox jumps over the lazy dog and enjoys the warm sunshine on a bright afternoon.'
@@ -16,18 +23,29 @@ const TypingText =
 const onlyAlphabetsAndSpace = [...TypingText].filter((char) =>
     /[a-zA-Z\u2000\s]/.test(char)
 )
-let characterArray = TypingText.split('').map((element) =>
-    element === ' ' ? `\u2000` : element.toLowerCase()
-)
 
 export default function Typing() {
     const [charTyped, setCharTyped] = useState([])
+    const typingSentence = useGenerateTypingText().typingSuggestion
+    const [characterArray, setCharacterArray] = useState<string[]>([])
+    useEffect(() => {
+        let characterArray = typingSentence
+            .split('')
+            .map((element: string) =>
+                element === ' ' ? `\u2000` : element.toLowerCase()
+            )
+        const onlyAlphabetsAndSpace = [...characterArray].filter((char) =>
+            /[a-zA-Z\u2000\s]/.test(char)
+        )
+
+        setCharacterArray(onlyAlphabetsAndSpace)
+    }, [typingSentence])
+
     const charIndex = charTyped.length
     const [autoSpacing, setAutoSpacing] = useState(false)
     const [preventIncorrect, setPreventIncorrect] = useState(false)
     const [isTyping, setIsTyping] = useState(false)
     const [gameOver, setGameOver] = useState(false)
-    const [timeGap, setTimeGap] = useState<any[]>([])
     const { progress, incorrectChar, cursor, charTypedInfo } = useListenTyping(
         characterArray,
         charTyped,
@@ -38,12 +56,6 @@ export default function Typing() {
         gameOver
     )
     const { timer, startTimer, stopTimer } = useTimer()
-    // const { typingSuggestion } = useGenerateTypingText()
-
-    // useEffect(() => {
-    //     console.log(typingSuggestion)
-    // }, [typingSuggestion])
-
     const score = useCalculateScore(
         isTyping,
         timer,
@@ -53,19 +65,21 @@ export default function Typing() {
     )
 
     useEffect(() => {
-        if (isTyping && cursor <= 1 && 10 >= timer) {
+        if (isTyping && cursor <= 1 && 30 >= timer) {
             startTimer()
         }
 
-        if (10 <= timer && isTyping) {
+        if (30 <= timer && isTyping) {
             stopTimer()
             setIsTyping(!isTyping)
             setGameOver(true)
         }
     }, [timer, cursor, isTyping])
 
+    useCookiesScore({ gameover: gameOver, wpm: score.wpm, data: charTypedInfo })
+    const { timexwpm } = useTimexWpm({ timer: timer, wpm: score.wpm })
     return (
-        <div className="flex flex-1 flex-col justify-center items-center w-screen overflow-hidden h-[70vh] ">
+        <div className="flex flex-1 flex-col justify-center items-center w-screen overflow-hidden min-h-screen">
             <div className="flex flex-row justify-start items-center gap-5">
                 {/* <div className="flex flex-row justify-start items-center bg-blue-600 px-5 py-2 rounded-full hover:bg-purple-700 transition duration-1000 ease-out ">
                     <button
@@ -194,8 +208,16 @@ export default function Typing() {
                         trigger={gameOver}
                         data={charTypedInfo}
                         _wpm={score.wpm}
+                        timexwpm={timexwpm}
                     />
                 </ModalProvider>
+            ) : (
+                <></>
+            )}
+            {gameOver ? (
+                <div>
+                    <TimexWpm data={timexwpm} />
+                </div>
             ) : (
                 <></>
             )}

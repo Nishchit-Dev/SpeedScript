@@ -1,24 +1,23 @@
 import { Schema, models, model } from 'mongoose'
 
-const ScoreSchema = new Schema({
-    userId: {
-        type: String,
-        required: true,
-        unique: true,
+const ScoreSchema = new Schema(
+    {
+        clerkId: {
+            type: String,
+            required: true,
+        },
+        wpm: {
+            type: Number,
+            required: true,
+        },
+        accuracy: {
+            type: Number,
+        },
     },
-    clerkId: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    wpm: {
-        type: String,
-        required: true,
-    },
-    accuracy: {
-        type: String
-    },
-})
+    {
+        timestamps: true,
+    }
+)
 
 const Score = models?.Score || model('Score', ScoreSchema)
 

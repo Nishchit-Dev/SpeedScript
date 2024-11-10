@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import useAddNewScore from './useAddNewScore'
 
 const useCalculateScore = (
     isTyping: boolean,
@@ -9,6 +10,8 @@ const useCalculateScore = (
 ) => {
     const [wpm, setWpm] = useState<any>(1)
     const [accuracy, setAccuracy] = useState<number>(1)
+
+    useAddNewScore(gameOver, wpm)
 
     useEffect(() => {
         if (isTyping && !gameOver) {

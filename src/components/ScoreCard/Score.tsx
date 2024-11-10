@@ -13,6 +13,8 @@ import Counter from '../ui/countingNumberAnimation'
 import useInformative from '@/app/hooks/useInformative'
 import html2canvas from 'html2canvas'
 import { Component } from './wpmCard'
+import { RefreshCcw, Twitter } from 'lucide-react'
+import TimexWpm from '../graph/timexwpmGraph'
 
 // ... existing code ...
 
@@ -20,22 +22,24 @@ export default function Score({
     trigger,
     data,
     _wpm,
+    timexwpm,
 }: {
     trigger: boolean
     data: any
     _wpm: number
+    timexwpm: any[]
 }) {
     const { open, setOpen } = useModal()
     const [wpm, setWpm] = useState(0)
     const { avgTimeToHitChar, lowestTimeToHitChar, highestTimeToHitChar } =
         useInformative(data)
+
     useEffect(() => {
-        console.log('modal opnner -> ', trigger)
         setOpen(trigger)
         setWpm(_wpm)
     }, [trigger])
+
     useEffect(() => {
-        console.log('wpm -> ', _wpm)
         setWpm(_wpm)
     }, [])
 
@@ -79,14 +83,24 @@ export default function Score({
     return (
         <Modal>
             <ModalTrigger>
-                <div className=" border-green-400 px-5 py-2 border-2 rounded-full text-black/70 font-jetBrainsMono ">
-                    Open Report
+                <div className="flex justify-center items-center flex-col gap-5">
+                    <div className=" border-green-400 px-5 py-2 border-2 rounded-full text-black/70 font-jetBrainsMono ">
+                        Open Report
+                    </div>
+                    <div className="flex flex-row gap-2 items-center">
+                        <RefreshCcw
+                            className="text-gray-300 hover:text-gray-500 transition-all duration-300"
+                            onClick={() => {
+                                location.reload()
+                            }}
+                        />
+                    </div>
                 </div>
             </ModalTrigger>
             <ModalBody isOpen={open}>
                 <ModalContent>
-                    <div className="flex flex-row mb-10 gap-10 " id="score">
-                        <div className="flex flex-col">
+                    <div className="flex flex-col  gap-10" id="score">
+                        <div className="flex flex-col flex-1 justify-center items-center">
                             <GlareCard className="flex flex-1 justify-center items-center hover:text-white/80">
                                 <div
                                     className=" rounded-xl w-min text-green-400 "
@@ -100,7 +114,7 @@ export default function Score({
                                                         number={Number(wpm)}
                                                     ></Counter>
                                                 </h1>
-                                                <p className="text-3xl font-jetBrainsMono font-semibold text-white/60">
+                                                <p className="text-3xl font-jetBrainsMono font-semibold text-white/60 pt-2">
                                                     Wpm
                                                 </p>
                                             </div>
@@ -117,18 +131,20 @@ export default function Score({
                                 </div>
                             </GlareCard>
                             <div>
-                                <div>
-                                    <Button onClick={handleShareToTwitter}>
-                                        Share on Twitter
-                                    </Button>
-                                </div>
+                                <span
+                                    onClick={handleShareToTwitter}
+                                    className="bg-blue-500 px-3 py-2 flex flex-row gap-2 items-center rounded-full mt-2 break-keep w-max cursor-pointer"
+                                >
+                                    <Twitter className="text-white"></Twitter>
+                                    <p className="font-jetBrainsMono text-white">
+                                        Share Tweet
+                                    </p>
+                                </span>
                             </div>
                         </div>
+
                         <div className="flex flex-wrap gap-10 ">
-                            <div>
-                                <Component />
-                            </div>
-                            <div className="">
+                            {/* <div className="flex flex-row gap-3 flex-wrap">
                                 <div className="font-jetBrainsMono">
                                     <h1>Average Time to Hit Character</h1>
                                     <p className="text-2xl font-bold">
@@ -141,20 +157,22 @@ export default function Score({
                                         {lowestTimeToHitChar.toFixed(2)} ms
                                     </p>
                                 </div>
-                            </div>
-                            <div>
-                                <div className="font-jetBrainsMono">
-                                    <h1>Highest Time to Hit Character</h1>
-                                    <p className="text-2xl font-bold">
-                                        {highestTimeToHitChar.toFixed(2)} ms
-                                    </p>
+                                <div>
+                                    <div className="font-jetBrainsMono">
+                                        <h1>Highest Time to Hit Character</h1>
+                                        <p className="text-2xl font-bold">
+                                            {highestTimeToHitChar.toFixed(2)} ms
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
-                    </div>
-
-                    <div className="flex flex-1 justify-center items-center">
-                        <ShowGraph data={data} />
+                        <div className="flex flex-1 justify-center items-center">
+                            <ShowGraph data={data} />
+                        </div>
+                        <div>
+                            <TimexWpm data={timexwpm} />
+                        </div>
                     </div>
                 </ModalContent>
             </ModalBody>

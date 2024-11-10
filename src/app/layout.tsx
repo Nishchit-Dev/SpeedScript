@@ -4,6 +4,8 @@ import './globals.css'
 import { ClerkProvider, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 
 import { JetBrains_Mono } from 'next/font/google'
+import { Crown } from 'lucide-react'
+import Link from 'next/link'
 
 const jetBrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -41,20 +43,37 @@ export default function RootLayout({
                     cz-shortcut-listen="true"
                 >
                     <div className="flex flex-1 justify-between items-center p-3 px-10 ">
-                        <div></div>
                         <div>
-                            <p className="text-4xl font-jetBrainsMono italic font-semibold">
-                                SpeedScript<span className='text-green-400'>.</span>
-                            </p>
+                            <div className="text-4xl font-jetBrainsMono font-semibold bg-black p-2 rounded-lg pr-4">
+                                <p className="text-white italic">SS</p>
+                            </div>
                         </div>
-                        <SignedIn>
-                            <UserButton />
-                        </SignedIn>
-                        <SignedOut>
-                            <SignedIn />
-                        </SignedOut>
+                        <div className="flex flex-row justify-center items-center gap-3 cursor-pointer">
+                            <Link href={'/'}>
+                                <p className="text-4xl font-jetBrainsMono italic font-semibold">
+                                    SpeedScript
+                                    <span className="text-green-400">.</span>
+                                </p>
+                            </Link>
+
+                            <Link href={'/leaderboard'}>
+                                <p className="font-jetBrainsMono flex flex-row text-lg justify-center gap-4 bg-yellow-300 items-center p-2 px-5 rounded-full">
+                                    <Crown size={32} />
+                                    <span>Leaderboard</span>
+                                </p>
+                            </Link>
+                        </div>
+
+                        <div>
+                            <SignedIn>
+                                <UserButton />
+                            </SignedIn>
+                            <SignedOut>
+                                <SignedIn />
+                            </SignedOut>
+                        </div>
                     </div>
-                    <div className="py-10">{children}</div>
+                    <div className="py-10 ">{children}</div>
                 </body>
             </html>
         </ClerkProvider>

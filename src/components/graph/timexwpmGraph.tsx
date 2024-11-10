@@ -13,31 +13,13 @@ import {
     YAxis,
 } from 'recharts'
 
-const ShowGraph = ({ data }: { data: any[] }) => {
-    const [finalTimeGap, setFinalTimeGap] = useState<any[]>([])
-
-    const calculateFinalTimeGap = useCallback(() => {
-        if (data.length > 0) {
-            let _data = calculateTimeDifferences(data)
-            return _data.map((item) => ({
-                data: item.data,
-                time: item.time,
-            }))
-        }
-        return []
-    }, [data])
-
-    useEffect(() => {
-        setFinalTimeGap(calculateFinalTimeGap())
-        console.log(finalTimeGap)
-    }, [calculateFinalTimeGap])
-
+const TimexWpm = ({ data }: { data: any[] }) => {
+    console.log(data)
     return (
         <LineChart
             height={300}
-            width={innerWidth*0.5}
-            data={finalTimeGap}
-
+            width={innerWidth * 0.5}
+            data={data}
             margin={{
                 top: 5,
                 right: 30,
@@ -47,8 +29,8 @@ const ShowGraph = ({ data }: { data: any[] }) => {
             className="flex flex-1 "
         >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="data" name="data" />
-            <YAxis dataKey="time" name="time" />
+            <XAxis dataKey="time" name="time" />
+            <YAxis dataKey="wpm" name="wpm" />
 
             <Tooltip />
             <Legend />
@@ -56,7 +38,6 @@ const ShowGraph = ({ data }: { data: any[] }) => {
             <Line
                 type="monotone"
                 dataKey="time"
-                
                 stroke="#4ADE80"
                 strokeWidth={2}
             />
@@ -64,4 +45,4 @@ const ShowGraph = ({ data }: { data: any[] }) => {
     )
 }
 
-export default ShowGraph
+export default TimexWpm

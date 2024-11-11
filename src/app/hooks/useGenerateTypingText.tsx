@@ -22,11 +22,11 @@ import axios, { AxiosDefaults } from 'axios'
 // }
 
 const fetchRamdomQuote = async (minLength: number = 300) => {
-    const url = `http://api.quotable.io/random?&minLength=${minLength}`
+    const url = 'https://shortstories-api.onrender.com/'
     try {
-        const Quote = await axios.get(url)
-        console.log(Quote.data.content)
-        return Quote.data.content
+        const storyApi = await axios.get(url)
+        console.log(storyApi.data.story)
+        return storyApi.data.story
     } catch (error) {
         const errorMessage =
             error instanceof Error ? error.message : 'An unknown error occurred'

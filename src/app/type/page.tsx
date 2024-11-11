@@ -79,7 +79,7 @@ export default function Typing() {
     useCookiesScore({ gameover: gameOver, wpm: score.wpm, data: charTypedInfo })
     const { timexwpm } = useTimexWpm({ timer: timer, wpm: score.wpm })
     return (
-        <div className="flex flex-1 flex-col justify-center items-center w-screen overflow-hidden min-h-screen">
+        <div className="flex flex-1 flex-col justify-center items-center w-screen overflow-hidden min-h-[70vh]">
             <div className="flex flex-row justify-start items-center gap-5">
                 {/* <div className="flex flex-row justify-start items-center bg-blue-600 px-5 py-2 rounded-full hover:bg-purple-700 transition duration-1000 ease-out ">
                     <button
@@ -100,12 +100,16 @@ export default function Typing() {
                             <p>{'Time: ' + timer}</p>
                         </div>
                         <div>
-                            <p className="mb-3">
-                                {characterArray[cursor] == ' ' ||
-                                characterArray[cursor] == '\u2000'
-                                    ? 'space'
-                                    : characterArray[cursor]}
-                            </p>
+                            {characterArray.length > 0 ? (
+                                <p className="mb-3">
+                                    {characterArray[cursor] == ' ' ||
+                                    characterArray[cursor] == '\u2000'
+                                        ? 'space'
+                                        : characterArray[cursor]}
+                                </p>
+                            ) : (
+                                <p className='mb-3 invisible'>a</p>
+                            )}
                         </div>
                     </div>
 
@@ -129,38 +133,49 @@ export default function Typing() {
                         style={{ transform: `translateX(-${progress}%)` }}
                         className={`pl-20 flex flex-row font-jetBrainsMono justify-start items-center md:text-2xl lg:text-3xl relative transition duration-1000 ease-out `}
                     >
-                        {characterArray.map((character, index) => {
-                            return (
-                                <p
-                                    key={index}
-                                    className={clsx(
-                                        {
-                                            'text-gray-500': index > charIndex,
-                                        },
-                                        {
-                                            'text-black':
-                                                index < charIndex ||
-                                                !incorrectChar.includes(index),
-                                        },
-                                        {
-                                            'text-red-500':
-                                                index < charIndex &&
-                                                incorrectChar.includes(index) &&
-                                                !preventIncorrect,
-                                        },
+                        {characterArray.length > 0 ? (
+                            characterArray.map((character, index) => {
+                                return (
+                                    <p
+                                        key={index}
+                                        className={clsx(
+                                            {
+                                                'text-gray-500':
+                                                    index > charIndex,
+                                            },
+                                            {
+                                                'text-black':
+                                                    index < charIndex ||
+                                                    !incorrectChar.includes(
+                                                        index
+                                                    ),
+                                            },
+                                            {
+                                                'text-red-500':
+                                                    index < charIndex &&
+                                                    incorrectChar.includes(
+                                                        index
+                                                    ) &&
+                                                    !preventIncorrect,
+                                            },
 
-                                        {
-                                            'font-bold': index == charIndex,
-                                            'text-3xl': index == charIndex,
-                                            'text-green-400':
-                                                index == charIndex,
-                                        }
-                                    )}
-                                >
-                                    {character}
-                                </p>
-                            )
-                        })}
+                                            {
+                                                'font-bold': index == charIndex,
+                                                'text-3xl': index == charIndex,
+                                                'text-green-400':
+                                                    index == charIndex,
+                                            }
+                                        )}
+                                    >
+                                        {character}
+                                    </p>
+                                )
+                            })
+                        ) : (
+                            <div className="">
+                                <h1 className="moving-text ">Generating</h1>
+                            </div>
+                        )}
                     </div>
                     <div className="z-20 absolute right-0">
                         <Image

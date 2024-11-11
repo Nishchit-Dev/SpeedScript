@@ -10,7 +10,7 @@ export const useTimexWpm = ({ timer, wpm }: { timer: number; wpm: number }) => {
     useEffect(() => {
         setTimeXWpm((prev: timeXwpmInterface[]) => [
             ...prev,
-            { time: timer, wpm: wpm },
+            { time: timer, wpm: Number(wpm) },
         ])
     }, [timer])
 

@@ -29,15 +29,16 @@ const TimexWpm = ({ data }: { data: any[] }) => {
             className="flex flex-1 "
         >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="time" name="time" />
-            <YAxis dataKey="wpm" name="wpm" />
+            <XAxis dataKey="time" name="Time (s)" label={{ value: "Time (s)", position: "insideBottomCenter", offset: 0, }} />
+            <YAxis dataKey="wpm" name="WPM" label={{ value: "WPM", angle: -90, position: "insideLeft" }} domain={[0, 100]} />
+
 
             <Tooltip />
             <Legend />
-            <Brush endIndex={20} dataKey="bar" height={30} stroke="#4ADE80" />
+            <Brush endIndex={25} dataKey="bar" height={30} stroke="#4ADE80" />
             <Line
                 type="monotone"
-                dataKey="time"
+                dataKey="wpm"
                 stroke="#4ADE80"
                 strokeWidth={2}
             />

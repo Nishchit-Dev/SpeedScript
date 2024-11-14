@@ -8,7 +8,7 @@ const useCalculateScore = (
     incorrect: number,
     gameOver: boolean
 ) => {
-    const [wpm, setWpm] = useState<any>(1)
+    const [wpm, setWpm] = useState<any>(0)
     const [accuracy, setAccuracy] = useState<number>(1)
 
     useAddNewScore(gameOver, wpm)

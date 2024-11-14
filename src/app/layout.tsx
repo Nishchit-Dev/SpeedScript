@@ -39,15 +39,11 @@ export default function RootLayout({
         <ClerkProvider>
             <html lang="en" suppressHydrationWarning>
                 <body
-                    className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased `}
+                    className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased bg-[#E1E1E3]`}
                     cz-shortcut-listen="true"
                 >
                     <div className="flex flex-1 justify-between items-center p-3 px-10 ">
-                        <div>
-                            <div className="text-4xl font-jetBrainsMono font-semibold bg-black p-2 rounded-lg pr-4">
-                                <p className="text-white italic">SS</p>
-                            </div>
-                        </div>
+                        <div></div>
                         <div className="flex flex-row justify-center items-center gap-3 cursor-pointer">
                             <Link href={'/'}>
                                 <p className="text-4xl font-jetBrainsMono italic font-semibold">
@@ -57,9 +53,8 @@ export default function RootLayout({
                             </Link>
 
                             <Link href={'/leaderboard'}>
-                                <p className="font-jetBrainsMono flex flex-row text-lg justify-center gap-4 bg-yellow-300 items-center p-2 px-5 rounded-full">
-                                    <Crown size={32} />
-                                    <span>Leaderboard</span>
+                                <p className="font-jetBrainsMono flex flex-row text-lg justify-center gap-4 bg-yellow-500 items-center p-2  rounded-full">
+                                    <Crown size={22} />
                                 </p>
                             </Link>
                         </div>

@@ -29,15 +29,15 @@ const ShowGraph = ({ data }: { data: any[] }) => {
 
     useEffect(() => {
         setFinalTimeGap(calculateFinalTimeGap())
-        console.log(finalTimeGap)
     }, [calculateFinalTimeGap])
+
+    if (finalTimeGap.length == 0) return <></>
 
     return (
         <LineChart
             height={300}
-            width={innerWidth*0.5}
+            width={innerWidth * 0.6}
             data={finalTimeGap}
-
             margin={{
                 top: 5,
                 right: 30,
@@ -52,12 +52,11 @@ const ShowGraph = ({ data }: { data: any[] }) => {
 
             <Tooltip />
             <Legend />
-            <Brush endIndex={20} dataKey="bar" height={30} stroke="#4ADE80" />
+            <Brush endIndex={15} dataKey="bar" height={30} stroke="#FDE047" />
             <Line
                 type="monotone"
                 dataKey="time"
-                
-                stroke="#4ADE80"
+                stroke="#FDE047"
                 strokeWidth={2}
             />
         </LineChart>

@@ -81,7 +81,7 @@ export default function Score({
     }
 
     return (
-        <Modal >
+        <Modal>
             <ModalTrigger>
                 <div className="flex justify-center items-center flex-col gap-5">
                     <div className=" border-green-400 px-5 py-2 border-2 rounded-full text-black/70 font-jetBrainsMono ">
@@ -97,9 +97,12 @@ export default function Score({
                     </div>
                 </div>
             </ModalTrigger>
-            <ModalBody isOpen={open} >
-                <ModalContent >
-                    <div className="flex flex-col flex-1 w-full gap-10" id="score">
+            <ModalBody isOpen={open}>
+                <ModalContent>
+                    <div
+                        className="flex flex-col flex-1 w-full gap-10"
+                        id="score"
+                    >
                         <div className="flex flex-col flex-1 justify-center items-center">
                             <GlareCard className="flex flex-1 justify-center items-center hover:text-white/80">
                                 <div
@@ -168,10 +171,18 @@ export default function Score({
                             </div> */}
                         </div>
                         <div className="flex flex-1 justify-center items-center">
-                            <ShowGraph data={data} />
+                            {data.length > 0 ? (
+                                <ShowGraph data={data} />
+                            ) : (
+                                <></>
+                            )}
                         </div>
-                        <div>
-                            <TimexWpm data={timexwpm} />
+                        <div className="flex flex-1 justify-center items-center">
+                            {timexwpm.length > 0 ? (
+                                <TimexWpm data={timexwpm} />
+                            ) : (
+                                <></>
+                            )}
                         </div>
                     </div>
                 </ModalContent>

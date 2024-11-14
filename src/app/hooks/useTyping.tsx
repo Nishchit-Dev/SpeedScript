@@ -30,14 +30,19 @@ export const calculateTimeGap = (
 }
 
 const useListenTyping = (
-    text: string[],
+    generatedText: string[],
     charTyped: string[],
     setCharTyped: any,
     preventIncorrect: boolean,
     isTyping: boolean,
     setIsTyping: any,
-    gameOver: boolean
+    gameOver: boolean,
+    startTimer: any
 ) => {
+    const [text, setText] = useState<string[]>(generatedText)
+    useEffect(() => {
+        setText(generatedText)
+    }, [generatedText])
     // pointer of the cursor: where the user is tpying now...
     const [cursor, setCursor] = useState(0)
     // total length of the text
@@ -52,10 +57,13 @@ const useListenTyping = (
     useEffect(() => {
         const handleEvent = (event: KeyboardEvent) => {
             // if Press Key is BackSpace
-            setIsTyping(true)
+            if (!isTyping) {
+                setIsTyping(true)
+                startTimer()
+            }
 
             if (event.key == 'Backspace') {
-                if (cursor >= 0) {
+                if (cursor >= 1) {
                     setIncorrectTypeCharacter((prev) =>
                         prev.filter((char) => char != cursor)
                     )
@@ -84,7 +92,6 @@ const useListenTyping = (
 
                 // if the pressed key is a character
             } else if (event.key.length == 1) {
-                console.log('key typed')
                 if (text[cursor] == event.key && !preventIncorrect) {
                     // press correct key
 
@@ -127,9 +134,10 @@ const useListenTyping = (
         }
         let progress = (cursor / totalChar) * 100
 
-        if (cursor == totalChar - 1 && !isTyping) {
+        if (cursor == totalChar - 1) {
             window.removeEventListener('keydown', handleEvent)
         } else {
+            console.log('added listen')
             window.addEventListener('keydown', handleEvent)
         }
 
@@ -140,9 +148,10 @@ const useListenTyping = (
 
         // remove the event listener when the component unmounts
         return () => {
+            console.log('listener removed')
             window.removeEventListener('keydown', handleEvent)
         }
-    }, [cursor, isTyping, gameOver])
+    }, [cursor, isTyping, gameOver, text])
 
     return {
         progress,

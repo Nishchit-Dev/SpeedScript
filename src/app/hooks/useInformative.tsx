@@ -11,11 +11,13 @@ const useInformative = (data: any[]) => {
         setAverageTimeToHitChar(totalTime / data.length)
     }
     const LowestTimeToHitChar = (data: any[]) => {
-        const nonZeroTimes = data.map(item => item.time).filter(time => time !== 0);
+        const nonZeroTimes = data
+            .map((item) => item.time)
+            .filter((time) => time !== 0)
         if (nonZeroTimes.length > 0) {
-            setLowestTimeToHitChar(Math.min(...nonZeroTimes));
+            setLowestTimeToHitChar(Math.min(...nonZeroTimes))
         } else {
-            setLowestTimeToHitChar(0); // Default value if all times are zero
+            setLowestTimeToHitChar(0) // Default value if all times are zero
         }
     }
 
@@ -73,6 +75,7 @@ const useInformative = (data: any[]) => {
         avgTimeToHitChar,
         lowestTimeToHitChar,
         highestTimeToHitChar,
+        totalChar: data.length,
     }
 }
 

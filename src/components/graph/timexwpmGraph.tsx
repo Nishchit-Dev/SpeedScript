@@ -15,13 +15,13 @@ import {
     YAxis,
 } from 'recharts'
 
-const TimexWpm = ({ data }: { data: any[] }) => {
+const TimexWpm = ({ data, timer }: { data: any[]; timer: number }) => {
     if (data.length == 0) return <></>
 
     return (
         <LineChart
             height={400}
-            width={innerWidth*0.6}
+            width={innerWidth * 0.6}
             data={data}
             margin={{
                 top: 5,
@@ -50,13 +50,13 @@ const TimexWpm = ({ data }: { data: any[] }) => {
 
             <Tooltip />
             <Legend />
-            <Brush endIndex={30} dataKey="bar" height={30} stroke="#4ADE80" />
-            {/* <Line
-                type="monotone"
-                dataKey="wpm"
+            <Brush
+                endIndex={timer > 30 ? timer / 3 : timer }
+                dataKey="bar"
+                height={30}
                 stroke="#4ADE80"
-                strokeWidth={2}
-            /> */}
+            />
+
             <ReferenceArea
                 type="monotone"
                 stroke="#8884d8"

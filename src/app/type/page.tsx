@@ -34,7 +34,7 @@ export default function Typing() {
     const [buttons, setButtons] = useState({
         style: false,
         autoCorrect: true,
-        withSymbols: true,
+        withSymbols: false,
     })
     useEffect(() => {
         let characterArray = typingSentence
@@ -57,7 +57,7 @@ export default function Typing() {
     const [isTyping, setIsTyping] = useState(false)
     const [gameOver, setGameOver] = useState(false)
     const { timer, startTimer, stopTimer } = useTimer()
-    const [timerOption, setTimerOption] = useState(30)
+    const [timerOption, setTimerOption] = useState(10)
     const { progress, incorrectChar, cursor, charTypedInfo } = useListenTyping(
         characterArray,
         charTyped,
@@ -80,10 +80,7 @@ export default function Typing() {
         if (isTyping && cursor < 1 && timerOption >= timer) {
             startTimer()
         }
-
-        if (
-            (timerOption <= timer && isTyping)
-        ) {
+        if (timerOption <= timer && isTyping) {
             stopTimer()
             setIsTyping(!isTyping)
             setGameOver(true)
@@ -133,9 +130,16 @@ export default function Typing() {
                         }
                     )}
                 >
+                    {/* here is the buttons for the modification of game rules */}
                     <div className="flex flex-row text-sm">
                         <div
-                            className="m-2 text-white/60 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer"
+                            className={clsx(
+                                'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                { 'text-green-400': buttons.withSymbols },
+                                {
+                                    'text-white/60': !buttons.withSymbols,
+                                }
+                            )}
                             onClick={() => {
                                 setButtons((prev) => {
                                     return {
@@ -149,13 +153,10 @@ export default function Typing() {
                         </div>
                         <div
                             className={clsx(
+                                'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                { 'text-green-400': buttons.style },
                                 {
-                                    'text-green-300 hover:text-green-500':
-                                        buttons.style,
-                                },
-                                {
-                                    'm-2 text-white/60 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer':
-                                        true,
+                                    'text-white/60': !buttons.style,
                                 }
                             )}
                             onClick={() => {
@@ -182,6 +183,20 @@ export default function Typing() {
 
                         <div className="flex justify-center items-center">
                             <div className="w-1 h-[60%] bg-gray-400 rounded-full"></div>
+                        </div>
+                        <div
+                            className={clsx(
+                                'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                { 'text-green-400': timerOption == 10 },
+                                {
+                                    'text-white/60': timerOption != 10,
+                                }
+                            )}
+                            onClick={() => {
+                                setTimerOption(10)
+                            }}
+                        >
+                            <p>10s</p>
                         </div>
                         <div
                             className={clsx(
@@ -225,6 +240,32 @@ export default function Typing() {
                         >
                             <p>120s</p>
                         </div>
+                        <>
+                            {gameOver ? (
+                                <div
+                                    className={clsx(
+                                        'm-2  hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                        {
+                                            'text-green-400':
+                                                timerOption == 120,
+                                        },
+                                        {
+                                            'text-white/60': timerOption != 120,
+                                        }
+                                    )}
+                                >
+                                    <RefreshCcw
+                                        size={22}
+                                        className="text-gray-400 hover:text-gray-200 transition-all duration-300"
+                                        onClick={() => {
+                                            location.reload()
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                <></>
+                            )}
+                        </>
                     </div>
                 </div>
                 <div className="flex flex-row flex-wrap justify-start items-center gap-5">
@@ -239,41 +280,62 @@ export default function Typing() {
                 </div> */}
                 </div>
 
-                {buttons.autoCorrect ? (
-                    <>
-                        <div
-                            className={clsx(
-                                'overflow-hidden transition-all duration-700 ease-in-out',
-                                {
-                                    'max-h-0 opacity-0 scale-0 ':
-                                        buttons.autoCorrect,
-                                    'max-h-[500px] opacity-100 scale-100':
-                                        !buttons.autoCorrect,
-                                }
-                            )}
-                        >
-                            <TimexWpm data={timexwpm} />
+                {gameOver ? (
+                    <div className="flex flex-1 flex-row">
+                        <div>
+                            <Score
+                                data={charTypedInfo}
+                                _wpm={score.wpm}
+                                timexwpm={timexwpm}
+                            />
                         </div>
+                        <div>
+                            <div
+                                className={clsx(
+                                    'overflow-hidden transition-all duration-700 ease-in-out',
+                                    {
+                                        'max-h-0 opacity-0 scale-0 ': !gameOver,
+                                    },
+                                    {
+                                        'max-h-[500px] opacity-100 scale-100':
+                                            gameOver,
+                                    }
+                                )}
+                            >
+                                <TimexWpm data={timexwpm} timer={timer} />
+                            </div>
 
-                        <div
-                            className={clsx(
-                                'overflow-hidden transition-all duration-700 ease-in-out',
-                                {
-                                    'max-h-0 opacity-0 scale-0 ':
-                                        buttons.autoCorrect,
-                                    'max-h-[500px] opacity-100 scale-100':
-                                        !buttons.autoCorrect,
-                                }
-                            )}
-                        >
-                            <ShowGraph data={charTypedInfo} />
+                            <div
+                                className={clsx(
+                                    'overflow-hidden transition-all duration-700 ease-in-out',
+                                    {
+                                        'max-h-0 opacity-0 scale-0 ': !gameOver,
+                                    },
+                                    {
+                                        'max-h-[500px] opacity-100 scale-100':
+                                            gameOver,
+                                    }
+                                )}
+                            >
+                                <ShowGraph data={charTypedInfo} />
+                            </div>
                         </div>
-                    </>
+                    </div>
                 ) : (
                     <></>
                 )}
 
-                <div>
+                <div
+                    className={clsx(
+                        'transition duration-500',
+                        {
+                            'max-h-0 opacity-0 scale-0 ': gameOver,
+                        },
+                        {
+                            'max-h-[500px] opacity-100 scale-100': !gameOver,
+                        }
+                    )}
+                >
                     <div className="text-3xl font-jetBrainsMono font-bold">
                         <div className="flex flex-col justify-center items-center gap-3 ">
                             <div className="flex flex-row gap-10 text-black/60">
@@ -301,21 +363,26 @@ export default function Typing() {
 
                 <div
                     className={clsx(
+                        'max-w-full relative overflow-hidden w-full transition-all duration-700 ease-in-out',
                         { 'left-[45%] ': buttons.style },
-
-                        'max-w-full relative overflow-hidden w-full'
+                        {
+                            'max-h-0 opacity-0 scale-0 ': gameOver,
+                        },
+                        {
+                            'max-h-[500px] opacity-100 scale-100': !gameOver,
+                        }
                     )}
                 >
                     {buttons.style ? (
                         <div className="flex flex-row gap-10">
-                            <div className="z-20 absolute ">
-                                <Image
+                            <div className="z-20 absolute w-[100px] h-[50px] bg-gradient-to-r from-[#E1E1E3] to-transparent">
+                                {/* <Image
                                     src={'/blured-sides/fade-text-left.png'}
                                     alt="typing"
                                     height={0}
                                     width={100}
                                     className="w-[100px] z-20"
-                                />
+                                /> */}
                             </div>
 
                             <div
@@ -452,20 +519,6 @@ export default function Typing() {
                 ) : (
                     <></>
                 )} */}
-                <>
-                    {gameOver ? (
-                        <div className="flex flex-row gap-2 items-center mt-8 cursor-pointer">
-                            <RefreshCcw
-                                className="text-gray-400 hover:text-gray-500 transition-all duration-300"
-                                onClick={() => {
-                                    location.reload()
-                                }}
-                            />
-                        </div>
-                    ) : (
-                        <></>
-                    )}
-                </>
             </div>
         </>
     )

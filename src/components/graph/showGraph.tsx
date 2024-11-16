@@ -15,7 +15,7 @@ import {
 
 const ShowGraph = ({ data }: { data: any[] }) => {
     const [finalTimeGap, setFinalTimeGap] = useState<any[]>([])
-
+    const [length, setLength] = useState(data.length-1)
     const calculateFinalTimeGap = useCallback(() => {
         if (data.length > 0) {
             let _data = calculateTimeDifferences(data)
@@ -52,11 +52,16 @@ const ShowGraph = ({ data }: { data: any[] }) => {
 
             <Tooltip />
             <Legend />
-            <Brush endIndex={15} dataKey="bar" height={30} stroke="#FDE047" />
+            <Brush
+                endIndex={length/2}
+                dataKey="bar"
+                height={30}
+                stroke="#EAB308"
+            />
             <Line
                 type="monotone"
                 dataKey="time"
-                stroke="#FDE047"
+                stroke="#EAB308"
                 strokeWidth={2}
             />
         </LineChart>

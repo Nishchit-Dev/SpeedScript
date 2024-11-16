@@ -58,8 +58,10 @@ const useListenTyping = (
         const handleEvent = (event: KeyboardEvent) => {
             // if Press Key is BackSpace
             if (!isTyping) {
-                setIsTyping(true)
-                startTimer()
+                if (event.key.length == 1) {
+                    setIsTyping(true)
+                    startTimer()
+                }
             }
 
             if (event.key == 'Backspace') {
@@ -107,7 +109,7 @@ const useListenTyping = (
                     ])
                 } else if (preventIncorrect && text[cursor] != event.key) {
                     // press incorrect key
-
+                    console.log('alt')
                     setIncorrectTypeCharacter((prev) => [...prev, cursor])
                     setCursor(cursor + 1)
                     setCharTyped((prev: any) => [...prev, event.key])
@@ -122,14 +124,8 @@ const useListenTyping = (
                 }
 
                 // pressed special key
-            } else if (event.key.length > 1) {
+            } else if (event.key.length > 1 && cursor > 1) {
                 console.log('special key -> ', event.key)
-            }
-
-            // pressed Alt key
-            if (event.key == 'Alt') {
-                console.log(incorrectTypeCharacter)
-                console.log(charTypedInfo)
             }
         }
         let progress = (cursor / totalChar) * 100

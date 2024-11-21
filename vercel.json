@@ -4,11 +4,6 @@
       "NPM_FLAGS": "--legacy-peer-deps"
     }
   },
-  "functions": {
-    "api/cronjob.ts": {
-      "runtime": "nodejs16.x"
-    }
-  },
   "crons": [
     {
       "path": "/api/cronjob",

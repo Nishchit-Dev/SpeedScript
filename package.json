@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "20.x"
+  },
   "name": "speedscript",
   "version": "0.1.0",
   "private": true,
@@ -32,7 +35,8 @@
     "svix": "^1.37.0",
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.4",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "vercel": "^39.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",

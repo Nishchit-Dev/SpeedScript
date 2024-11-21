@@ -109,7 +109,7 @@ const useListenTyping = (
                     ])
                 } else if (preventIncorrect && text[cursor] != event.key) {
                     // press incorrect key
-                    console.log('alt')
+
                     setIncorrectTypeCharacter((prev) => [...prev, cursor])
                     setCursor(cursor + 1)
                     setCharTyped((prev: any) => [...prev, event.key])
@@ -133,7 +133,6 @@ const useListenTyping = (
         if (cursor == totalChar - 1) {
             window.removeEventListener('keydown', handleEvent)
         } else {
-            console.log('added listen')
             window.addEventListener('keydown', handleEvent)
         }
 
@@ -144,7 +143,6 @@ const useListenTyping = (
 
         // remove the event listener when the component unmounts
         return () => {
-            console.log('listener removed')
             window.removeEventListener('keydown', handleEvent)
         }
     }, [cursor, isTyping, gameOver, text])

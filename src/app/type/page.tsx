@@ -19,6 +19,7 @@ import TimexWpm from '@/components/graph/timexwpmGraph'
 import ShowGraph from '@/components/graph/showGraph'
 import useCursor from '../hooks/curosrAnimationHook/useCursorAnimation'
 import { RefreshCcw } from 'lucide-react'
+import useGuest from '../hooks/cookies/useGuest'
 
 const TypingText =
     'The quick brown fox jumps over the lazy dog and enjoys the warm sunshine on a bright afternoon.'
@@ -89,6 +90,7 @@ export default function Typing() {
 
     const cursorPosition = useCursor({ cursor })
     const [style, setStyle] = useState(false)
+    const { userGuest } = useGuest()
 
     useCookiesScore({ gameover: gameOver, wpm: score.wpm, data: charTypedInfo })
     const { timexwpm } = useTimexWpm({ timer: timer, wpm: score.wpm })
@@ -375,15 +377,7 @@ export default function Typing() {
                 >
                     {buttons.style ? (
                         <div className="flex flex-row gap-10">
-                            <div className="z-20 absolute w-[100px] h-[50px] bg-gradient-to-r from-[#E1E1E3] to-transparent">
-                                {/* <Image
-                                    src={'/blured-sides/fade-text-left.png'}
-                                    alt="typing"
-                                    height={0}
-                                    width={100}
-                                    className="w-[100px] z-20"
-                                /> */}
-                            </div>
+                            <div className="z-20 absolute w-[100px] h-[50px] bg-gradient-to-r from-[#E1E1E3] to-transparent"></div>
 
                             <div
                                 style={{
@@ -498,7 +492,7 @@ export default function Typing() {
                                 ) : (
                                     <div className="">
                                         <h1 className="moving-text ">
-                                            Generating
+                                            generating
                                         </h1>
                                     </div>
                                 )}

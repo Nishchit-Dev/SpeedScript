@@ -10,7 +10,6 @@ const useCursor = ({ cursor }: { cursor: Number }) => {
 
             const x = rct?.left
             const y = rct?.top
-            console.log(x, y)
             if (x && y) setPosition({ x: x, y: y })
         }
         getPosition()

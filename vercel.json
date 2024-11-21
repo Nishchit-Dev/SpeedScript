@@ -12,10 +12,7 @@
   "crons": [
     {
       "path": "/api/cronjob",
-      "schedule": "0 0 * * *",
-      "headers": {
-        "Authorization": "Bearer ${CRONJOB_APIKEY}"
-      }
+      "schedule": "0 0 * * *"
     }
   ]
 }

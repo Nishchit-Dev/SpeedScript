@@ -9,7 +9,7 @@
       "runtime": "nodejs16.x"
     }
   },
-  "cron": {
+  "crons": {
     "jobs": [
       {
         "path": "/api/cronjob",

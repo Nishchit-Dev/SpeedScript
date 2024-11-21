@@ -5,17 +5,17 @@
     }
   },
   "functions": {
-    "api/cron.js": {
+    "api/cronjob.ts": {
       "runtime": "nodejs16.x"
     }
   },
   "cron": {
     "jobs": [
       {
-        "path": "/api/resetLeaderboard",
-        "schedule": "* * * * *",
+        "path": "/api/cronjob",
+        "schedule": "*/5 * * * *",
         "headers": {
-          "Authorization": "Bearer whsec_txZEywoK6x6DLlsaQfM8+GIEz2jSDRnn"
+          "Authorization": "Bearer ${CRONJOB_APIKEY}"
         }
       }
     ]

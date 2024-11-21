@@ -14,8 +14,6 @@ export const useTimexWpm = ({ timer, wpm }: { timer: number; wpm: number }) => {
         ])
     }, [timer])
 
-    useEffect(() => {
-        console.log(timexwpm)
-    }, [timexwpm])
+    useEffect(() => {}, [timexwpm])
     return { timexwpm }
 }

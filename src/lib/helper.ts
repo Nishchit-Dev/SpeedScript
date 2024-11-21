@@ -30,7 +30,6 @@ export const getUserHisotry = () => {
 
     let stringyRawData = localStorage.getItem(ID)
     let parseData = stringyRawData ? JSON.parse(stringyRawData) : []
-    console.log(parseData)
     if (parseData.wpm && parseData.data) {
         return parseData
     } else {

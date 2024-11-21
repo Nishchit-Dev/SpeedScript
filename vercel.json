@@ -3,5 +3,21 @@
     "env": {
       "NPM_FLAGS": "--legacy-peer-deps"
     }
+  },
+  "functions": {
+    "api/cron.js": {
+      "runtime": "nodejs16.x"
+    }
+  },
+  "cron": {
+    "jobs": [
+      {
+        "path": "/api/resetLeaderboard",
+        "schedule": "* * * * *",
+        "headers": {
+          "Authorization": "Bearer whsec_txZEywoK6x6DLlsaQfM8+GIEz2jSDRnn"
+        }
+      }
+    ]
   }
 }

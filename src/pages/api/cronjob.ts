@@ -6,12 +6,6 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    const apiKey = req.headers.authorization
-
-    if (apiKey !== `Bearer ${process.env.CRONJOB_APIKEY}`) {
-        return res.status(403).json({ error: 'Forbidden: Invalid API Key' })
-    }
-
     try {
         // Reset leaderboard logic
         await connect()
@@ -20,7 +14,7 @@ export default async function handler(
             {}, // Match all users
             { $set: { dailyHighestWpm: 0 } } // Reset dailyHighestWpm to 0
         )
-
+        console.log('Leaderboard reset successfully')
         res.status(200).json({ message: 'Leaderboard reset successfully' })
     } catch (error) {
         console.error('Error resetting leaderboard:', error)

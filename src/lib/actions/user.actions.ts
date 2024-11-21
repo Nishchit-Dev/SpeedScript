@@ -6,8 +6,8 @@ import { connect } from '@/lib/db'
 export async function createUser(user: any) {
     try {
         const res = await connect()
-        console.log(res)
         const newUser = await User.create(user)
+
         return JSON.parse(JSON.stringify(newUser))
     } catch (err) {
         console.log(err)
@@ -19,12 +19,18 @@ export async function getUserIdByClerkId(
     clerkId: string | null
 ): Promise<Object | null> {
     try {
-        console.log('Fetching user...')
+        console.log(clerkId)
         const res = await connect()
         const user = await User.findOne({ clerkId })
-        return user ? user._id.toString() : null
+        return user ? JSON.stringify(user) : {}
     } catch (error) {
         console.error('Error fetching user by clerkId:', error)
         throw new Error('Could not retrieve user ID')
     }
+}
+
+// this function is used to link the clerkId with the user's _id
+export async function updateUserWithClerkId(userId: string, clerkId: string) {
+    const res = await connect()
+    await User.findByIdAndUpdate(userId, { clerkId })
 }

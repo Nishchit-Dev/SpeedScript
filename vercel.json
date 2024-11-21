@@ -9,15 +9,13 @@
       "runtime": "nodejs16.x"
     }
   },
-  "crons": {
-    "jobs": [
-      {
-        "path": "/api/cronjob",
-        "schedule": "*/5 * * * *",
-        "headers": {
-          "Authorization": "Bearer ${CRONJOB_APIKEY}"
-        }
+  "crons": [
+    {
+      "path": "/api/cronjob",
+      "schedule": "*/5 * * * *",
+      "headers": {
+        "Authorization": "Bearer ${CRONJOB_APIKEY}"
       }
-    ]
-  }
+    }
+  ]
 }

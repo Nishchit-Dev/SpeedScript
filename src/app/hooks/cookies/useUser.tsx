@@ -15,9 +15,7 @@ const useUserCookies = () => {
         highestWpm: 0,
     })
     const getUser = () => {
-        return JSON.parse(
-            JSON.parse(localStorage.getItem(USER_IDENTIFIER) || '{}')
-        )
+        return JSON.parse(localStorage.getItem(USER_IDENTIFIER) || '{}')
     }
     useEffect(() => {
         if (user && getUser()._id) {

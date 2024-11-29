@@ -1,7 +1,8 @@
-import { createUser } from '@/lib/actions/user.actions'
+import { getUserIdByClerkId } from '@/lib/actions/user.actions'
+import { useUser } from '@clerk/nextjs'
 import { useEffect, useState } from 'react'
 
-const useGuest = () => {
+const useUserLocal = () => {
     const USER_IDENTIFIER = 'USER'
     const [user, setUser] = useState<any>({
         clerkId: null,
@@ -10,23 +11,30 @@ const useGuest = () => {
         Photo: null,
         highestWpm: 0,
     })
+    const { user: clerkUser }: { user: any } = useUser()
 
     useEffect(() => {
-        const createUserGuest = async () => {
-            const newUser = await createUser(user)
-            localStorage.setItem(USER_IDENTIFIER, JSON.stringify(newUser))
-            return newUser
-        }
-
-        if (!localStorage.getItem(USER_IDENTIFIER)) {
-            createUserGuest().then((user) => {
-                setUser(user)
+        if (clerkUser?.id) {
+            getUserIdByClerkId(clerkUser?.id).then((newUser: any) => {
+                if (newUser) {
+                    localStorage.setItem(
+                        USER_IDENTIFIER,
+                        JSON.stringify(newUser)
+                    )
+                    setUser(newUser)
+                }
             })
         }
-    }, [])
+    }, [clerkUser])
 
     const getUser = () => {
-        return JSON.parse(localStorage.getItem(USER_IDENTIFIER) || '{}')
+        const userdata = localStorage.getItem(USER_IDENTIFIER) || ''
+        console.log(userdata)
+        if (userdata) {
+            return JSON.parse(userdata)
+        } else {
+            return null
+        }
     }
 
     useEffect(() => {
@@ -34,9 +42,9 @@ const useGuest = () => {
         if (storedUser) {
             setUser(storedUser)
         }
-    }, [])
+    }, [clerkUser])
 
     return { userGuest: user, getUser }
 }
 
-export default useGuest
+export default useUserLocal

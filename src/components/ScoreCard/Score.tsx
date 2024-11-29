@@ -32,7 +32,7 @@ export default function Score({
         lowestTimeToHitChar,
         highestTimeToHitChar,
         totalChar,
-    } = useInformative(data)
+    } = useInformative(data,_wpm)
 
     const handleShareToTwitter = async () => {
         const element = document.getElementById('tweetImg')

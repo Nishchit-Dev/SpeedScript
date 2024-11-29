@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
+import useUserGhostCursorTime from './cookies/useUserGhostCursorTime'
 
-const useInformative = (data: any[]) => {
+const useInformative = (data: any[], wpm: number) => {
     const [avgTimeToHitChar, setAverageTimeToHitChar] = useState(0)
     const [lowestTimeToHitChar, setLowestTimeToHitChar] = useState(0)
     const [highestTimeToHitChar, setHighestTimeToHitChar] = useState(0)
     const [finalData, setFinalData] = useState<any[]>([])
-
+    const { saveUserScore } = useUserGhostCursorTime()
     const averageTimeToHitChar = (data: any[]) => {
         const totalTime = data.reduce((acc, curr) => acc + curr.time, 0)
         setAverageTimeToHitChar(totalTime / data.length)
+        return (totalTime / data.length) * 100
     }
     const LowestTimeToHitChar = (data: any[]) => {
         const nonZeroTimes = data
@@ -64,6 +66,15 @@ const useInformative = (data: any[]) => {
     useEffect(() => {
         setFinalData(calculateFinalData())
     }, [data])
+
+    useEffect(() => {
+        if (finalData.length > 0) {
+            saveUserScore({
+                userGhostCursorTimeVelocity: averageTimeToHitChar(finalData),
+                userGhostWpm: wpm,
+            })
+        }
+    }, [finalData])
 
     useEffect(() => {
         averageTimeToHitChar(finalData)

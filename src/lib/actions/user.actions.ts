@@ -8,7 +8,7 @@ export async function createUser(user: any) {
         const res = await connect()
         const newUser = await User.create(user)
 
-        return JSON.parse(JSON.stringify(newUser))
+        return newUser
     } catch (err) {
         console.log(err)
     }
@@ -22,7 +22,12 @@ export async function getUserIdByClerkId(
         console.log(clerkId)
         const res = await connect()
         const user = await User.findOne({ clerkId })
-        return user ? JSON.stringify(user) : {}
+        console.log(user)
+        if (user) {
+            return JSON.parse(JSON.stringify(user))
+        } else {
+            return null
+        }
     } catch (error) {
         console.error('Error fetching user by clerkId:', error)
         throw new Error('Could not retrieve user ID')

@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+
+import { getRandomSentence } from '@/lib/actions/sentences.actions'
 const fetchRamdomQuote = async (minLength: number = 300) => {
-    const url = 'https://shortstories-api.onrender.com/'
     try {
-        const storyApi = await axios.get(url)
-        console.log(storyApi.data.story)
-        return storyApi.data.story
+        const sentence = await getRandomSentence()
+        return sentence
     } catch (error) {
         const errorMessage =
             error instanceof Error ? error.message : 'An unknown error occurred'
@@ -17,8 +16,11 @@ const fetchRamdomQuote = async (minLength: number = 300) => {
 export default function useGenerateTypingText() {
     const [typingSuggestion, setTypingSuggestion] = useState('')
     useEffect(() => {
-        fetchRamdomQuote(300).then((quote) => {
-            setTypingSuggestion(quote)
+        fetchRamdomQuote(300).then((quote: any) => {
+            console.log(quote)
+            if (quote) {
+                setTypingSuggestion(quote.story)
+            }
         })
     }, [])
     return { typingSuggestion }

@@ -1,15 +1,9 @@
-import { useCookiesScore } from '@/app/hooks/cookies/useCookies'
-import { calculateTimeDifferences, getUserHisotry } from '@/lib/helper'
-import { AreaChart } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
 import {
-    Area,
     Brush,
     CartesianGrid,
     Legend,
     Line,
     LineChart,
-    ReferenceArea,
     Tooltip,
     XAxis,
     YAxis,
@@ -51,18 +45,12 @@ const TimexWpm = ({ data, timer }: { data: any[]; timer: number }) => {
             <Tooltip />
             <Legend />
             <Brush
-                endIndex={timer > 30 ? timer / 3 : timer }
+                endIndex={timer > 30 ? Math.ceil(timer / 3) : timer}
                 dataKey="bar"
                 height={30}
                 stroke="#4ADE80"
             />
 
-            <ReferenceArea
-                type="monotone"
-                stroke="#8884d8"
-                fillOpacity={1}
-                fill="#8884d8"
-            />
             {/* Line for WPM */}
             <Line
                 type="monotone"

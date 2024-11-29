@@ -47,6 +47,7 @@ export async function addNewScoreById(
 ) {
     try {
         if (userId != null) {
+            console.log(userId)
             const _userId = new mongoose.Types.ObjectId(userId)
             const res = await connect().then(async () => {
                 const HighestWpm = await User.updateOne(
@@ -55,7 +56,7 @@ export async function addNewScoreById(
                     { upsert: true }
                 )
                 const dailyHighestWpm = await User.updateOne(
-                    { _id: userId },
+                    { _id: _userId },
                     { $max: { dailyHighestWpm: wpm } },
                     { upsert: true }
                 )
@@ -66,7 +67,7 @@ export async function addNewScoreById(
                 })
                 return { AddScoreLeaderBoard, HighestWpm, dailyHighestWpm }
             })
-            // const newScore = await Score.create({ userId, wpm, accuracy })
+            const newScore = await Score.create({ userId, wpm, accuracy })
 
             return JSON.parse(JSON.stringify(res.AddScoreLeaderBoard))
         } else {
@@ -147,8 +148,19 @@ export const getUserRank = async (
                         },
                     },
                 },
-                { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+                { $match: { clerkId: userId } },
+                {
+                    $project: {
+                        username: 1,
+                        highestWpm: 1,
+                        dailyHighestWpm: 1,
+                        _id: 1,
+                        clerkId: 1,
+                        rank:1
+                    },
+                },
             ])
+            console.log(leaderboard)
             return leaderboard
         })
         if (res.length > 0) {

@@ -15,7 +15,7 @@ import {
 
 const ShowGraph = ({ data }: { data: any[] }) => {
     const [finalTimeGap, setFinalTimeGap] = useState<any[]>([])
-    const [length, setLength] = useState(data.length-1)
+    const [length, setLength] = useState(data.length - 1)
     const calculateFinalTimeGap = useCallback(() => {
         if (data.length > 0) {
             let _data = calculateTimeDifferences(data)
@@ -25,7 +25,7 @@ const ShowGraph = ({ data }: { data: any[] }) => {
             }))
         }
         return []
-    }, [data])
+    }, [])
 
     useEffect(() => {
         setFinalTimeGap(calculateFinalTimeGap())
@@ -53,7 +53,7 @@ const ShowGraph = ({ data }: { data: any[] }) => {
             <Tooltip />
             <Legend />
             <Brush
-                endIndex={length/2}
+                endIndex={Math.ceil(length / 2)}
                 dataKey="bar"
                 height={30}
                 stroke="#EAB308"

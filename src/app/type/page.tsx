@@ -19,7 +19,8 @@ import TimexWpm from '@/components/graph/timexwpmGraph'
 import ShowGraph from '@/components/graph/showGraph'
 import useCursor from '../hooks/curosrAnimationHook/useCursorAnimation'
 import { RefreshCcw } from 'lucide-react'
-import useGuest from '../hooks/cookies/useGuest'
+import useUserLocal from '../hooks/cookies/useGuest'
+import useGhostCursor from '../hooks/curosrAnimationHook/useGhostCursor'
 
 const TypingText =
     'The quick brown fox jumps over the lazy dog and enjoys the warm sunshine on a bright afternoon.'
@@ -36,7 +37,9 @@ export default function Typing() {
         style: false,
         autoCorrect: true,
         withSymbols: false,
+        ghost: true,
     })
+    const { getUser } = useUserLocal()
     useEffect(() => {
         let characterArray = typingSentence
             .split('')
@@ -76,7 +79,28 @@ export default function Typing() {
         incorrectChar.length,
         gameOver
     )
+    const ghostCursorPosition = useGhostCursor({
+        gameOver,
+        ghost: buttons.ghost,
+    })
+    const [multiplier, setMultiplier] = useState(1)
+    const numberOfCharacters = 300
+    useEffect(() => {
+        console.log(charIndex < numberOfCharacters * multiplier)
+        if (charIndex > numberOfCharacters * multiplier) {
+            setMultiplier((prev) => prev + 1)
+        }
+    }, [charIndex])
 
+    useEffect(() => {
+        if (buttons.ghost) {
+            if (isTyping) {
+                ghostCursorPosition.startGhostCursor()
+            } else {
+                ghostCursorPosition.stopTimer()
+            }
+        }
+    }, [isTyping])
     useEffect(() => {
         if (isTyping && cursor < 1 && timerOption >= timer) {
             startTimer()
@@ -87,19 +111,36 @@ export default function Typing() {
             setGameOver(true)
         }
     }, [timer, cursor, isTyping])
+    useEffect(() => {
+        if (
+            charIndex == characterArray.length - 1 &&
+            characterArray.length > 0
+        ) {
+            stopTimer()
+            setIsTyping(!isTyping)
+            setGameOver(true)
+        }
+    }, [charIndex])
 
     const cursorPosition = useCursor({ cursor })
+    useEffect(() => {
+        console.log(charIndex)
+    }, [charIndex])
     const [style, setStyle] = useState(false)
-    const { userGuest } = useGuest()
 
     useCookiesScore({ gameover: gameOver, wpm: score.wpm, data: charTypedInfo })
     const { timexwpm } = useTimexWpm({ timer: timer, wpm: score.wpm })
+
+    const charactersToShow = 200 // Number of characters to display at a time
+    const startIndex =
+        Math.floor(charIndex / charactersToShow) * charactersToShow // Calculate the starting index based on the cursor position
+
     return (
         <>
             {!style ? (
                 <div
                     className={clsx(
-                        { 'absolute w-full ': !gameOver },
+                        { 'relative w-full ': !gameOver },
                         {
                             invisible: gameOver,
                         }
@@ -107,7 +148,7 @@ export default function Typing() {
                 >
                     <div
                         className={
-                            'relative w-1 h-8 transition duration-300 bg-yellow-500 '
+                            'absolute w-1 h-8 transition duration-300 bg-yellow-500 '
                         }
                         style={{
                             transform: `translate(${cursorPosition.x - 2}px, ${
@@ -115,10 +156,29 @@ export default function Typing() {
                             }px)`,
                         }}
                     ></div>
+
+                    <div
+                        className={clsx(
+                            'absolute w-1 h-8 transition duration-200 bg-gray-400 ease-out ',
+                            {
+                                'invisible ':
+                                    ghostCursorPosition.ghostCursorIndex <=
+                                        numberOfCharacters * (multiplier - 1) ||
+                                    ghostCursorPosition.ghostCursorIndex >=
+                                        numberOfCharacters * multiplier,
+                            }
+                        )}
+                        style={{
+                            transform: `translate(${
+                                ghostCursorPosition.x - 2
+                            }px, ${ghostCursorPosition.y - 99}px)`,
+                        }}
+                    ></div>
                 </div>
             ) : (
                 <></>
             )}
+
             <div className="flex flex-1 flex-col justify-center items-center w-screen overflow-hidden min-h-[70vh] bg-[#E1E1E3]">
                 <div
                     className={clsx(
@@ -168,6 +228,25 @@ export default function Typing() {
                             }}
                         >
                             <p>Style</p>
+                        </div>
+                        <div
+                            className={clsx(
+                                'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                { 'text-green-400': buttons.ghost },
+                                {
+                                    'text-white/60': !buttons.ghost,
+                                }
+                            )}
+                            onClick={() => {
+                                setButtons((prev) => {
+                                    return {
+                                        ...prev,
+                                        ghost: !prev.ghost,
+                                    }
+                                })
+                            }}
+                        >
+                            <p>Ghost Cursor</p>
                         </div>
                         <div
                             className="m-2 text-white/60 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer"
@@ -444,17 +523,25 @@ export default function Typing() {
                             </div>
                         </div>
                     ) : (
-                        <>
-                            <div
-                                // style={{ transform: `translateX(-${progress}%)` }}
-                                className={`flex flex-1 flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl relative left-[25%] transition duration-2000 ease-out `}
-                            >
-                                {characterArray.length > 0 ? (
-                                    characterArray.map((character, index) => {
+                        <div
+                            // style={{ transform: `translateX(-${progress}%)` }}
+                            className={clsx(
+                                `flex flex-1 h-[144px]  flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl relative left-[25%] transition duration-2000 ease-out `
+                            )}
+                        >
+                            {characterArray.length > 0 ? (
+                                characterArray.map((character, index) => {
+                                    if (
+                                        index >=
+                                            numberOfCharacters *
+                                                (multiplier - 1) &&
+                                        index <= numberOfCharacters * multiplier
+                                    )
                                         return (
                                             <p
                                                 key={index}
                                                 className={clsx(
+                                                    `character${index}  `,
                                                     {
                                                         'text-gray-400':
                                                             index > charIndex,
@@ -488,16 +575,13 @@ export default function Typing() {
                                                 {character}
                                             </p>
                                         )
-                                    })
-                                ) : (
-                                    <div className="">
-                                        <h1 className="moving-text ">
-                                            generating
-                                        </h1>
-                                    </div>
-                                )}
-                            </div>
-                        </>
+                                })
+                            ) : (
+                                <div className="">
+                                    <h1 className="moving-text ">generating</h1>
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
 

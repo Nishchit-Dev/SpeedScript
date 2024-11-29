@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { useLeaderboard } from '../hooks/leaderBoard/useLeaderBoard'
 import Counter from '@/components/ui/countingNumberAnimation'
 import { ReceiptRussianRuble, User } from 'lucide-react'
-import useGuest from '../hooks/cookies/useGuest'
+import useUserLocal from '../hooks/cookies/useGuest'
 import { useEffect, useState } from 'react'
 import { GlareCard } from '@/components/ui/glare-ui'
 import useUserCookies from '../hooks/cookies/useUser'
@@ -24,14 +24,15 @@ const LeaderboardComponent = ({
     data: data
     flag?: boolean
 }) => {
-    const { getUser }: { getUser: () => data } = useUserCookies()
+    const { userGuest, getUser } = useUserLocal()
     const [user, setUser] = useState<data | null>(null)
     useEffect(() => {
-        let userdata = getUser()
-        if (userdata) {
-            setUser(userdata)
+        if (userGuest) {
+            getUser()
+            console.log(userGuest)
+            setUser(userGuest)
         }
-    }, [])
+    }, [userGuest])
 
     return (
         <div
@@ -95,14 +96,13 @@ const DailyLeaderboardComponent = ({
     index: number
     data: data
 }) => {
-    const { getUser }: { getUser: () => data } = useUserCookies()
+    const { userGuest } = useUserLocal()
     const [user, setUser] = useState<data | null>(null)
     useEffect(() => {
-        let userdata = getUser()
-        if (userdata) {
-            setUser(userdata)
+        if (userGuest) {
+            setUser(userGuest)
         }
-    }, [])
+    }, [userGuest])
     return (
         <div
             className={clsx(
@@ -197,17 +197,16 @@ const LeaderboardButton = ({
 
 const UserScoreBoard = () => {
     const { getRank, userRank } = useLeaderboard()
-    const { getUser }: { getUser: () => data } = useUserCookies()
+    const { userGuest, getUser } = useUserLocal()
     const [user, setUser] = useState<data | null>(null)
 
     useEffect(() => {
-        setUser(getUser())
-    }, [])
-    useEffect(() => {
         if (user) {
-            getRank(getUser()._id)
+            getRank(getUser().clerkId)
+        } else {
+            setUser(userGuest)
         }
-    }, [user])
+    }, [userGuest])
     return (
         <div
             className={clsx(

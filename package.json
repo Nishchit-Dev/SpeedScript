@@ -19,7 +19,6 @@
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.5.0",
     "axios": "^1.7.7",
-    "bson": "^6.9.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.10",
@@ -36,7 +35,7 @@
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "vercel": "^39.1.0"
+    "vercel": "^32.3.0"
   },
   "devDependencies": {
     "@types/node": "^20",

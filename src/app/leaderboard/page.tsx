@@ -205,9 +205,10 @@ const UserScoreBoard = ({ flag }: { flag: boolean }) => {
             setUser(userGuest)
         }
     }, [userGuest])
+   
     return (
         <>
-            {user ? (
+            {user?.clerkId ? (
                 <div
                     className={clsx(
                         'mb-5',

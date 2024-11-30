@@ -19,9 +19,8 @@ export const useLeaderboard = () => {
     const [dailyLeaderboard, setDailyLeaderboard] = useState<UserRank[]>([])
     const [userRank, setUserRank] = useState<UserRank | undefined>(undefined)
 
-    const getRank = async (userId?: string) => {
+    const getRank = async (userId: string) => {
         await getUserRank(userId).then((res) => {
-            console.log(res)
             setUserRank(res)
         })
     }

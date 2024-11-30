@@ -104,7 +104,7 @@ export const getDailyLeaderboard = async () => {
             (await connect().then(async () => {
                 const leaderboard = await User.find(
                     { dailyHighestWpm: { $gt: 0 } },
-                    '_id username dailyHighestWpm'
+                    '_id clerkId username dailyHighestWpm'
                 )
                     .sort({ dailyHighestWpm: -1 }) // Sort by highestWpm in descending order
                     .limit(100) // Limit to top 100 entries (or adjust as needed)
@@ -128,9 +128,7 @@ interface UserRank {
     rank: number
 }
 
-export const getUserRank = async (
-    userId: string = 'user_2p09O09z2vWDWgqdSvmcrj58MYQ'
-): Promise<UserRank> => {
+export const getUserRank = async (userId: string): Promise<UserRank> => {
     try {
         const res = await connect().then(async () => {
             const leaderboard = await User.aggregate([
@@ -156,7 +154,7 @@ export const getUserRank = async (
                         dailyHighestWpm: 1,
                         _id: 1,
                         clerkId: 1,
-                        rank:1
+                        rank: 1,
                     },
                 },
             ])

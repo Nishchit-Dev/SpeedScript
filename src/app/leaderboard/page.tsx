@@ -29,7 +29,6 @@ const LeaderboardComponent = ({
     useEffect(() => {
         if (userGuest) {
             getUser()
-            console.log(userGuest)
             setUser(userGuest)
         }
     }, [userGuest])
@@ -96,10 +95,11 @@ const DailyLeaderboardComponent = ({
     index: number
     data: data
 }) => {
-    const { userGuest } = useUserLocal()
+    const { userGuest,getUser } = useUserLocal()
     const [user, setUser] = useState<data | null>(null)
     useEffect(() => {
         if (userGuest) {
+            getUser()
             setUser(userGuest)
         }
     }, [userGuest])
@@ -195,7 +195,7 @@ const LeaderboardButton = ({
     )
 }
 
-const UserScoreBoard = () => {
+const UserScoreBoard = ({ flag }: { flag: boolean }) => {
     const { getRank, userRank } = useLeaderboard()
     const { userGuest, getUser } = useUserLocal()
     const [user, setUser] = useState<data | null>(null)
@@ -211,6 +211,8 @@ const UserScoreBoard = () => {
         <div
             className={clsx(
                 'mb-5',
+                { hidden: !flag },
+                { hidden: !user },
                 { visible: userRank?.rank != -1 },
                 { hidden: userRank?.rank == -1 }
             )}
@@ -228,8 +230,8 @@ const UserScoreBoard = () => {
                                     {userRank?.rank}
                                 </p>
                                 <p className="text-xl">
-                                    {user?.username ? (
-                                        user.username
+                                    {getUser()?.username ? (
+                                        getUser().username
                                     ) : userRank?._id ? (
                                         'user' +
                                         userRank?._id.slice(
@@ -251,12 +253,16 @@ const UserScoreBoard = () => {
 
 const LeaderBoard = () => {
     const { leaderboard, dailyLeaderboard } = useLeaderboard()
+    useEffect(() => {
+        console.log(dailyLeaderboard)
+    }, [dailyLeaderboard])
     const [flag, setFlag] = useState(true)
 
     return (
         <div className="flex flex-1 flex-col justify-center items-center w-full">
             <LeaderboardButton flag={flag} setFlag={setFlag} />
-            <UserScoreBoard />
+            {<UserScoreBoard flag={flag} />}
+
             {flag
                 ? leaderboard.map((data: any, index) => {
                       return (

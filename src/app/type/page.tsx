@@ -526,7 +526,7 @@ export default function Typing() {
                         <div
                             // style={{ transform: `translateX(-${progress}%)` }}
                             className={clsx(
-                                `flex flex-1 h-[144px]  flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl relative left-[25%] transition duration-2000 ease-out `
+                                `flex flex-1   flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl relative left-[25%] transition duration-2000 ease-out `
                             )}
                         >
                             {characterArray.length > 0 ? (

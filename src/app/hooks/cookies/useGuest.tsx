@@ -29,7 +29,6 @@ const useUserLocal = () => {
 
     const getUser = () => {
         const userdata = localStorage.getItem(USER_IDENTIFIER) || ''
-        console.log(userdata)
         if (userdata) {
             return JSON.parse(userdata)
         } else {

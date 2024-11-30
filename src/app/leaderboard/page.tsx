@@ -28,7 +28,6 @@ const LeaderboardComponent = ({
     const [user, setUser] = useState<data | null>(null)
     useEffect(() => {
         if (userGuest) {
-            getUser()
             setUser(userGuest)
         }
     }, [userGuest])
@@ -95,11 +94,10 @@ const DailyLeaderboardComponent = ({
     index: number
     data: data
 }) => {
-    const { userGuest,getUser } = useUserLocal()
+    const { userGuest, getUser } = useUserLocal()
     const [user, setUser] = useState<data | null>(null)
     useEffect(() => {
         if (userGuest) {
-            getUser()
             setUser(userGuest)
         }
     }, [userGuest])
@@ -208,54 +206,56 @@ const UserScoreBoard = ({ flag }: { flag: boolean }) => {
         }
     }, [userGuest])
     return (
-        <div
-            className={clsx(
-                'mb-5',
-                { hidden: !flag },
-                { hidden: !user },
-                { visible: userRank?.rank != -1 },
-                { hidden: userRank?.rank == -1 }
-            )}
-        >
-            <div>
-                <GlareCard className="flex flex-1 justify-center items-center hover:text-white/80 ">
-                    <div className="w-[600px] h-24 font-jetBrainsMono">
-                        <div className="flex flex-col justify-center items-center my-2">
-                            <div className="text-white">
-                                <p>All Time Leaderboard Rank</p>
+        <>
+            {user ? (
+                <div
+                    className={clsx(
+                        'mb-5',
+                        { hidden: !flag },
+                        { visible: userRank?.rank != -1 },
+                        { hidden: userRank?.rank == -1 }
+                    )}
+                >
+                    <div>
+                        <GlareCard className="flex flex-1 justify-center items-center hover:text-white/80 ">
+                            <div className="w-[600px] h-24 font-jetBrainsMono">
+                                <div className="flex flex-col justify-center items-center my-2">
+                                    <div className="text-white">
+                                        <p>All Time Leaderboard Rank</p>
+                                    </div>
+                                    <div className="text-white/80 flex flex-row justify-center items-center flex-1 gap-3">
+                                        <p className="text-6xl font-bold flex justify-center items-center">
+                                            <span className="text-lg">#</span>
+                                            {userRank?.rank}
+                                        </p>
+                                        <p className="text-xl">
+                                            {getUser()?.username ? (
+                                                getUser().username
+                                            ) : userRank?._id ? (
+                                                'user' +
+                                                userRank?._id.slice(
+                                                    userRank._id.length - 4,
+                                                    userRank._id.length
+                                                )
+                                            ) : (
+                                                <></>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="text-white/80 flex flex-row justify-center items-center flex-1 gap-3">
-                                <p className="text-6xl font-bold flex justify-center items-center">
-                                    <span className="text-lg">#</span>
-                                    {userRank?.rank}
-                                </p>
-                                <p className="text-xl">
-                                    {getUser()?.username ? (
-                                        getUser().username
-                                    ) : userRank?._id ? (
-                                        'user' +
-                                        userRank?._id.slice(
-                                            userRank._id.length - 4,
-                                            userRank._id.length
-                                        )
-                                    ) : (
-                                        <></>
-                                    )}
-                                </p>
-                            </div>
-                        </div>
+                        </GlareCard>
                     </div>
-                </GlareCard>
-            </div>
-        </div>
+                </div>
+            ) : (
+                <></>
+            )}
+        </>
     )
 }
 
 const LeaderBoard = () => {
     const { leaderboard, dailyLeaderboard } = useLeaderboard()
-    useEffect(() => {
-        console.log(dailyLeaderboard)
-    }, [dailyLeaderboard])
     const [flag, setFlag] = useState(true)
 
     return (

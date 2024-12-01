@@ -6,15 +6,15 @@ import TypingSentences from '../models/typingSentences.modal'
 // Function to get MongoDB ID using clerkId
 export async function getRandomSentence(): Promise<Object | null> {
     try {
-        console.log('fetching sentence')
+        console.log('fetching random sentence')
         const res = await connect().then(async () => {
-            console.log('fetching sentence from db')
-            const sentence = await TypingSentences.findOne({
-                _id: '67422f7c0f3a7a731efd1920',
-            })
+            console.log('fetching random sentence from db')
+            const sentence = await TypingSentences.aggregate([
+                { $sample: { size: 1 } } // Randomly select 1 document
+            ])
             console.log(sentence)
-            if (sentence) {
-                return JSON.parse(JSON.stringify(sentence))
+            if (sentence.length > 0) {
+                return JSON.parse(JSON.stringify(sentence[0])) // Return the first (and only) document
             } else {
                 return null
             }

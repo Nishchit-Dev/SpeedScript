@@ -66,7 +66,7 @@ export default function Typing() {
     const [isTyping, setIsTyping] = useState(false)
     const [gameOver, setGameOver] = useState(false)
     const { timer, startTimer, stopTimer } = useTimer()
-    const [timerOption, setTimerOption] = useState(10)
+    const [timerOption, setTimerOption] = useState(120)
     const { progress, incorrectChar, cursor, charTypedInfo } = useListenTyping(
         characterArray,
         charTyped,
@@ -79,7 +79,7 @@ export default function Typing() {
     )
 
     const { roomData, toggleReady, playerControls, countDown, gameState } =
-        useSocket({ cursor })
+        useSocket({ cursor, totalcharacter: typingSentence.length })
     useEffect(() => {
         setTypingSentence(roomData.roomText)
     }, [roomData.roomText])
@@ -150,6 +150,16 @@ export default function Typing() {
     const startIndex =
         Math.floor(charIndex / charactersToShow) * charactersToShow // Calculate the starting index based on the cursor position
 
+    const getPosition = (index?: number) => {
+        const element = document.querySelector(`.character${index}`)
+
+        const rct = element?.getBoundingClientRect()
+
+        const x = rct?.left
+        const y = rct?.top
+        return { x, y }
+    }
+
     return (
         <>
             {!style ? (
@@ -171,7 +181,41 @@ export default function Typing() {
                             }px)`,
                         }}
                     ></div>
-
+                    {Object.entries(roomData.roomInfo).map(
+                        ([player, state], index) => {
+                            const typedState = state as {
+                                progress: number
+                                x: number
+                                y: number
+                            }
+                            return (
+                                <div
+                                    key={index}
+                                    className={clsx(
+                                        'absolute w-1 h-8 transition duration-200 bg-gray-400 ease-out ',
+                                        {
+                                            'invisible ':
+                                                typedState.progress <=
+                                                    numberOfCharacters *
+                                                        (multiplier - 1) ||
+                                                typedState.progress >=
+                                                    numberOfCharacters *
+                                                        multiplier,
+                                        }
+                                    )}
+                                    style={{
+                                        transform: `translate(${
+                                            getPosition(typedState.progress)
+                                                ?.x ?? 0
+                                        }px, ${
+                                            getPosition(typedState.progress)
+                                                ?.y ?? 0 - 99
+                                        }px)`,
+                                    }}
+                                ></div>
+                            )
+                        }
+                    )}
                     <div
                         className={clsx(
                             'absolute w-1 h-8 transition duration-200 bg-gray-400 ease-out ',
@@ -198,11 +242,11 @@ export default function Typing() {
                 <div
                     className={clsx(
                         {
-                            'invisible transition duration-500 ease-out':
+                            'flex flex-row invisible transition duration-500 ease-out':
                                 isTyping,
                         },
                         {
-                            ' relative mb-20 bg-gray-600 font-jetBrainsMono rounded-lg':
+                            'flex justify-center  flex-row relative mb-20 bg-gray-600 font-jetBrainsMono rounded-lg':
                                 true,
                         }
                     )}
@@ -256,13 +300,6 @@ export default function Typing() {
                         })}
                     >
                         <p>{countDown}</p>
-                    </div>
-                    <div
-                        className={clsx('bg-white', {
-                            block: countDown != 0,
-                        })}
-                    >
-                        <p>{gameState}</p>
                     </div>
                     {/* here is the buttons for the modification of game rules */}
                     <div className="flex flex-row text-sm hidden">

@@ -9,7 +9,13 @@ const GameState = {
     GAME_RESET: 'game_reset',
 }
 
-const useSocket = ({ cursor }: { cursor: any }) => {
+const useSocket = ({
+    cursor,
+    totalcharacter,
+}: {
+    cursor: Number
+    totalcharacter: Number
+}) => {
     function generateRandomCode() {
         // Generate 4 random letters
         const letters = Array.from(
@@ -117,7 +123,47 @@ const useSocket = ({ cursor }: { cursor: any }) => {
             )
         }
     }
-    return { roomData, toggleReady, playerControls, countDown, gameState }
+
+    const sendCursorProgress = (
+        cursorIndex: Number,
+        totalCharacters: Number
+    ) => {
+        console.log('sending progess')
+        if (
+            connection &&
+            GameState.IN_PROGRESS == gameState &&
+            connection.readyState == WebSocket.OPEN
+        ) {
+            console.log('passed the condition progess')
+
+            connection.send(
+                JSON.stringify({
+                    type: 'progress',
+                    data: {
+                        progress: cursorIndex,
+                        totalCharacters,
+                    },
+                })
+            )
+        }
+
+        if (cursorIndex >= totalCharacters) {
+            setGameState(GameState.FINISHED)
+        }
+    }
+
+    useEffect(() => {
+        sendCursorProgress(cursor, totalcharacter)
+    }, [cursor])
+
+    return {
+        roomData,
+        toggleReady,
+        playerControls,
+        countDown,
+        gameState,
+        sendCursorProgress,
+    }
 }
 
 export default useSocket

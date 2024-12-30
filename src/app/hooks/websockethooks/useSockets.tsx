@@ -12,9 +12,11 @@ const GameState = {
 const useSocket = ({
     cursor,
     totalcharacter,
+    setIsTyping,
 }: {
-    cursor: Number
-    totalcharacter: Number
+    cursor: number
+    totalcharacter: number
+    setIsTyping: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
     function generateRandomCode() {
         // Generate 4 random letters
@@ -140,7 +142,7 @@ const useSocket = ({
                 JSON.stringify({
                     type: 'progress',
                     data: {
-                        progress: cursorIndex,
+                        currentPosition: cursorIndex,
                         totalCharacters,
                     },
                 })
@@ -155,6 +157,12 @@ const useSocket = ({
     useEffect(() => {
         sendCursorProgress(cursor, totalcharacter)
     }, [cursor])
+
+    useEffect(() => {
+        if (gameState == GameState.IN_PROGRESS) {
+            setIsTyping(true)
+        }
+    }, [gameState])
 
     return {
         roomData,

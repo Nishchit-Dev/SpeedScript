@@ -79,7 +79,11 @@ export default function Typing() {
     )
 
     const { roomData, toggleReady, playerControls, countDown, gameState } =
-        useSocket({ cursor, totalcharacter: typingSentence.length })
+        useSocket({
+            cursor,
+            totalcharacter: typingSentence.length,
+            setIsTyping,
+        })
     useEffect(() => {
         setTypingSentence(roomData.roomText)
     }, [roomData.roomText])
@@ -184,7 +188,7 @@ export default function Typing() {
                     {Object.entries(roomData.roomInfo).map(
                         ([player, state], index) => {
                             const typedState = state as {
-                                progress: number
+                                currentPosition: number
                                 x: number
                                 y: number
                             }
@@ -195,21 +199,23 @@ export default function Typing() {
                                         'absolute w-1 h-8 transition duration-200 bg-gray-400 ease-out ',
                                         {
                                             'invisible ':
-                                                typedState.progress <=
+                                                typedState.currentPosition <=
                                                     numberOfCharacters *
                                                         (multiplier - 1) ||
-                                                typedState.progress >=
+                                                typedState.currentPosition >=
                                                     numberOfCharacters *
                                                         multiplier,
                                         }
                                     )}
                                     style={{
                                         transform: `translate(${
-                                            getPosition(typedState.progress)
-                                                ?.x ?? 0
+                                            getPosition(
+                                                typedState.currentPosition
+                                            )?.x ?? 0
                                         }px, ${
-                                            getPosition(typedState.progress)
-                                                ?.y ?? 0 - 99
+                                            getPosition(
+                                                typedState.currentPosition
+                                            )?.y ?? 0 - 99
                                         }px)`,
                                     }}
                                 ></div>
@@ -268,13 +274,13 @@ export default function Typing() {
                     {Object.entries(roomData.roomInfo).map(
                         ([player, state]) => {
                             const typedValues = state as {
-                                progress: string
+                                currentPosition: string
                                 isReady: boolean
                             }
                             return (
                                 <div className="p-2 bg-white" key={player}>
                                     <p>{player}</p>
-                                    <p>{typedValues.progress}</p>
+                                    <p>{typedValues.currentPosition}</p>
                                     <div
                                         className={clsx(
                                             ' p-2 justify-center items-center flex cursor-pointer',
@@ -523,6 +529,9 @@ export default function Typing() {
                         },
                         {
                             'max-h-[500px] opacity-100 scale-100': !gameOver,
+                        },
+                        {
+                            hidden: !isTyping,
                         }
                     )}
                 >
@@ -563,135 +572,67 @@ export default function Typing() {
                         }
                     )}
                 >
-                    {buttons.style ? (
-                        <div className="flex flex-row gap-10">
-                            <div className="z-20 absolute w-[100px] h-[50px] bg-gradient-to-r from-[#E1E1E3] to-transparent"></div>
+                    <div
+                        // style={{ transform: `translateX(-${progress}%)` }}
+                        className={clsx(
+                            `flex flex-1   flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl relative left-[25%] transition duration-2000 ease-out `,
+                            {
+                                hidden: !isTyping,
+                            }
+                        )}
+                    >
+                        {characterArray.length > 0 ? (
+                            characterArray.map((character, index) => {
+                                if (
+                                    index >=
+                                        numberOfCharacters * (multiplier - 1) &&
+                                    index <= numberOfCharacters * multiplier
+                                )
+                                    return (
+                                        <p
+                                            key={index}
+                                            className={clsx(
+                                                `character${index}  `,
+                                                {
+                                                    'text-gray-400':
+                                                        index > charIndex,
+                                                },
+                                                {
+                                                    'text-black':
+                                                        index < charIndex ||
+                                                        !incorrectChar.includes(
+                                                            index
+                                                        ),
+                                                },
+                                                {
+                                                    'text-red-500':
+                                                        index < charIndex &&
+                                                        incorrectChar.includes(
+                                                            index
+                                                        ) &&
+                                                        !preventIncorrect,
+                                                },
 
-                            <div
-                                style={{
-                                    transform: `translateX(-${progress}%)`,
-                                }}
-                                className={`ml-20 flex flex-row font-jetBrainsMono justify-start items-center md:text-2xl lg:text-3xl relative transition duration-1000 ease-out `}
-                            >
-                                {characterArray.length > 0 ? (
-                                    characterArray.map((character, index) => {
-                                        return (
-                                            <p
-                                                key={index}
-                                                className={clsx(
-                                                    {
-                                                        'text-gray-500 ':
-                                                            index > charIndex,
-                                                    },
-                                                    {
-                                                        'text-black ':
-                                                            index < charIndex ||
-                                                            !incorrectChar.includes(
-                                                                index
-                                                            ),
-                                                    },
-                                                    {
-                                                        'text-red-500 ':
-                                                            index < charIndex &&
-                                                            incorrectChar.includes(
-                                                                index
-                                                            ) &&
-                                                            !preventIncorrect,
-                                                    },
-
-                                                    {
-                                                        'font-bold ':
-                                                            index == charIndex,
-                                                        'text-3xl ':
-                                                            index == charIndex,
-                                                        'text-green-400 ':
-                                                            index == charIndex,
-                                                    }
-                                                )}
-                                            >
-                                                {character}
-                                            </p>
-                                        )
-                                    })
-                                ) : (
-                                    <div className="">
-                                        <h1 className="moving-text ">
-                                            generating
-                                        </h1>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="z-20 absolute right-0">
-                                <Image
-                                    src={'/blured-sides/fade-text-right.png'}
-                                    alt="typing"
-                                    height={0}
-                                    width={0}
-                                    className="w-[100px] h-[100px] z-20"
-                                />
-                            </div>
-                        </div>
-                    ) : (
-                        <div
-                            // style={{ transform: `translateX(-${progress}%)` }}
-                            className={clsx(
-                                `flex flex-1   flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl relative left-[25%] transition duration-2000 ease-out `
-                            )}
-                        >
-                            {characterArray.length > 0 ? (
-                                characterArray.map((character, index) => {
-                                    if (
-                                        index >=
-                                            numberOfCharacters *
-                                                (multiplier - 1) &&
-                                        index <= numberOfCharacters * multiplier
+                                                {
+                                                    'font-bold':
+                                                        index == charIndex,
+                                                    'text-3xl':
+                                                        index == charIndex,
+                                                    'text-green-500 cursorIsHere':
+                                                        index == charIndex,
+                                                }
+                                            )}
+                                        >
+                                            {character}
+                                        </p>
                                     )
-                                        return (
-                                            <p
-                                                key={index}
-                                                className={clsx(
-                                                    `character${index}  `,
-                                                    {
-                                                        'text-gray-400':
-                                                            index > charIndex,
-                                                    },
-                                                    {
-                                                        'text-black':
-                                                            index < charIndex ||
-                                                            !incorrectChar.includes(
-                                                                index
-                                                            ),
-                                                    },
-                                                    {
-                                                        'text-red-500':
-                                                            index < charIndex &&
-                                                            incorrectChar.includes(
-                                                                index
-                                                            ) &&
-                                                            !preventIncorrect,
-                                                    },
-
-                                                    {
-                                                        'font-bold':
-                                                            index == charIndex,
-                                                        'text-3xl':
-                                                            index == charIndex,
-                                                        'text-green-500 cursorIsHere':
-                                                            index == charIndex,
-                                                    }
-                                                )}
-                                            >
-                                                {character}
-                                            </p>
-                                        )
-                                })
-                            ) : (
-                                <div className="">
-                                    <h1 className="moving-text ">generating</h1>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                            })
+                        ) : (
+                            <div className="">
+                                <h1 className="moving-text ">generating</h1>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* {gameOver ? (

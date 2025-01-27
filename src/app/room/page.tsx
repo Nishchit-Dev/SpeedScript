@@ -1,28 +1,22 @@
 'use client'
 import { useEffect, useState } from 'react'
-import useListenTyping, { calculateTimeGap } from '../hooks/useTyping'
+import useListenTyping from '../hooks/useTypingRoom'
 import clsx from 'clsx'
 import useTimer from '../hooks/useTimer'
 import useCalculateScore from '../hooks/useCalculateScore'
-import Image from 'next/image'
 import Score from '@/components/ScoreCard/Score'
-import { ModalProvider } from '@/components/ui/animated-modal'
-import useGenerateTypingText from '../hooks/useGenerateTypingText'
-import { addNewScore } from '@/lib/actions/score.actions'
-import { currentUser } from '@clerk/nextjs/server'
-import { useUser } from '@clerk/nextjs'
 
-import useAddNewScore from '../hooks/useAddNewScore'
 import { useCookiesScore } from '../hooks/cookies/useCookies'
 import { useTimexWpm } from '../hooks/useTimeXWpm'
-import TimexWpm from '@/components/graph/timexwpmGraph'
+import TimexWpmRoom from '@/components/graph/timexwpmGraphRoom'
 import ShowGraph from '@/components/graph/showGraph'
 import useCursor from '../hooks/curosrAnimationHook/useCursorAnimation'
-import { Key, RefreshCcw } from 'lucide-react'
+import { RefreshCcw } from 'lucide-react'
 import useUserLocal from '../hooks/cookies/useGuest'
 import useGhostCursor from '../hooks/curosrAnimationHook/useGhostCursor'
 import useSocket from '../hooks/websockethooks/useSockets'
-import { root } from 'postcss'
+import useRandomColor from '../hooks/useRandomColor'
+import RankUsers, { RankingStage } from './_ranks/rankUsers'
 
 const TypingText =
     'The quick brown fox jumps over the lazy dog and enjoys the warm sunshine on a bright afternoon.'
@@ -34,8 +28,6 @@ const onlyAlphabetsAndSpace = [...TypingText].filter((char) =>
 export default function Typing() {
     const [charTyped, setCharTyped] = useState([])
     const [typingSentence, setTypingSentence] = useState('')
-
-    const [countDownFlag, setCountDownFlag] = useState(false)
 
     const [characterArray, setCharacterArray] = useState<string[]>([])
     const [buttons, setButtons] = useState({
@@ -61,12 +53,11 @@ export default function Typing() {
     }, [typingSentence, buttons.withSymbols])
 
     const charIndex = charTyped.length
-    const [autoSpacing, setAutoSpacing] = useState(false)
     const [preventIncorrect, setPreventIncorrect] = useState(false)
     const [isTyping, setIsTyping] = useState(false)
     const [gameOver, setGameOver] = useState(false)
     const { timer, startTimer, stopTimer } = useTimer()
-    const [timerOption, setTimerOption] = useState(120)
+    const [timerOption, setTimerOption] = useState(3)
     const { progress, incorrectChar, cursor, charTypedInfo } = useListenTyping(
         characterArray,
         charTyped,
@@ -78,16 +69,6 @@ export default function Typing() {
         startTimer
     )
 
-    const { roomData, toggleReady, playerControls, countDown, gameState } =
-        useSocket({
-            cursor,
-            totalcharacter: typingSentence.length,
-            setIsTyping,
-        })
-    useEffect(() => {
-        setTypingSentence(roomData.roomText)
-    }, [roomData.roomText])
-
     const score = useCalculateScore(
         isTyping,
         timer,
@@ -95,6 +76,7 @@ export default function Typing() {
         incorrectChar.length,
         gameOver
     )
+
     const ghostCursorPosition = useGhostCursor({
         gameOver,
         ghost: buttons.ghost,
@@ -124,7 +106,9 @@ export default function Typing() {
         if (timerOption <= timer && isTyping) {
             stopTimer()
             setIsTyping(!isTyping)
+
             setGameOver(true)
+            sendTimeout()
         }
     }, [timer, cursor, isTyping])
     useEffect(() => {
@@ -135,6 +119,8 @@ export default function Typing() {
         ) {
             stopTimer()
             setIsTyping(!isTyping)
+            setGameState('finished')
+
             setGameOver(true)
         }
     }, [charIndex])
@@ -148,7 +134,34 @@ export default function Typing() {
     useCookiesScore({ gameover: gameOver, wpm: score.wpm, data: charTypedInfo })
     const { timexwpm } = useTimexWpm({ timer: timer, wpm: score.wpm })
 
-    console.log('roomData :', roomData)
+    const {
+        roomData,
+        toggleReady,
+        playerControls,
+        countDown,
+        gameState,
+        sendResults,
+        finalState,
+        setGameState,
+        sendTimeout,
+    } = useSocket({
+        cursor,
+        totalCharacter: typingSentence.length,
+        setIsTyping,
+        userStats: timexwpm,
+        wpm: score.wpm,
+    })
+
+    useEffect(() => {
+        setTypingSentence(roomData.roomText)
+    }, [roomData.roomText])
+
+    useEffect(() => {
+        console.log(gameState)
+        if (gameState == 'finished') {
+            sendResults(timexwpm, score.wpm)
+        }
+    }, [gameState])
 
     const charactersToShow = 200 // Number of characters to display at a time
     const startIndex =
@@ -156,20 +169,27 @@ export default function Typing() {
 
     const getPosition = (index?: number) => {
         const element = document.querySelector(`.character${index}`)
-
         const rct = element?.getBoundingClientRect()
 
-        const x = rct?.left
-        const y = rct?.top
-        return { x, y }
+        const x = rct?.left ?? 0
+        const y = rct?.top ?? 0
+        const scrollX =
+            window.pageXOffset || document.documentElement.scrollLeft
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop
+        return { x: x + scrollX, y: y + scrollY }
     }
+
+    const { colors } = useRandomColor()
 
     return (
         <>
             {!style ? (
                 <div
                     className={clsx(
-                        { 'relative w-full ': !gameOver },
+                        {
+                            'relative w-full justify-center items-center':
+                                !gameOver,
+                        },
                         {
                             invisible: gameOver,
                         }
@@ -177,7 +197,7 @@ export default function Typing() {
                 >
                     <div
                         className={
-                            'absolute w-1 h-8 transition duration-300 bg-yellow-500 '
+                            'absolute w-1 h-8 transition duration-300 bg-yellow-500 sm:h-2 md:h-7 lg:h-8'
                         }
                         style={{
                             transform: `translate(${cursorPosition.x - 2}px, ${
@@ -192,11 +212,12 @@ export default function Typing() {
                                 x: number
                                 y: number
                             }
+                            if (player == roomData.username) return
                             return (
                                 <div
                                     key={index}
                                     className={clsx(
-                                        'absolute w-1 h-8 transition duration-200 bg-gray-400 ease-out ',
+                                        `absolute w-1 h-8 align-middle transition duration-200 ${colors[index]} opacity-45 ease-out  sm:h-5 md:h-5 lg:h-8`,
                                         {
                                             'invisible ':
                                                 typedState.currentPosition <=
@@ -209,13 +230,17 @@ export default function Typing() {
                                     )}
                                     style={{
                                         transform: `translate(${
-                                            getPosition(
-                                                typedState.currentPosition
-                                            )?.x ?? 0
+                                            Number(
+                                                getPosition(
+                                                    typedState.currentPosition
+                                                )?.x ?? 0
+                                            ) - 2
                                         }px, ${
-                                            getPosition(
-                                                typedState.currentPosition
-                                            )?.y ?? 0 - 99
+                                            Number(
+                                                getPosition(
+                                                    typedState.currentPosition
+                                                )?.y ?? 0
+                                            ) - 99
                                         }px)`,
                                     }}
                                 ></div>
@@ -245,225 +270,88 @@ export default function Typing() {
             )}
 
             <div className="flex flex-1 flex-col justify-center items-center w-screen overflow-hidden min-h-[70vh] bg-[#E1E1E3]">
-                <div
-                    className={clsx(
-                        {
-                            'flex flex-row invisible transition duration-500 ease-out':
-                                isTyping,
-                        },
-                        {
-                            'flex justify-center  flex-row relative mb-20 bg-gray-600 font-jetBrainsMono rounded-lg':
-                                true,
-                        }
-                    )}
-                >
+                {gameOver ? (
+                    <></>
+                ) : (
                     <div
                         className={clsx(
-                            ' p-2 justify-center items-center flex cursor-pointer',
                             {
-                                'bg-green-500': playerControls,
+                                'flex flex-row invisible transition duration-500 ease-out':
+                                    isTyping,
                             },
                             {
-                                'bg-red-500': !playerControls,
+                                'flex justify-center  flex-row relative mb-20 bg-gray-600 font-jetBrainsMono rounded-lg':
+                                    true,
                             }
                         )}
-                        onClick={toggleReady}
                     >
-                        Ready
-                    </div>
-                    {Object.entries(roomData.roomInfo).map(
-                        ([player, state]) => {
-                            const typedValues = state as {
-                                currentPosition: string
-                                isReady: boolean
-                            }
-                            return (
-                                <div className="p-2 bg-white" key={player}>
-                                    <p>{player}</p>
-                                    <p>{typedValues.currentPosition}</p>
-                                    <div
-                                        className={clsx(
-                                            ' p-2 justify-center items-center flex cursor-pointer',
-                                            {
-                                                'bg-green-500':
-                                                    typedValues.isReady,
-                                            },
-                                            {
-                                                'bg-red-500':
-                                                    !typedValues.isReady,
-                                            }
-                                        )}
-                                    >
-                                        Ready
-                                    </div>
-                                </div>
-                            )
-                        }
-                    )}
-                    <div
-                        className={clsx('bg-white', {
-                            block: countDown != 0,
-                        })}
-                    >
-                        <p>{countDown}</p>
-                    </div>
-                    {/* here is the buttons for the modification of game rules */}
-                    <div className="flex flex-row text-sm hidden">
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': buttons.withSymbols },
-                                {
-                                    'text-white/60': !buttons.withSymbols,
-                                }
-                            )}
-                            onClick={() => {
-                                setButtons((prev) => {
-                                    return {
-                                        ...prev,
-                                        withSymbols: !prev.withSymbols,
-                                    }
-                                })
-                            }}
-                        >
-                            <p>@ puncutuation</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': buttons.style },
-                                {
-                                    'text-white/60': !buttons.style,
-                                }
-                            )}
-                            onClick={() => {
-                                setButtons((prev) => {
-                                    return { ...prev, style: !prev.style }
-                                })
-                            }}
-                        >
-                            <p>Style</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': buttons.ghost },
-                                {
-                                    'text-white/60': !buttons.ghost,
-                                }
-                            )}
-                            onClick={() => {
-                                setButtons((prev) => {
-                                    return {
-                                        ...prev,
-                                        ghost: !prev.ghost,
-                                    }
-                                })
-                            }}
-                        >
-                            <p>Ghost Cursor</p>
-                        </div>
-                        <div
-                            className="m-2 text-white/60 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer"
-                            onClick={() => {
-                                setButtons((prev) => {
-                                    return {
-                                        ...prev,
-                                        autoCorrect: !prev.autoCorrect,
-                                    }
-                                })
-                            }}
-                        >
-                            <p>AutoCorrect</p>
-                        </div>
-
-                        <div className="flex justify-center items-center">
-                            <div className="w-1 h-[60%] bg-gray-400 rounded-full"></div>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': timerOption == 10 },
-                                {
-                                    'text-white/60': timerOption != 10,
-                                }
-                            )}
-                            onClick={() => {
-                                setTimerOption(10)
-                            }}
-                        >
-                            <p>10s</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': timerOption == 30 },
-                                {
-                                    'text-white/60': timerOption != 30,
-                                }
-                            )}
-                            onClick={() => {
-                                setTimerOption(30)
-                            }}
-                        >
-                            <p>30s</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': timerOption == 60 },
-                                {
-                                    'text-white/60': timerOption != 60,
-                                }
-                            )}
-                            onClick={() => {
-                                setTimerOption(60)
-                            }}
-                        >
-                            <p>60s</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2  hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': timerOption == 120 },
-                                {
-                                    'text-white/60': timerOption != 120,
-                                }
-                            )}
-                            onClick={() => {
-                                setTimerOption(120)
-                            }}
-                        >
-                            <p>120s</p>
-                        </div>
-                        <>
-                            {gameOver ? (
-                                <div
-                                    className={clsx(
-                                        'm-2  hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                        {
-                                            'text-green-400':
-                                                timerOption == 120,
-                                        },
-                                        {
-                                            'text-white/60': timerOption != 120,
+                        <div>
+                            <div className="flex flex-row">
+                                {Object.entries(roomData.roomInfo).map(
+                                    ([player, state], index) => {
+                                        const typedValues = state as {
+                                            currentPosition: string
+                                            isReady: boolean
                                         }
-                                    )}
-                                >
-                                    <RefreshCcw
-                                        size={22}
-                                        className="text-gray-400 hover:text-gray-200 transition-all duration-300"
-                                        onClick={() => {
-                                            location.reload()
-                                        }}
-                                    />
+                                        return (
+                                            <div
+                                                className="p-2 bg-white"
+                                                key={player}
+                                            >
+                                                <div
+                                                    className={clsx(
+                                                        ` p-2 justify-center items-center flex cursor-pointer gap-1`,
+                                                        {
+                                                            'opacity-100':
+                                                                typedValues.isReady,
+                                                        },
+                                                        {
+                                                            'opacity-50':
+                                                                !typedValues.isReady,
+                                                        }
+                                                    )}
+                                                >
+                                                    <p>{player}</p>
+                                                    <span
+                                                        className={clsx(
+                                                            `${colors[index]} w-2 h-7 rounded-full flex flex-1`
+                                                        )}
+                                                    ></span>
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                )}
+                            </div>
+
+                            <div
+                                className={clsx(
+                                    ' p-2 justify-center items-center flex cursor-pointer',
+                                    {
+                                        'bg-green-500': playerControls,
+                                    },
+                                    {
+                                        'bg-red-500': !playerControls,
+                                    }
+                                )}
+                                onClick={toggleReady}
+                            >
+                                <div className="">
+                                    <p
+                                        className={clsx({
+                                            hidden: countDown === 0,
+                                            'flex transition duration-500 ease-out text-2xl font-extrabold mr-5':
+                                                countDown !== 0,
+                                        })}
+                                    >
+                                        {countDown}
+                                    </p>
                                 </div>
-                            ) : (
-                                <></>
-                            )}
-                        </>
+                                Ready
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
                 <div className="flex flex-row flex-wrap justify-start items-center gap-5">
                     {/* <div className="flex flex-row justify-start items-center bg-blue-600 px-5 py-2 rounded-full hover:bg-purple-700 transition duration-1000 ease-out ">
                     <button
@@ -475,9 +363,10 @@ export default function Typing() {
                     </button>
                 </div> */}
                 </div>
+                {gameOver ? <RankingStage data={finalState} /> : <></>}
 
                 {gameOver ? (
-                    <div className="flex flex-1 flex-row">
+                    <div className="flex flex-1 flex-row mt-20">
                         <div>
                             <Score
                                 data={charTypedInfo}
@@ -498,7 +387,7 @@ export default function Typing() {
                                     }
                                 )}
                             >
-                                <TimexWpm data={timexwpm} timer={timer} />
+                                <TimexWpmRoom data={finalState} timer={timer} />
                             </div>
 
                             <div
@@ -515,6 +404,9 @@ export default function Typing() {
                             >
                                 <ShowGraph data={charTypedInfo} />
                             </div>
+                        </div>
+                        <div>
+                            <RankUsers data={finalState} />
                         </div>
                     </div>
                 ) : (
@@ -634,19 +526,6 @@ export default function Typing() {
                         )}
                     </div>
                 </div>
-
-                {/* {gameOver ? (
-                    <ModalProvider>
-                        <Score
-                            trigger={gameOver}
-                            data={charTypedInfo}
-                            _wpm={score.wpm}
-                            timexwpm={timexwpm}
-                        />
-                    </ModalProvider>
-                ) : (
-                    <></>
-                )} */}
             </div>
         </>
     )

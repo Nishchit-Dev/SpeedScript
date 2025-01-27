@@ -13,6 +13,19 @@ interface UserRank {
     highestWpm: number
     rank: number
 }
+function swapFirstTwoElements(array: any[]): any[] {
+    if (!Array.isArray(array) || array.length < 2) {
+        return array // Return the array as is if it's not valid
+    }
+
+    // Swap the first two elements
+    const temp = array[0]
+    array[0] = array[1]
+    array[1] = temp
+
+    console.log(array)
+    return array // Return the updated array
+}
 
 export const useLeaderboard = () => {
     const [leaderboard, setLeaderboard] = useState<UserRank[]>([])
@@ -26,10 +39,10 @@ export const useLeaderboard = () => {
     }
     useEffect(() => {
         getLeaderboard().then((res) => {
-            setLeaderboard(res)
+            setLeaderboard(swapFirstTwoElements(res))
         })
         getDailyLeaderboard().then((res) => {
-            setDailyLeaderboard(res)
+            setDailyLeaderboard(swapFirstTwoElements(res))
         })
     }, [])
 

@@ -23,7 +23,10 @@ const useGhostCursor = ({
 
         const x = rct?.left
         const y = rct?.top
-        if (x && y) setPosition({ x: x, y: y })
+        const scrollX =
+            window.pageXOffset || document.documentElement.scrollLeft
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop
+        if (x && y) setPosition({ x: x + scrollX, y: y + scrollY })
     }
 
     function timePerKeyPress(wpm: number) {

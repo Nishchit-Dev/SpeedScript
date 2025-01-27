@@ -7,6 +7,8 @@ import useUserLocal from '../hooks/cookies/useGuest'
 import { useEffect, useState } from 'react'
 import { GlareCard } from '@/components/ui/glare-ui'
 import useUserCookies from '../hooks/cookies/useUser'
+import Image from 'next/image'
+import { RankingStage } from '../room/_ranks/rankUsers'
 
 interface data {
     username: string
@@ -36,16 +38,16 @@ const LeaderboardComponent = ({
         <div
             className={clsx(
                 {
-                    'bg-yellow-400 p-3 px-10 min-w-[512px] text-2xl':
+                    'bg-yellow-400 p-3 px-10 min-w-[612px] text-2xl':
                         index == 0,
                 },
                 {
-                    'bg-yellow-300 p-3 px-10 min-w-[462px] text-xl': index == 1,
+                    'bg-yellow-300 p-3 px-10 min-w-[562px] text-xl': index == 1,
                 },
                 {
-                    'bg-yellow-200 p-3 px-10 min-w-[412px] text-lg': index == 2,
+                    'bg-yellow-200 p-3 px-10 min-w-[512px] text-lg': index == 2,
                 },
-                { 'bg-yellow-100 p-3 px-10 min-w-[412px]': index > 2 },
+                { 'bg-yellow-100 p-3 px-10 min-w-[452px]': index > 2 },
                 {
                     hidden: data.highestWpm <= 0,
                 }
@@ -53,7 +55,21 @@ const LeaderboardComponent = ({
         >
             <div className="flex flex-1 justify-between items-center font-jetBrainsMono ">
                 <div className="flex justify-center items-center gap-5">
-                    <div className="">{index + 1}</div>
+                    {index >= 3 ? (
+                        <div className="">{index + 1}</div>
+                    ) : (
+                        <div className="bg-white rounded-full">
+                            <Image
+                                src={`/throphies/LeaderboardRank${
+                                    index + 1
+                                }.svg`}
+                                alt=""
+                                height={60}
+                                width={60}
+                            />
+                        </div>
+                    )}
+
                     <div className="bg-white/60 rounded-full p-1">
                         <User />
                     </div>
@@ -145,7 +161,7 @@ const DailyLeaderboardComponent = ({
                         </div>
                     </div>
                 </div>
-                <div className="">
+                <div className="font-jetBrainsMono">
                     <Counter
                         number={
                             data.dailyHighestWpm > 0 ? data.dailyHighestWpm : 0
@@ -205,7 +221,7 @@ const UserScoreBoard = ({ flag }: { flag: boolean }) => {
             setUser(userGuest)
         }
     }, [userGuest])
-   
+
     return (
         <>
             {user?.clerkId ? (

@@ -1,7 +1,4 @@
-import { set } from 'mongoose'
-import { eventNames } from 'process'
 import { useEffect, useState } from 'react'
-import useSocket from './websockethooks/useSockets'
 
 interface CharTypedInfo {
     char: string
@@ -64,7 +61,7 @@ const useListenTyping = (
             //         startTimer()
             //     }
             // }
-            if(!isTyping){
+            if (!isTyping) {
                 return
             }
 

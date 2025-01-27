@@ -57,7 +57,7 @@ export default function Typing() {
     const [isTyping, setIsTyping] = useState(false)
     const [gameOver, setGameOver] = useState(false)
     const { timer, startTimer, stopTimer } = useTimer()
-    const [timerOption, setTimerOption] = useState(3)
+    const [timerOption, setTimerOption] = useState(30)
     const { progress, incorrectChar, cursor, charTypedInfo } = useListenTyping(
         characterArray,
         charTyped,

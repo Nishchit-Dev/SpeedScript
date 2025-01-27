@@ -1,5 +1,5 @@
 'use client'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { useLeaderboard } from '../hooks/leaderBoard/useLeaderBoard'
 import Counter from '@/components/ui/countingNumberAnimation'
 import { ReceiptRussianRuble, User } from 'lucide-react'
@@ -9,6 +9,8 @@ import { GlareCard } from '@/components/ui/glare-ui'
 import useUserCookies from '../hooks/cookies/useUser'
 import Image from 'next/image'
 import { RankingStage } from '../room/_ranks/rankUsers'
+import React from 'react'
+import { Data } from './rankUsers'
 
 interface data {
     username: string
@@ -17,6 +19,46 @@ interface data {
     highestWpm: number
     dailyHighestWpm: number
 }
+
+const usernameSlicer = (data: data) => {
+    return data.username
+        ? data.username
+        : 'user' + data._id.slice(data._id.length - 4, data._id.length)
+}
+
+export const Stage = ({ data, index }: { data: data; index: number }) => {
+    return (
+        <div className="p-2 h-80">
+            <div
+                className={clsx(
+                    'relative  items-center flex flex-col',
+                    { ' top-[0%]': index == 2 },
+                    { 'top-[30%]': index == 1 },
+                    { ' top-[45%]': index == 3 }
+                )}
+            >
+                <div>
+                    <Image
+                        src={`/throphies/LeaderboardRank${index}.svg`}
+                        alt=""
+                        width={180}
+                        height={180}
+                    />
+                </div>
+                <div className="font-jetBrainsMono font-bold text-2xl ">
+                    <p> {data.highestWpm}</p>
+                </div>
+                <div className="flex flex-row gap-2 font-jetBrainsMono bg-white/80 px-3 py-2 rounded-full justify-center items-center">
+                    <div className="bg-slate-400 rounded-full p-[2px]">
+                        <User />
+                    </div>
+                    <p> {usernameSlicer(data)}</p>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 const LeaderboardComponent = ({
     index,
     data,
@@ -35,70 +77,74 @@ const LeaderboardComponent = ({
     }, [userGuest])
 
     return (
-        <div
-            className={clsx(
-                {
-                    'bg-yellow-400 p-3 px-10 min-w-[612px] text-2xl':
-                        index == 0,
-                },
-                {
-                    'bg-yellow-300 p-3 px-10 min-w-[562px] text-xl': index == 1,
-                },
-                {
-                    'bg-yellow-200 p-3 px-10 min-w-[512px] text-lg': index == 2,
-                },
-                { 'bg-yellow-100 p-3 px-10 min-w-[452px]': index > 2 },
-                {
-                    hidden: data.highestWpm <= 0,
-                }
-            )}
-        >
-            <div className="flex flex-1 justify-between items-center font-jetBrainsMono ">
-                <div className="flex justify-center items-center gap-5">
-                    {index >= 3 ? (
-                        <div className="">{index + 1}</div>
-                    ) : (
-                        <div className="bg-white rounded-full">
-                            <Image
-                                src={`/throphies/LeaderboardRank${
-                                    index + 1
-                                }.svg`}
-                                alt=""
-                                height={60}
-                                width={60}
+        <div className="">
+            {index < 3 ? (
+                <></>
+            ) : (
+                <div
+                    className={clsx(
+                        {
+                            'bg-yellow-400 p-3 px-10 min-w-[612px] text-2xl':
+                                index == 0,
+                        },
+                        {
+                            'bg-yellow-300 p-3 px-10 min-w-[562px] text-xl':
+                                index == 1,
+                        },
+                        {
+                            'bg-yellow-200 p-3 px-10 min-w-[512px] text-lg':
+                                index == 2,
+                        },
+                        { 'bg-white p-3 px-10 min-w-[452px]': index > 2 },
+                        {
+                            hidden: data.highestWpm <= 0,
+                        }
+                    )}
+                >
+                    <div className="flex flex-1 justify-between items-center font-jetBrainsMono ">
+                        <div className="flex justify-center items-center gap-5">
+                            {index >= 3 ? (
+                                <div className="">{index + 1}</div>
+                            ) : (
+                                <div className="bg-white rounded-full">
+                                    <Image
+                                        src={`/throphies/LeaderboardRank${
+                                            index + 1
+                                        }.svg`}
+                                        alt=""
+                                        height={60}
+                                        width={60}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="bg-white/60 rounded-full p-1">
+                                <User />
+                            </div>
+                            <div className="" onClick={() => {}}>
+                                {usernameSlicer(data)}
+                            </div>
+                            <div
+                                className={clsx('', {
+                                    invisible: user?._id != data._id,
+                                })}
+                            >
+                                <div className="px-3 py-1 bg-white/80  text-black text-xs rounded-full">
+                                    <p>you</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="">
+                            <Counter
+                                number={
+                                    data.highestWpm > 0 ? data.highestWpm : 0
+                                }
+                                speed={5}
                             />
                         </div>
-                    )}
-
-                    <div className="bg-white/60 rounded-full p-1">
-                        <User />
-                    </div>
-                    <div className="" onClick={() => {}}>
-                        {data.username
-                            ? data.username
-                            : 'user' +
-                              data._id.slice(
-                                  data._id.length - 4,
-                                  data._id.length
-                              )}
-                    </div>
-                    <div
-                        className={clsx('', {
-                            invisible: user?._id != data._id,
-                        })}
-                    >
-                        <div className="px-3 py-1 bg-white/80  text-black text-xs rounded-full">
-                            <p>you</p>
-                        </div>
                     </div>
                 </div>
-                <div className="">
-                    <Counter
-                        number={data.highestWpm > 0 ? data.highestWpm : 0}
-                        speed={5}
-                    />
-                </div>
-            </div>
+            )}
         </div>
     )
 }
@@ -143,13 +189,7 @@ const DailyLeaderboardComponent = ({
                         <User />
                     </div>
                     <div className="" onClick={() => {}}>
-                        {data.username
-                            ? data.username
-                            : 'user' +
-                              data._id.slice(
-                                  data._id.length - 4,
-                                  data._id.length
-                              )}
+                        {usernameSlicer(data)}
                     </div>
                     <div
                         className={clsx('', {
@@ -280,28 +320,44 @@ const LeaderBoard = () => {
             <LeaderboardButton flag={flag} setFlag={setFlag} />
             {<UserScoreBoard flag={flag} />}
 
-            {flag
-                ? leaderboard.map((data: any, index) => {
-                      return (
-                          <div key={index}>
-                              <LeaderboardComponent
-                                  data={data}
-                                  index={index}
-                                  flag={!flag}
-                              />
-                          </div>
-                      )
-                  })
-                : dailyLeaderboard.map((data: any, index) => {
-                      return (
-                          <div key={index}>
-                              <DailyLeaderboardComponent
-                                  data={data}
-                                  index={index}
-                              />
-                          </div>
-                      )
-                  })}
+            {flag ? (
+                <>
+                    <div className="flex flex-row h-80 mb-28">
+                        {leaderboard.map((data: any, index) => {
+                            if (index < 3)
+                                return (
+                                    <Stage
+                                        data={data}
+                                        key={index + 1}
+                                        index={index + 1}
+                                    />
+                                )
+                        })}
+                    </div>
+                    {leaderboard.map((data: any, index) => {
+                        return (
+                            <div key={index}>
+                                <LeaderboardComponent
+                                    data={data}
+                                    index={index}
+                                    flag={!flag}
+                                />
+                            </div>
+                        )
+                    })}
+                </>
+            ) : (
+                dailyLeaderboard.map((data: any, index) => {
+                    return (
+                        <div key={index}>
+                            <DailyLeaderboardComponent
+                                data={data}
+                                index={index}
+                            />
+                        </div>
+                    )
+                })
+            )}
         </div>
     )
 }

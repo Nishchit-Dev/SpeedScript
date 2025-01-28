@@ -21,6 +21,7 @@ import useCursor from '../hooks/curosrAnimationHook/useCursorAnimation'
 import { RefreshCcw } from 'lucide-react'
 import useUserLocal from '../hooks/cookies/useGuest'
 import useGhostCursor from '../hooks/curosrAnimationHook/useGhostCursor'
+import UserRankingSystem from './_ranks/userRanks'
 
 const TypingText =
     'The quick brown fox jumps over the lazy dog and enjoys the warm sunshine on a bright afternoon.'
@@ -92,6 +93,9 @@ export default function Typing() {
         }
     }, [charIndex])
 
+    useEffect(()=>{
+        
+    },[])
     useEffect(() => {
         if (buttons.ghost) {
             if (isTyping) {
@@ -123,9 +127,7 @@ export default function Typing() {
     }, [charIndex])
 
     const cursorPosition = useCursor({ cursor })
-    useEffect(() => {
-        console.log(charIndex)
-    }, [charIndex])
+
     const [style, setStyle] = useState(false)
 
     useCookiesScore({ gameover: gameOver, wpm: score.wpm, data: charTypedInfo })
@@ -362,46 +364,54 @@ export default function Typing() {
                 </div>
 
                 {gameOver ? (
-                    <div className="flex flex-1 flex-row">
+                    <>
                         <div>
-                            <Score
-                                data={charTypedInfo}
-                                _wpm={score.wpm}
-                                timexwpm={timexwpm}
-                            />
+                            <UserRankingSystem wpm={score.wpm} />
                         </div>
-                        <div>
-                            <div
-                                className={clsx(
-                                    'overflow-hidden transition-all duration-700 ease-in-out',
-                                    {
-                                        'max-h-0 opacity-0 scale-0 ': !gameOver,
-                                    },
-                                    {
-                                        'max-h-[500px] opacity-100 scale-100':
-                                            gameOver,
-                                    }
-                                )}
-                            >
-                                <TimexWpm data={timexwpm} timer={timer} />
-                            </div>
 
-                            <div
-                                className={clsx(
-                                    'overflow-hidden transition-all duration-700 ease-in-out',
-                                    {
-                                        'max-h-0 opacity-0 scale-0 ': !gameOver,
-                                    },
-                                    {
-                                        'max-h-[500px] opacity-100 scale-100':
-                                            gameOver,
-                                    }
-                                )}
-                            >
-                                <ShowGraph data={charTypedInfo} />
+                        <div className="flex flex-1 flex-row">
+                            <div>
+                                <Score
+                                    data={charTypedInfo}
+                                    _wpm={score.wpm}
+                                    timexwpm={timexwpm}
+                                />
+                            </div>
+                            <div>
+                                <div
+                                    className={clsx(
+                                        'overflow-hidden transition-all duration-700 ease-in-out',
+                                        {
+                                            'max-h-0 opacity-0 scale-0 ':
+                                                !gameOver,
+                                        },
+                                        {
+                                            'max-h-[500px] opacity-100 scale-100':
+                                                gameOver,
+                                        }
+                                    )}
+                                >
+                                    <TimexWpm data={timexwpm} timer={timer} />
+                                </div>
+
+                                <div
+                                    className={clsx(
+                                        'overflow-hidden transition-all duration-700 ease-in-out',
+                                        {
+                                            'max-h-0 opacity-0 scale-0 ':
+                                                !gameOver,
+                                        },
+                                        {
+                                            'max-h-[500px] opacity-100 scale-100':
+                                                gameOver,
+                                        }
+                                    )}
+                                >
+                                    <ShowGraph data={charTypedInfo} />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </>
                 ) : (
                     <></>
                 )}

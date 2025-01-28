@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import { User } from 'lucide-react'
 
-interface Data {
+export interface Data {
     username: string
     clerkId: string
     _id: string
@@ -32,7 +32,7 @@ const customSortForTopRanks = (data: Data[]) => {
 }
 
 
- const Stage = ({ data, index }: { data: Data; index: number }) => {
+const Stage = ({ data, index }: { data: Data; index: number }) => {
     return (
         <div className="p-2 h-72">
             <div

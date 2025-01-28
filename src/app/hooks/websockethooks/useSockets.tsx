@@ -39,7 +39,6 @@ const useSocket = ({
     userStats,
     wpm,
 }: UseSocketProps) => {
-    // Generate random username
     const generateRandomCode = useCallback((): string => {
         const letters = Array.from({ length: 4 }, () =>
             String.fromCharCode(65 + Math.floor(Math.random() * 26))
@@ -48,10 +47,9 @@ const useSocket = ({
         return letters + digits
     }, [])
 
-    // State management
     const [roomData, setRoomData] = useState<RoomData>({
         username: '',
-        roomID: 'its_me',
+        roomID: '',
         roomInfo: {},
         roomText: '',
     })
@@ -70,13 +68,11 @@ const useSocket = ({
         setRoomData((prev) => ({ ...prev, username: user }))
 
         const URL = 'ws://localhost:8080/ws/room'
-        const ws = new WebSocket(
-            `${URL}?username=${encodeURIComponent(
-                user
-            )}&room_id=${encodeURIComponent(roomData.roomID)}`
-        )
+        const ws = new WebSocket(`${URL}?username=${encodeURIComponent(user)}`)
 
-        // WebSocket event handlers
+        window.addEventListener('beforeunload', () => {
+            ws.close()
+        })
         const handleOpen = () => {
             console.log('socket connected')
             connectionRef.current = ws
@@ -101,6 +97,7 @@ const useSocket = ({
                     case 'room_state':
                         setRoomData((prev) => ({
                             ...prev,
+                            roomID: message.room_id,
                             roomText:
                                 message.data.text || 'Default typing text',
                             roomInfo: message.data.players,
@@ -119,7 +116,7 @@ const useSocket = ({
 
                     case 'game_finished':
                         setUserStat(message.data)
-                        console.log('Game finished Recieved', message.data)
+                        console.log('Game finished Received', message.data)
                         break
 
                     case 'ws_final_stat':
@@ -132,21 +129,19 @@ const useSocket = ({
             }
         }
 
-        // Attach event listeners
+        // event listeners
         ws.onopen = handleOpen
         ws.onclose = handleClose
         ws.onerror = handleError
         ws.onmessage = handleMessage
 
-        // Cleanup function
         return () => {
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.close()
             }
         }
-    }, [generateRandomCode, roomData.roomID])
+    }, [generateRandomCode])
 
-    // Initial connection effect
     useEffect(() => {
         const cleanup = connect()
         return cleanup
@@ -227,10 +222,9 @@ const useSocket = ({
             JSON.stringify({
                 type: 'timeout',
                 username: roomData.username,
-                room_id: roomData.roomID,
             })
         )
-    }, [connectionRef, roomData.username, roomData.roomID])
+    }, [connectionRef, roomData.username])
 
     // Cursor progress effect
     useEffect(() => {
@@ -255,7 +249,7 @@ const useSocket = ({
         sendResults,
         setGameState,
         sendTimeout,
-        finalState
+        finalState,
     }
 }
 

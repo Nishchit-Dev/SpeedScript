@@ -11,10 +11,17 @@ const useGhostCursor = ({
     const [cursorPosition, setPosition] = useState({ x: 0, y: 0 })
     const [countIndex, setCountIndex] = useState(0)
     const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
-    const { getUserGhostCursor } = useUserGhostCursorTime()
+    const {
+        getUserGhostCursor,
+        calculateAverageWpm,
+        calculateAverageVelocity,
+    } = useUserGhostCursorTime()
     useEffect(() => {
         getPosition()
     }, [countIndex])
+    useEffect(() => {
+        console.log(calculateAverageVelocity())
+    }, [])
 
     const getPosition = () => {
         const element = document.querySelector(`.character${countIndex}`)
@@ -46,7 +53,7 @@ const useGhostCursor = ({
 
     const startGhostCursor = useCallback(() => {
         // let time = getUserGhostCursor().time + createCursorIntervalRandom()
-        let time = getUserGhostCursor().time * 10
+        let time = calculateAverageVelocity() * 10
         console.log('time', time)
         console.log('getUserGhostCursor().time', getUserGhostCursor().time)
 

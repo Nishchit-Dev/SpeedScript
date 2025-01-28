@@ -27,7 +27,15 @@ const usernameSlicer = (data: data) => {
         : 'user' + data._id.slice(data._id.length - 4, data._id.length)
 }
 
-export const Stage = ({ data, index }: { data: data; index: number }) => {
+export const Stage = ({
+    data,
+    index,
+    flag,
+}: {
+    data: data
+    index: number
+    flag?: boolean
+}) => {
     return (
         <div className="p-2 h-80">
             <div
@@ -47,7 +55,12 @@ export const Stage = ({ data, index }: { data: data; index: number }) => {
                     />
                 </div>
                 <div className="font-jetBrainsMono font-bold text-2xl ">
-                    <p> {data.highestWpm}</p>
+                    {flag ? (
+                        <p> {data.highestWpm}</p>
+                    ) : (
+                        <p> {data.dailyHighestWpm}</p>
+                    )}
+                    
                 </div>
                 <div className="flex flex-row gap-2 font-jetBrainsMono bg-white/80 px-3 py-2 rounded-full justify-center items-center">
                     <div className="bg-slate-400 rounded-full p-[2px]">
@@ -194,22 +207,32 @@ const DailyLeaderboardComponent = ({
         >
             <div className="flex flex-1 justify-between items-center font-jetBrainsMono ">
                 <div className="flex justify-center items-center gap-5">
-                    <div className="">
-                        <div>{index + 1}</div>
-                        <div>
+                    {index >= 3 ? (
+                        <div className="flex flex-row justify-center items-center gap-5">
+                            <div>{index + 1}</div>
+                            <div>
+                                <Image
+                                    src={`/throphies/badges/${getBadgeImage(
+                                        data.dailyHighestWpm
+                                    )}`}
+                                    alt=""
+                                    width={50}
+                                    height={50}
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="bg-white rounded-full">
                             <Image
-                                src={`/trophies/badges/${getBadgeImage(
-                                    data.dailyHighestWpm
-                                )}`}
+                                src={`/throphies/LeaderboardRank${
+                                    index + 1
+                                }.svg`}
                                 alt=""
-                                width={50}
-                                height={50}
+                                height={60}
+                                width={60}
                             />
                         </div>
-                    </div>
-                    <div className="bg-white/60 rounded-full p-1">
-                        <User />
-                    </div>
+                    )}
                     <div className="" onClick={() => {}}>
                         {usernameSlicer(data)}
                     </div>
@@ -350,13 +373,14 @@ const LeaderBoard = () => {
                                 return (
                                     <Stage
                                         data={data}
+                                        flag={true}
                                         key={index + 1}
                                         index={index + 1}
                                     />
                                 )
                         })}
                     </div>
-                    <div className='bg-white rounded-lg'>
+                    <div className="bg-white rounded-lg">
                         {leaderboard.map((data: any, index) => {
                             return (
                                 <div key={index}>
@@ -371,16 +395,47 @@ const LeaderBoard = () => {
                     </div>
                 </>
             ) : (
-                dailyLeaderboard.map((data: any, index) => {
-                    return (
-                        <div key={index}>
-                            <DailyLeaderboardComponent
-                                data={data}
-                                index={index}
-                            />
-                        </div>
-                    )
-                })
+                <>
+                    <div className="flex flex-row h-80 mb-28 ">
+                        {
+                            <>
+                                {dailyLeaderboard.map((data: any, index) => {
+                                    if (index < 3)
+                                        return (
+                                            <Stage
+                                                data={data}
+                                                key={index + 1}
+                                                index={index + 1}
+                                            />
+                                        )
+                                })}
+                            </>
+                        }
+                    </div>
+                    <div className="bg-white rounded-lg">
+                        {dailyLeaderboard.map((data: any, index) => {
+                            if (index > 3)
+                                return (
+                                    <div key={index}>
+                                        <DailyLeaderboardComponent
+                                            data={data}
+                                            index={index}
+                                        />
+                                    </div>
+                                )
+                        })}
+                    </div>
+                </>
+                // dailyLeaderboard.map((data: any, index) => {
+                //     return (
+                //         <div key={index}>
+                //             <DailyLeaderboardComponent
+                //                 data={data}
+                //                 index={index}
+                //             />
+                //         </div>
+                //     )
+                // })
             )}
         </div>
     )

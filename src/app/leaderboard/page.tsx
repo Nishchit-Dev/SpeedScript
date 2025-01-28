@@ -11,6 +11,7 @@ import Image from 'next/image'
 import { RankingStage } from '../room/_ranks/rankUsers'
 import React from 'react'
 import { Data } from './rankUsers'
+import { getBadgeImage } from '@/components/BadgeComponent'
 
 interface data {
     username: string
@@ -95,16 +96,28 @@ const LeaderboardComponent = ({
                             'bg-yellow-200 p-3 px-10 min-w-[512px] text-lg':
                                 index == 2,
                         },
-                        { 'bg-white p-3 px-10 min-w-[452px]': index > 2 },
+                        { ' p-3 px-10 min-w-[452px]': index > 2 },
                         {
                             hidden: data.highestWpm <= 0,
                         }
                     )}
                 >
                     <div className="flex flex-1 justify-between items-center font-jetBrainsMono ">
-                        <div className="flex justify-center items-center gap-5">
+                        <div className="flex justify-center items-center gap-2">
                             {index >= 3 ? (
-                                <div className="">{index + 1}</div>
+                                <div className="flex flex-row justify-center items-center gap-5">
+                                    <div>{index + 1}</div>
+                                    <div>
+                                        <Image
+                                            src={`/throphies/badges/${getBadgeImage(
+                                                data.highestWpm
+                                            )}`}
+                                            alt=""
+                                            width={50}
+                                            height={50}
+                                        />
+                                    </div>
+                                </div>
                             ) : (
                                 <div className="bg-white rounded-full">
                                     <Image
@@ -118,9 +131,6 @@ const LeaderboardComponent = ({
                                 </div>
                             )}
 
-                            <div className="bg-white/60 rounded-full p-1">
-                                <User />
-                            </div>
                             <div className="" onClick={() => {}}>
                                 {usernameSlicer(data)}
                             </div>
@@ -184,7 +194,19 @@ const DailyLeaderboardComponent = ({
         >
             <div className="flex flex-1 justify-between items-center font-jetBrainsMono ">
                 <div className="flex justify-center items-center gap-5">
-                    <div className="">{index + 1}</div>
+                    <div className="">
+                        <div>{index + 1}</div>
+                        <div>
+                            <Image
+                                src={`/trophies/badges/${getBadgeImage(
+                                    data.dailyHighestWpm
+                                )}`}
+                                alt=""
+                                width={50}
+                                height={50}
+                            />
+                        </div>
+                    </div>
                     <div className="bg-white/60 rounded-full p-1">
                         <User />
                     </div>
@@ -322,7 +344,7 @@ const LeaderBoard = () => {
 
             {flag ? (
                 <>
-                    <div className="flex flex-row h-80 mb-28">
+                    <div className="flex flex-row h-80 mb-28 ">
                         {leaderboard.map((data: any, index) => {
                             if (index < 3)
                                 return (
@@ -334,17 +356,19 @@ const LeaderBoard = () => {
                                 )
                         })}
                     </div>
-                    {leaderboard.map((data: any, index) => {
-                        return (
-                            <div key={index}>
-                                <LeaderboardComponent
-                                    data={data}
-                                    index={index}
-                                    flag={!flag}
-                                />
-                            </div>
-                        )
-                    })}
+                    <div className='bg-white rounded-lg'>
+                        {leaderboard.map((data: any, index) => {
+                            return (
+                                <div key={index}>
+                                    <LeaderboardComponent
+                                        data={data}
+                                        index={index}
+                                        flag={!flag}
+                                    />
+                                </div>
+                            )
+                        })}
+                    </div>
                 </>
             ) : (
                 dailyLeaderboard.map((data: any, index) => {

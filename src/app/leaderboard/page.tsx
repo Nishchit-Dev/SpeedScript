@@ -27,7 +27,7 @@ const usernameSlicer = (data: data) => {
         : 'user' + data._id.slice(data._id.length - 4, data._id.length)
 }
 
-export const Stage = ({
+const Stage = ({
     data,
     index,
     flag,

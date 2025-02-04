@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState, useRef } from 'react'
+import useUserCookies from '../cookies/useUser'
+import { useUser } from '@clerk/nextjs'
 
 const GameState = {
     CONNECTING: 'connecting',
@@ -30,15 +32,18 @@ interface UseSocketProps {
     setIsTyping: React.Dispatch<React.SetStateAction<boolean>>
     userStats: UserStats[]
     wpm: number
+    username: string
 }
 
 const useSocket = ({
     cursor,
     totalCharacter,
     setIsTyping,
+    username,
     userStats,
     wpm,
 }: UseSocketProps) => {
+    const { isSignedIn } = useUser()
     const generateRandomCode = useCallback((): string => {
         const letters = Array.from({ length: 4 }, () =>
             String.fromCharCode(65 + Math.floor(Math.random() * 26))
@@ -64,10 +69,14 @@ const useSocket = ({
 
     // Handle WebSocket connection
     const connect = useCallback(() => {
-        const user = generateRandomCode()
+        console.log('username:', username)
+        const user = username || generateRandomCode()
         setRoomData((prev) => ({ ...prev, username: user }))
 
-        const URL = 'ws://localhost:8080/ws/room'
+        const URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL
+            ? `ws://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}:8080/ws/room`
+            : 'ws://localhost:8080/ws/room'
+        console.log('URL', URL)
         const ws = new WebSocket(`${URL}?username=${encodeURIComponent(user)}`)
 
         window.addEventListener('beforeunload', () => {
@@ -102,6 +111,7 @@ const useSocket = ({
                                 message.data.text || 'Default typing text',
                             roomInfo: message.data.players,
                         }))
+                        console.log('Room state:', message.data)
                         setGameState(message.data.status as GameStateValue)
                         break
 
@@ -143,9 +153,11 @@ const useSocket = ({
     }, [generateRandomCode])
 
     useEffect(() => {
-        const cleanup = connect()
-        return cleanup
-    }, [connect])
+        if (username && isSignedIn) {
+            const cleanup = connect()
+            return cleanup
+        }
+    }, [connect, username, isSignedIn])
 
     // Toggle player ready state
     const toggleReady = useCallback(() => {

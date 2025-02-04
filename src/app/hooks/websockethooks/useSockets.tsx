@@ -74,7 +74,7 @@ const useSocket = ({
         setRoomData((prev) => ({ ...prev, username: user }))
 
         const URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL
-            ? `ws://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}:8080/ws/room`
+            ? `wss://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}:8080/ws/room`
             : 'ws://localhost:8080/ws/room'
         console.log('URL', URL)
         const ws = new WebSocket(`${URL}?username=${encodeURIComponent(user)}`)

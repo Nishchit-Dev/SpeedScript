@@ -70,11 +70,11 @@ const useSocket = ({
     // Handle WebSocket connection
     const connect = useCallback(() => {
         console.log('username:', username)
-        const user = username || generateRandomCode()
+        const user = username 
         setRoomData((prev) => ({ ...prev, username: user }))
 
         const URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL
-            ? `wss://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}:8080/ws/room`
+            ? `wss://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/room`
             : 'ws://localhost:8080/ws/room'
         console.log('URL', URL)
         const ws = new WebSocket(`${URL}?username=${encodeURIComponent(user)}`)

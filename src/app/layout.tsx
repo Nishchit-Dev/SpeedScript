@@ -6,6 +6,8 @@ import { ClerkProvider, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { JetBrains_Mono } from 'next/font/google'
 import { Crown } from 'lucide-react'
 import Link from 'next/link'
+import FireAnimation from './lottieAnimation'
+import useUserCookies from './hooks/cookies/useUser'
 
 const jetBrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -35,7 +37,6 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode
 }>) {
-    
     return (
         <ClerkProvider>
             <html lang="en" suppressHydrationWarning>
@@ -44,8 +45,9 @@ export default function RootLayout({
                     cz-shortcut-listen="true"
                 >
                     <div className="flex flex-1 justify-between items-center p-3 px-10 ">
-                        <div></div>
-                        <div className="flex flex-row justify-center items-center gap-3 cursor-pointer">
+                        <div className="flex flex-1"></div>
+
+                        <div className="flex flex-1 flex-row justify-center items-center gap-3 cursor-pointer">
                             <Link href={'/'}>
                                 <p className="text-4xl font-jetBrainsMono italic font-semibold">
                                     SpeedScript
@@ -60,7 +62,15 @@ export default function RootLayout({
                             </Link>
                         </div>
 
-                        <div>
+                        <div className="flex flex-1 flex-row gap-3 items-center justify-end">
+                            <div className="font-jetBrainsMono flex flex-row ">
+                                <Link href={'/multiplayer'}>
+                                    <div className="flex flex-row px-5 py-2 text-sm text-black bg-white hover:opacity-70 duration-300 rounded-full cursor-pointer">
+                                        Competitive
+                                        <FireAnimation />
+                                    </div>
+                                </Link>
+                            </div>
                             <SignedIn>
                                 <UserButton />
                             </SignedIn>

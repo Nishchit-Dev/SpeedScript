@@ -18,11 +18,10 @@ import useSocket from '../hooks/websockethooks/useSockets'
 import useRandomColor from '../hooks/useRandomColor'
 import RankUsers, { RankingStage } from './_ranks/rankUsers'
 import OnBoarding from './onBoarding'
-import { get } from 'http'
 import { useUser } from '@clerk/nextjs'
 
 export default function Typing() {
-    const { isSignedIn } = useUser()
+    const { isSignedIn, user } = useUser()
     const [charTyped, setCharTyped] = useState([])
     const [typingSentence, setTypingSentence] = useState('')
 
@@ -33,7 +32,6 @@ export default function Typing() {
         withSymbols: false,
         ghost: false,
     })
-    const { getUser } = useUserLocal()
     useEffect(() => {
         let characterArray = typingSentence
             .split('')
@@ -144,7 +142,7 @@ export default function Typing() {
         setIsTyping,
         userStats: timexwpm,
         wpm: score.wpm,
-        username: getUser()?.username ? getUser().username : '',
+        username: user?.username || '',
     })
 
     useEffect(() => {
@@ -178,7 +176,7 @@ export default function Typing() {
 
     return (
         <>
-            {getUser()?.username != '' && isSignedIn ? (
+            {user?.username && isSignedIn ? (
                 <>
                     {!style ? (
                         <div

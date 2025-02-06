@@ -3,11 +3,9 @@
 import { Cover } from '@/components/ui/cover'
 
 import Link from 'next/link'
-import useUserCookies from './hooks/cookies/useUser'
-import useUserLocal from './hooks/cookies/useGuest'
 
 export default function Home() {
-    const { userGuest } = useUserLocal()
+    
     return (
         <div className="flex flex-1 justify-center items-center h-[70vh]">
             <div className="flex flex-col ">

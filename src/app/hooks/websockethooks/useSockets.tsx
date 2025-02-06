@@ -15,7 +15,7 @@ type GameStateKey = keyof typeof GameState
 type GameStateValue = (typeof GameState)[GameStateKey]
 
 interface RoomData {
-    username: string
+    username: string | null
     roomID: string
     roomInfo: Record<string, any>
     roomText: string
@@ -32,18 +32,16 @@ interface UseSocketProps {
     setIsTyping: React.Dispatch<React.SetStateAction<boolean>>
     userStats: UserStats[]
     wpm: number
-    username: string
 }
 
 const useSocket = ({
     cursor,
     totalCharacter,
     setIsTyping,
-    username,
     userStats,
     wpm,
 }: UseSocketProps) => {
-    const { isSignedIn } = useUser()
+    const { isSignedIn, user } = useUser()
     const generateRandomCode = useCallback((): string => {
         const letters = Array.from({ length: 4 }, () =>
             String.fromCharCode(65 + Math.floor(Math.random() * 26))
@@ -68,96 +66,101 @@ const useSocket = ({
     const connectionRef = useRef<WebSocket | null>(null)
 
     // Handle WebSocket connection
-    const connect = useCallback(() => {
-        console.log('username:', username)
-        const user = username 
-        setRoomData((prev) => ({ ...prev, username: user }))
+    const connect = useCallback(
+        (username: string) => {
+            console.log('username:', username)
+            const user = username
+            setRoomData((prev) => ({ ...prev, username: user }))
 
-        const URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL
-            ? `wss://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/room`
-            : 'ws://localhost:8080/ws/room'
-        console.log('URL', URL)
-        const ws = new WebSocket(`${URL}?username=${encodeURIComponent(user)}`)
+            const URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL
+                ? `wss://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/room`
+                : 'ws://localhost:8080/ws/room'
+            console.log('URL', URL)
+            const ws = new WebSocket(
+                `${URL}?username=${encodeURIComponent(user ? user : '')}`
+            )
 
-        window.addEventListener('beforeunload', () => {
-            ws.close()
-        })
-        const handleOpen = () => {
-            console.log('socket connected')
-            connectionRef.current = ws
-        }
-
-        const handleClose = (event: CloseEvent) => {
-            console.log('socket closed ', event.code)
-            setGameState(GameState.CONNECTING)
-            connectionRef.current = null
-        }
-
-        const handleError = (error: Event) => {
-            console.log('socket error ', error)
-        }
-
-        const handleMessage = (event: MessageEvent) => {
-            try {
-                const message = JSON.parse(event.data)
-                console.log('Received message:', message)
-
-                switch (message.type) {
-                    case 'room_state':
-                        setRoomData((prev) => ({
-                            ...prev,
-                            roomID: message.room_id,
-                            roomText:
-                                message.data.text || 'Default typing text',
-                            roomInfo: message.data.players,
-                        }))
-                        console.log('Room state:', message.data)
-                        setGameState(message.data.status as GameStateValue)
-                        break
-
-                    case 'countdown':
-                        setCountDown(message.data)
-                        break
-
-                    case 'game_timeout':
-                        console.log('Game timeout received:', message)
-                        setGameState(GameState.FINISHED)
-                        break
-
-                    case 'game_finished':
-                        setUserStat(message.data)
-                        console.log('Game finished Received', message.data)
-                        break
-
-                    case 'ws_final_stat':
-                        console.log('Final stats received', message.data)
-                        setFinalState(message.data.players)
-                        break
-                }
-            } catch (err) {
-                console.error('Message parsing error', err)
-            }
-        }
-
-        // event listeners
-        ws.onopen = handleOpen
-        ws.onclose = handleClose
-        ws.onerror = handleError
-        ws.onmessage = handleMessage
-
-        return () => {
-            if (ws && ws.readyState === WebSocket.OPEN) {
+            window.addEventListener('beforeunload', () => {
                 ws.close()
+            })
+            const handleOpen = () => {
+                console.log('socket connected')
+                connectionRef.current = ws
             }
-        }
-    }, [generateRandomCode])
+
+            const handleClose = (event: CloseEvent) => {
+                console.log('socket closed ', event.code)
+                setGameState(GameState.CONNECTING)
+                connectionRef.current = null
+            }
+
+            const handleError = (error: Event) => {
+                console.log('socket error ', error)
+            }
+
+            const handleMessage = (event: MessageEvent) => {
+                try {
+                    const message = JSON.parse(event.data)
+                    console.log('Received message:', message)
+
+                    switch (message.type) {
+                        case 'room_state':
+                            setRoomData((prev) => ({
+                                ...prev,
+                                roomID: message.room_id,
+                                roomText:
+                                    message.data.text || 'Default typing text',
+                                roomInfo: message.data.players,
+                            }))
+                            console.log('Room state:', message.data)
+                            setGameState(message.data.status as GameStateValue)
+                            break
+
+                        case 'countdown':
+                            setCountDown(message.data)
+                            break
+
+                        case 'game_timeout':
+                            console.log('Game timeout received:', message)
+                            setGameState(GameState.FINISHED)
+                            break
+
+                        case 'game_finished':
+                            setUserStat(message.data)
+                            console.log('Game finished Received', message.data)
+                            break
+
+                        case 'ws_final_stat':
+                            console.log('Final stats received', message.data)
+                            setFinalState(message.data.players)
+                            break
+                    }
+                } catch (err) {
+                    console.error('Message parsing error', err)
+                }
+            }
+
+            // event listeners
+            ws.onopen = handleOpen
+            ws.onclose = handleClose
+            ws.onerror = handleError
+            ws.onmessage = handleMessage
+
+            return () => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.close()
+                }
+            }
+        },
+        [generateRandomCode]
+    )
 
     useEffect(() => {
-        if (username && isSignedIn) {
-            const cleanup = connect()
+        if (user?.username && isSignedIn) {
+            const cleanup = connect(user.username)
             return cleanup
         }
-    }, [connect, username, isSignedIn])
+    }, [connect, user?.username, isSignedIn])
 
     // Toggle player ready state
     const toggleReady = useCallback(() => {

@@ -123,7 +123,7 @@ export default function Typing() {
     const cursorPosition = useCursor({ cursor })
     const [style, setStyle] = useState(false)
 
-    useCookiesScore({ gameover: gameOver, wpm: score.wpm, data: charTypedInfo })
+    // useCookiesScore({ gameover: gameOver, wpm: score.wpm, data: charTypedInfo })
     const { timexwpm } = useTimexWpm({ timer: timer, wpm: score.wpm })
 
     const {
@@ -142,7 +142,6 @@ export default function Typing() {
         setIsTyping,
         userStats: timexwpm,
         wpm: score.wpm,
-        username: user?.username || '',
     })
 
     useEffect(() => {
@@ -176,7 +175,7 @@ export default function Typing() {
 
     return (
         <>
-            {user?.username && isSignedIn ? (
+            {user?.username || isSignedIn || true ? (
                 <>
                     {!style ? (
                         <div

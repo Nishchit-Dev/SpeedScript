@@ -2,15 +2,15 @@
 import { clsx } from 'clsx'
 import { useLeaderboard } from '../hooks/leaderBoard/useLeaderBoard'
 import Counter from '@/components/ui/countingNumberAnimation'
-import { ReceiptRussianRuble, User } from 'lucide-react'
+import { User } from 'lucide-react'
 import useUserLocal from '../hooks/cookies/useGuest'
 import { useEffect, useState } from 'react'
 import { GlareCard } from '@/components/ui/glare-ui'
-import useUserCookies from '../hooks/cookies/useUser'
 import Image from 'next/image'
 import React from 'react'
-import { Data } from './rankUsers'
 import { getBadgeImage } from '@/components/BadgeComponent'
+import { useUser } from '@clerk/nextjs'
+import { set } from 'mongoose'
 
 interface data {
     username: string
@@ -59,7 +59,6 @@ const Stage = ({
                     ) : (
                         <p> {data.dailyHighestWpm}</p>
                     )}
-                    
                 </div>
                 <div className="flex flex-row gap-2 font-jetBrainsMono bg-white/80 px-3 py-2 rounded-full justify-center items-center">
                     <div className="bg-slate-400 rounded-full p-[2px]">
@@ -295,20 +294,23 @@ const LeaderboardButton = ({
 
 const UserScoreBoard = ({ flag }: { flag: boolean }) => {
     const { getRank, userRank } = useLeaderboard()
-    const { userGuest, getUser } = useUserLocal()
-    const [user, setUser] = useState<data | null>(null)
+    const { user } = useUser()
+    const [_user, setUser] = useState<data | null>(null)
 
     useEffect(() => {
         if (user) {
-            getRank(getUser().clerkId)
-        } else {
-            setUser(userGuest)
+            getRank(user.id)
+            if (user?.username) {
+                setUser((prev: any) => {
+                    return { ...prev, username: user.username || null }
+                })
+            }
         }
-    }, [userGuest])
+    }, [user?.username])
 
     return (
         <>
-            {user?.clerkId ? (
+            {user?.username ? (
                 <div
                     className={clsx(
                         'mb-5',
@@ -330,8 +332,8 @@ const UserScoreBoard = ({ flag }: { flag: boolean }) => {
                                             {userRank?.rank}
                                         </p>
                                         <p className="text-xl">
-                                            {getUser()?.username ? (
-                                                getUser().username
+                                            {_user ? (
+                                                _user.username
                                             ) : userRank?._id ? (
                                                 'user' +
                                                 userRank?._id.slice(

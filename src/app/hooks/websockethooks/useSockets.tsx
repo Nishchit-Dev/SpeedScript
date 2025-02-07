@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState, useRef } from 'react'
 import useUserCookies from '../cookies/useUser'
 import { useUser } from '@clerk/nextjs'
-import io from 'socket.io'
 const GameState = {
     CONNECTING: 'connecting',
     WAITING: 'waiting',

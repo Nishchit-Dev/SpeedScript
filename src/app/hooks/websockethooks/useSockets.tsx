@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react'
 import useUserCookies from '../cookies/useUser'
 import { useUser } from '@clerk/nextjs'
-
+import io from 'socket.io'
 const GameState = {
     CONNECTING: 'connecting',
     WAITING: 'waiting',
@@ -73,13 +73,33 @@ const useSocket = ({
             setRoomData((prev) => ({ ...prev, username: user }))
 
             const URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL
-                ? `wss://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/room`
-                : 'ws://localhost:8080/ws/room'
-            console.log('URL', URL)
-            const ws = new WebSocket(
-                `${URL}?username=${encodeURIComponent(user ? user : '')}`
-            )
+                ? `wss://${
+                      process.env.NEXT_PUBLIC_WEBSOCKET_URL
+                  }/ws/room?username=${encodeURIComponent(user ? user : '')}`
+                : `localhost:8080/ws/room?username=${encodeURIComponent(
+                      user ? user : ''
+                  )}`
 
+            const ws = new WebSocket(URL)
+            ws.addEventListener('open', () => {
+                console.log('WebSocket connected')
+                connectionRef.current = ws
+            })
+
+            ws.addEventListener('message', (event) => {
+                console.log('WebSocket message received:', event.data)
+            })
+
+            ws.addEventListener('error', (error) => {
+                console.error('WebSocket error:', error)
+            })
+
+            ws.addEventListener('close', (event) => {
+                console.log('WebSocket closed:', event)
+                connectionRef.current = null
+            })
+
+            console.log('Connecting to WebSocket...')
             window.addEventListener('beforeunload', () => {
                 ws.close()
             })

@@ -68,11 +68,12 @@ export default function Typing() {
             characterArray,
             charTyped,
             setCharTyped,
-            preventIncorrect,
+            buttons.autoCorrect,
             isTyping,
             setIsTyping,
             gameOver,
-            startTimer
+            startTimer,
+            { time: timer, totalCharcter: characterArray.length }
         )
     const score = useCalculateScore(
         isTyping,
@@ -250,12 +251,18 @@ export default function Typing() {
                             <p>Ghost Cursor</p>
                         </div>
                         <div
-                            className="m-2 text-white/60 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer"
+                            className={clsx(
+                                'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                { 'text-green-400': !buttons.autoCorrect },
+                                {
+                                    'text-white/60': buttons.autoCorrect,
+                                }
+                            )}
                             onClick={() => {
                                 setButtons((prev) => {
                                     return {
                                         ...prev,
-                                        autoCorrect: !prev.autoCorrect,
+                                        autoCorrect: !buttons.autoCorrect,
                                     }
                                 })
                             }}
@@ -437,7 +444,7 @@ export default function Typing() {
                                     {
                                         'text-green-600': CapsLock,
                                     },
-                                    { 'invisible': !CapsLock }
+                                    { invisible: !CapsLock }
                                 )}
                             >
                                 <p>Capslock</p>
@@ -469,7 +476,7 @@ export default function Typing() {
                             'max-h-0 opacity-0 scale-0 ': gameOver,
                         },
                         {
-                            'max-h-[500px] opacity-100 scale-100': !gameOver,
+                            'max-h-[500px] opacity-100 scale-100': gameOver,
                         }
                     )}
                 >

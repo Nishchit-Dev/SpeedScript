@@ -63,16 +63,17 @@ export default function Typing() {
     const [gameOver, setGameOver] = useState(false)
     const { timer, startTimer, stopTimer } = useTimer()
     const [timerOption, setTimerOption] = useState(10)
-    const { progress, incorrectChar, cursor, charTypedInfo } = useListenTyping(
-        characterArray,
-        charTyped,
-        setCharTyped,
-        preventIncorrect,
-        isTyping,
-        setIsTyping,
-        gameOver,
-        startTimer
-    )
+    const { progress, incorrectChar, cursor, charTypedInfo, CapsLock } =
+        useListenTyping(
+            characterArray,
+            charTyped,
+            setCharTyped,
+            preventIncorrect,
+            isTyping,
+            setIsTyping,
+            gameOver,
+            startTimer
+        )
     const score = useCalculateScore(
         isTyping,
         timer,
@@ -93,9 +94,7 @@ export default function Typing() {
         }
     }, [charIndex])
 
-    useEffect(()=>{
-        
-    },[])
+    useEffect(() => {}, [])
     useEffect(() => {
         if (buttons.ghost) {
             if (isTyping) {
@@ -432,6 +431,16 @@ export default function Typing() {
                             <div className="flex flex-row gap-10 text-black/60">
                                 <p>{'Wpm: ' + score.wpm}</p>
                                 <p>{'Time: ' + timer}</p>
+                            </div>
+                            <div
+                                className={clsx(
+                                    {
+                                        'text-green-600': CapsLock,
+                                    },
+                                    { 'invisible': !CapsLock }
+                                )}
+                            >
+                                <p>Capslock</p>
                             </div>
                             <div>
                                 {characterArray.length > 0 ? (

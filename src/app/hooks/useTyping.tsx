@@ -40,6 +40,7 @@ const useListenTyping = (
     gameOver: boolean,
     startTimer: any
 ) => {
+    const [CapsLock, setCapslock] = useState(false)
     const [text, setText] = useState<string[]>(generatedText)
     useEffect(() => {
         setText(generatedText)
@@ -57,6 +58,9 @@ const useListenTyping = (
 
     useEffect(() => {
         const handleEvent = (event: KeyboardEvent) => {
+            if (event.getModifierState('CapsLock') !== CapsLock) {
+                setCapslock(event.getModifierState('CapsLock'))
+            }
             // if Press Key is BackSpace
             if (!isTyping) {
                 if (event.key.length == 1) {
@@ -131,6 +135,7 @@ const useListenTyping = (
         }
         let progress = (cursor / totalChar) * 100
 
+        // Check if CapsLock is on
         if (cursor == totalChar - 1) {
             window.removeEventListener('keydown', handleEvent)
         } else {
@@ -146,13 +151,14 @@ const useListenTyping = (
         return () => {
             window.removeEventListener('keydown', handleEvent)
         }
-    }, [cursor, isTyping, gameOver, text])
+    }, [cursor, isTyping, gameOver, text, CapsLock])
 
     return {
         progress,
         incorrectChar: incorrectTypeCharacter,
         cursor,
         charTypedInfo,
+        CapsLock,
     }
 }
 

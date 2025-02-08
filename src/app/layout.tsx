@@ -7,7 +7,6 @@ import { JetBrains_Mono } from 'next/font/google'
 import { Crown } from 'lucide-react'
 import Link from 'next/link'
 import FireAnimation from './lottieAnimation'
-import useUserCookies from './hooks/cookies/useUser'
 import { Analytics } from '@vercel/analytics/react'
 
 const jetBrainsMono = JetBrains_Mono({

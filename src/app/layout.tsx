@@ -8,6 +8,7 @@ import { Crown } from 'lucide-react'
 import Link from 'next/link'
 import FireAnimation from './lottieAnimation'
 import useUserCookies from './hooks/cookies/useUser'
+import { Analytics } from '@vercel/analytics/react'
 
 const jetBrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -39,6 +40,7 @@ export default function RootLayout({
 }>) {
     return (
         <ClerkProvider>
+            <Analytics />
             <html lang="en" suppressHydrationWarning>
                 <body
                     className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased bg-[#E1E1E3]`}

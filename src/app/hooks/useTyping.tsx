@@ -80,10 +80,11 @@ const useListenTyping = (
         correctWords: [{ char: '', index: 0 }],
         incorrectWords: [{ char: '', index: 0 }],
     })
-    const { charTypedInfomatics, setCharTypedInfomatics,wpm } = useTypedContent({
-        gameOver,
-        gameData,
-    })
+    const { charTypedInfomatics, setCharTypedInfomatics, wpm } =
+        useTypedContent({
+            gameOver,
+            gameData,
+        })
 
     // total length of the text
     const totalChar = text.length
@@ -93,9 +94,7 @@ const useListenTyping = (
         number[]
     >([])
     const [charTypedInfo, setCharTypedInfo] = useState<any>([])
-    useEffect(() => {
-        console.log(charTypedInfomatics)
-    }, [charTypedInfomatics])
+
     useEffect(() => {
         const handleEvent = (event: KeyboardEvent) => {
             if (event.getModifierState('CapsLock') !== CapsLock) {
@@ -122,20 +121,20 @@ const useListenTyping = (
                     setCharTypedInfomatics((prev: any) => prev.slice(0, -1))
                 }
                 if (words.correctWords.length > words.incorrectWords.length) {
-                    setWords((prev: any) => {
-                        return {
-                            ...prev,
-                            correctWords: prev.correctWords.slice(0, -1),
-                        }
-                    })
+                    // setWords((prev: any) => {
+                    //     return {
+                    //         ...prev,
+                    //         correctWords: prev.correctWords.slice(0, -1),
+                    //     }
+                    // })
                 }
                 if (text[cursor] != event.key && preventIncorrect) {
-                    setWords((prev: any) => {
-                        return {
-                            ...prev,
-                            incorrectWords: prev.incorrectWords.slice(0, -1),
-                        }
-                    })
+                    // setWords((prev: any) => {
+                    //     return {
+                    //         ...prev,
+                    //         incorrectWords: prev.incorrectWords.slice(0, -1),
+                    //     }
+                    // })
                 }
             }
 
@@ -146,15 +145,15 @@ const useListenTyping = (
             ) {
                 setCursor(cursor + 1)
 
-                setWords((prev: any) => {
-                    return {
-                        ...prev,
-                        correctWords: [
-                            ...prev.correctWords,
-                            { char: ' ', index: cursor },
-                        ],
-                    }
-                })
+                // setWords((prev: any) => {
+                //     return {
+                //         ...prev,
+                //         correctWords: [
+                //             ...prev.correctWords,
+                //             { char: ' ', index: cursor },
+                //         ],
+                //     }
+                // })
                 setCharTypedInfomatics((prev: any) => {
                     return [
                         ...prev,
@@ -186,15 +185,15 @@ const useListenTyping = (
                     setCursor((prev) => {
                         return prev + 1
                     })
-                    setWords((prev: any) => {
-                        return {
-                            ...prev,
-                            correctWords: [
-                                ...prev.correctWords,
-                                { char: event.key, index: cursor },
-                            ],
-                        }
-                    })
+                    // setWords((prev: any) => {
+                    //     return {
+                    //         ...prev,
+                    //         correctWords: [
+                    //             ...prev.correctWords,
+                    //             { char: event.key, index: cursor },
+                    //         ],
+                    //     }
+                    // })
                     setCharTypedInfomatics((prev: any) => {
                         return [
                             ...prev,
@@ -216,15 +215,15 @@ const useListenTyping = (
                         },
                     ])
                 } else if (preventIncorrect && text[cursor] != event.key) {
-                    setWords((prev: any) => {
-                        return {
-                            ...prev,
-                            incorrectWords: [
-                                ...prev.incorrectWords,
-                                { char: event.key, index: cursor },
-                            ],
-                        }
-                    })
+                    // setWords((prev: any) => {
+                    //     return {
+                    //         ...prev,
+                    //         incorrectWords: [
+                    //             ...prev.incorrectWords,
+                    //             { char: event.key, index: cursor },
+                    //         ],
+                    //     }
+                    // })
                     setCharTypedInfomatics((prev: any) => {
                         return [
                             ...prev,
@@ -272,9 +271,6 @@ const useListenTyping = (
 
         if (gameOver) {
             window.removeEventListener('keydown', handleEvent)
-            console.log('CorrectWords: ', words.correctWords)
-            console.log('InCorrectWords: ', words.incorrectWords)
-            console.log('totalCorrectWords: ', countWords(charTypedInfomatics))
         }
         // start the event lister when the components mounts
 
@@ -290,7 +286,7 @@ const useListenTyping = (
         cursor,
         charTypedInfo,
         CapsLock,
-        wpm
+        wpm,
     }
 }
 

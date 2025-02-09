@@ -9,6 +9,7 @@ import Link from 'next/link'
 import FireAnimation from './lottieAnimation'
 import { Analytics } from '@vercel/analytics/react'
 import NaivgationComponent from '@/components/NavComponent'
+import Head from 'next/head'
 
 const jetBrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -42,25 +43,30 @@ export default function RootLayout({
         <ClerkProvider>
             <Analytics />
             <html lang="en" suppressHydrationWarning>
+                <Head>
+                    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+                    {/* Alternative for better compatibility */}
+                    <link rel="icon" href="/favicon.ico" sizes="any" />
+                </Head>
                 <body
                     className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased bg-[#E1E1E3]`}
                     cz-shortcut-listen="true"
                 >
                     <div className="flex flex-1 justify-between items-center p-3 px-10 ">
-                        <div className="flex flex-1"></div>
+                        <div className="flex flex-[5/10]"></div>
 
-                        <div className="flex flex-1 flex-row justify-center items-center gap-3 cursor-pointer">
+                        <div className="flex flex-[0.5] md:flex-[0.8] lg:flex-[0.5] flex-row justify-evenly  items-center gap-3 cursor-pointer">
                             <Link href={'/'}>
                                 <p className="text-4xl font-jetBrainsMono italic font-semibold">
                                     SpeedScript
                                     <span className="text-green-400">.</span>
                                 </p>
                             </Link>
+                            <div className="flex flex-1">
+                                <NaivgationComponent />
+                            </div>
                         </div>
-
-                        <div className='flex flex-1'>
-                            <NaivgationComponent />
-                        </div>
+                        <div className="flex flex-[5/10]"></div>
                     </div>
                     <div className="py-10 ">{children}</div>
                 </body>

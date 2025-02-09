@@ -75,7 +75,7 @@ const useSocket = ({
                 ? `wss://${
                       process.env.NEXT_PUBLIC_WEBSOCKET_URL
                   }/ws/room?username=${encodeURIComponent(user ? user : '')}`
-                : `localhost:8080/ws/room?username=${encodeURIComponent(
+                : `ws://localhost:8080/ws/room?username=${encodeURIComponent(
                       user ? user : ''
                   )}`
 

@@ -1,18 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
-import useListenTyping, { calculateTimeGap } from '../hooks/useTyping'
+import useListenTyping from '../hooks/useTyping'
 import clsx from 'clsx'
 import useTimer from '../hooks/useTimer'
 import useCalculateScore from '../hooks/useCalculateScore'
 import Image from 'next/image'
 import Score from '@/components/ScoreCard/Score'
-import { ModalProvider } from '@/components/ui/animated-modal'
 import useGenerateTypingText from '../hooks/useGenerateTypingText'
-import { addNewScore } from '@/lib/actions/score.actions'
-import { currentUser } from '@clerk/nextjs/server'
-import { useUser } from '@clerk/nextjs'
-
-import useAddNewScore from '../hooks/useAddNewScore'
 import { useCookiesScore } from '../hooks/cookies/useCookies'
 import { useTimexWpm } from '../hooks/useTimeXWpm'
 import TimexWpm from '@/components/graph/timexwpmGraph'
@@ -63,15 +57,23 @@ export default function Typing() {
     const [gameOver, setGameOver] = useState(false)
     const { timer, startTimer, stopTimer } = useTimer()
     const [timerOption, setTimerOption] = useState(10)
-    const { progress, incorrectChar, cursor, charTypedInfo } = useListenTyping(
+    const {
+        progress,
+        incorrectChar,
+        cursor,
+        charTypedInfo,
+        CapsLock,
+        wpm: _wpm,
+    } = useListenTyping(
         characterArray,
         charTyped,
         setCharTyped,
-        preventIncorrect,
+        buttons.autoCorrect,
         isTyping,
         setIsTyping,
         gameOver,
-        startTimer
+        startTimer,
+        { time: timer, totalCharcter: characterArray.length, timer: timer }
     )
     const score = useCalculateScore(
         isTyping,
@@ -93,9 +95,7 @@ export default function Typing() {
         }
     }, [charIndex])
 
-    useEffect(()=>{
-        
-    },[])
+    useEffect(() => {}, [])
     useEffect(() => {
         if (buttons.ghost) {
             if (isTyping) {
@@ -130,8 +130,8 @@ export default function Typing() {
 
     const [style, setStyle] = useState(false)
 
-    useCookiesScore({ gameover: gameOver, wpm: score.wpm, data: charTypedInfo })
-    const { timexwpm } = useTimexWpm({ timer: timer, wpm: score.wpm })
+    useCookiesScore({ gameover: gameOver, wpm: _wpm, data: charTypedInfo })
+    const { timexwpm } = useTimexWpm({ timer: timer, wpm: _wpm })
 
     const charactersToShow = 200 // Number of characters to display at a time
     const startIndex =
@@ -251,12 +251,18 @@ export default function Typing() {
                             <p>Ghost Cursor</p>
                         </div>
                         <div
-                            className="m-2 text-white/60 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer"
+                            className={clsx(
+                                'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                { 'text-green-400': !buttons.autoCorrect },
+                                {
+                                    'text-white/60': buttons.autoCorrect,
+                                }
+                            )}
                             onClick={() => {
                                 setButtons((prev) => {
                                     return {
                                         ...prev,
-                                        autoCorrect: !prev.autoCorrect,
+                                        autoCorrect: !buttons.autoCorrect,
                                     }
                                 })
                             }}
@@ -366,14 +372,14 @@ export default function Typing() {
                 {gameOver ? (
                     <>
                         <div>
-                            <UserRankingSystem wpm={score.wpm} />
+                            <UserRankingSystem wpm={_wpm} />
                         </div>
 
                         <div className="flex flex-1 flex-row">
                             <div>
                                 <Score
                                     data={charTypedInfo}
-                                    _wpm={score.wpm}
+                                    _wpm={_wpm}
                                     timexwpm={timexwpm}
                                 />
                             </div>
@@ -430,8 +436,18 @@ export default function Typing() {
                     <div className="text-3xl font-jetBrainsMono font-bold">
                         <div className="flex flex-col justify-center items-center gap-3 ">
                             <div className="flex flex-row gap-10 text-black/60">
-                                <p>{'Wpm: ' + score.wpm}</p>
+                                <p>{'Wpm: ' + _wpm}</p>
                                 <p>{'Time: ' + timer}</p>
+                            </div>
+                            <div
+                                className={clsx(
+                                    {
+                                        'text-green-600': CapsLock,
+                                    },
+                                    { invisible: !CapsLock }
+                                )}
+                            >
+                                <p>Capslock</p>
                             </div>
                             <div>
                                 {characterArray.length > 0 ? (
@@ -460,7 +476,7 @@ export default function Typing() {
                             'max-h-0 opacity-0 scale-0 ': gameOver,
                         },
                         {
-                            'max-h-[500px] opacity-100 scale-100': !gameOver,
+                            'max-h-[500px] opacity-100 scale-100': gameOver,
                         }
                     )}
                 >
@@ -600,7 +616,7 @@ export default function Typing() {
                         <Score
                             trigger={gameOver}
                             data={charTypedInfo}
-                            _wpm={score.wpm}
+                            _wpm={_wpm}
                             timexwpm={timexwpm}
                         />
                     </ModalProvider>

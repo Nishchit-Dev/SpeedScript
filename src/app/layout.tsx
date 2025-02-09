@@ -7,8 +7,8 @@ import { JetBrains_Mono } from 'next/font/google'
 import { Crown } from 'lucide-react'
 import Link from 'next/link'
 import FireAnimation from './lottieAnimation'
-import useUserCookies from './hooks/cookies/useUser'
 import { Analytics } from '@vercel/analytics/react'
+import NaivgationComponent from '@/components/NavComponent'
 
 const jetBrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -56,29 +56,10 @@ export default function RootLayout({
                                     <span className="text-green-400">.</span>
                                 </p>
                             </Link>
-
-                            <Link href={'/leaderboard'}>
-                                <p className="font-jetBrainsMono flex flex-row text-lg justify-center gap-4 bg-yellow-500 items-center p-2  rounded-full">
-                                    <Crown size={22} />
-                                </p>
-                            </Link>
                         </div>
 
-                        <div className="flex flex-1 flex-row gap-3 items-center justify-end">
-                            <div className="font-jetBrainsMono flex flex-row ">
-                                <Link href={'/multiplayer'}>
-                                    <div className="flex flex-row px-5 py-2 text-sm text-black bg-white hover:opacity-70 duration-300 rounded-full cursor-pointer">
-                                        Competitive
-                                        <FireAnimation />
-                                    </div>
-                                </Link>
-                            </div>
-                            <SignedIn>
-                                <UserButton />
-                            </SignedIn>
-                            <SignedOut>
-                                <SignedIn />
-                            </SignedOut>
+                        <div className='flex flex-1'>
+                            <NaivgationComponent />
                         </div>
                     </div>
                     <div className="py-10 ">{children}</div>

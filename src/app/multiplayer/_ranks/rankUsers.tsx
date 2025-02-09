@@ -81,9 +81,10 @@ export const Stage = ({ data, index }: { data: Data; index: number }) => {
                 <div className="font-jetBrainsMono font-bold text-2xl ">
                     <p> {data.wpm}</p>
                 </div>
-                <div className="flex flex-row gap-2 font-jetBrainsMono bg-white/80 px-3 py-2 rounded-full justify-center items-center">
-                    <div className="bg-slate-400 rounded-full p-[2px]">
-                        <User />
+                <div className="flex flex-row gap-2 font-jetBrainsMono bg-white/80 px-2 pr-3 py-2 rounded-full justify-center items-center">
+                    <div className="text-yellow-400   font-bold rounded-full p-[2px] px-[5px]">
+                        {/* <User /> */}
+                        <p>#{index == 1 ? 2 : index == 2 ? 1 : index}</p>
                     </div>
                     <p> {data.username}</p>
                 </div>

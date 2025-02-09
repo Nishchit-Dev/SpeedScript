@@ -8,6 +8,7 @@ import { Crown } from 'lucide-react'
 import Link from 'next/link'
 import FireAnimation from './lottieAnimation'
 import { Analytics } from '@vercel/analytics/react'
+import NaivgationComponent from '@/components/NavComponent'
 
 const jetBrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -57,27 +58,8 @@ export default function RootLayout({
                             </Link>
                         </div>
 
-                        <div className="flex flex-1 flex-row gap-3 items-center justify-end">
-                            <div className="font-jetBrainsMono flex flex-row gap-3 justify-center items-center">
-                                <Link href={'/multiplayer'}>
-                                    <div className="flex flex-row px-5 py-2 text-sm text-black bg-white hover:opacity-70 duration-300 rounded-full cursor-pointer">
-                                        Competitive
-                                        <FireAnimation />
-                                    </div>
-                                </Link>
-                                <Link href={'/leaderboard'}>
-                                    <div className="font-jetBrainsMono gap-2 flex flex-row text-sm justify-center  bg-yellow-500 items-center px-4 py-2  rounded-full">
-                                        <Crown size={18} />
-                                        <p>Leaderboard</p>
-                                    </div>
-                                </Link>
-                            </div>
-                            <SignedIn>
-                                <UserButton />
-                            </SignedIn>
-                            <SignedOut>
-                                <SignedIn />
-                            </SignedOut>
+                        <div className='flex flex-1'>
+                            <NaivgationComponent />
                         </div>
                     </div>
                     <div className="py-10 ">{children}</div>

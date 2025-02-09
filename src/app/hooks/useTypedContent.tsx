@@ -26,6 +26,7 @@ const countWords = (
 interface gameData {
     time: number
     totalCharcter: number
+    timer: number
 }
 
 const useTypedContent = ({
@@ -33,7 +34,7 @@ const useTypedContent = ({
     gameData,
 }: {
     gameOver?: boolean
-    gameData: gameData
+    gameData?: gameData
 }) => {
     const [charTypedInfomatics, setCharTypedInfomatics] = useState<any>([
         { char: '', index: 0, correct: true },
@@ -41,36 +42,18 @@ const useTypedContent = ({
     const [wpm, setWpm] = useState(0)
 
     useEffect(() => {
-        if (gameOver) {
+        if (gameData) {
             const wordsTyped = countWords(charTypedInfomatics)
-            console.log('wordsTyped', wordsTyped)
-            setWpm(wordsTyped / gameData.time)
-
-            // switch (gameData.time) {
-            //     case 10:
-            //         setWpm(wordsTyped / gameData.time) // Convert seconds to minutes
-
-            //         break
-            //     case 30:
-            //         setWpm(wordsTyped / gameData.time)
-            //         break
-
-            //     case 60:
-            //         setWpm(wordsTyped / gameData.time)
-            //         break
-
-            //     case 120:
-            //         setWpm(wordsTyped / gameData.time)
-            //         break
-            // }
+            let calculatedWpm = wordsTyped / (gameData.time / 60)
+            if (!isFinite(calculatedWpm)) {
+                calculatedWpm = 0
+            }
+            setWpm(parseFloat(calculatedWpm.toFixed(2)))
+            console.log('wpm: ', wpm)
         }
-    }, [gameOver])
+    }, [gameData?.timer, gameOver])
 
-    useEffect(() => {
-        console.log('wpm: ', wpm*100)
-    }, [wpm])
-
-    return { charTypedInfomatics, setCharTypedInfomatics }
+    return { charTypedInfomatics, setCharTypedInfomatics, wpm }
 }
 
 export default useTypedContent

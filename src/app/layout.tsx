@@ -47,19 +47,21 @@ export default function RootLayout({
                     cz-shortcut-listen="true"
                 >
                     <div className="flex flex-1 justify-between items-center p-3 px-10 ">
-                        <div className="flex flex-1"></div>
+                        <div className="flex flex-[5/10]"></div>
 
-                        <div className="flex flex-1 flex-row justify-center items-center gap-3 cursor-pointer">
+                        <div className="flex flex-[0.5] md:flex-[0.8] flex-row justify-evenly  items-center gap-3 cursor-pointer">
                             <Link href={'/'}>
                                 <p className="text-4xl font-jetBrainsMono italic font-semibold">
                                     SpeedScript
                                     <span className="text-green-400">.</span>
                                 </p>
                             </Link>
+                            <div className="flex flex-1">
+                                <NaivgationComponent />
+                            </div>
                         </div>
+                        <div className='flex flex-[5/10]'>
 
-                        <div className='flex flex-1'>
-                            <NaivgationComponent />
                         </div>
                     </div>
                     <div className="py-10 ">{children}</div>

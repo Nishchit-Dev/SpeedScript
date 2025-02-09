@@ -192,7 +192,7 @@ const useListenTyping = (
                             time: Date.now(),
                         },
                     ])
-                } else if (preventIncorrect && text[cursor] != event.key) {
+                } else if (!preventIncorrect && text[cursor] != event.key) {
                     // setWords((prev: any) => {
                     //     return {
                     //         ...prev,

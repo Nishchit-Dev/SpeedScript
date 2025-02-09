@@ -9,6 +9,7 @@ import Link from 'next/link'
 import FireAnimation from './lottieAnimation'
 import { Analytics } from '@vercel/analytics/react'
 import NaivgationComponent from '@/components/NavComponent'
+import Head from 'next/head'
 
 const jetBrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -42,6 +43,11 @@ export default function RootLayout({
         <ClerkProvider>
             <Analytics />
             <html lang="en" suppressHydrationWarning>
+                <Head>
+                    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+                    {/* Alternative for better compatibility */}
+                    <link rel="icon" href="/favicon.ico" sizes="any" />
+                </Head>
                 <body
                     className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased bg-[#E1E1E3]`}
                     cz-shortcut-listen="true"
@@ -60,9 +66,7 @@ export default function RootLayout({
                                 <NaivgationComponent />
                             </div>
                         </div>
-                        <div className='flex flex-[5/10]'>
-
-                        </div>
+                        <div className="flex flex-[5/10]"></div>
                     </div>
                     <div className="py-10 ">{children}</div>
                 </body>

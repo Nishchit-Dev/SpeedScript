@@ -2,7 +2,13 @@
 import { clsx } from 'clsx'
 import { useLeaderboard } from '../hooks/leaderBoard/useLeaderBoard'
 import Counter from '@/components/ui/countingNumberAnimation'
-import { User } from 'lucide-react'
+import {
+    ArrowBigRight,
+    ArrowLeft,
+    ArrowLeftCircle,
+    ArrowRight,
+    User,
+} from 'lucide-react'
 import useUserLocal from '../hooks/cookies/useGuest'
 import { useEffect, useState } from 'react'
 import { GlareCard } from '@/components/ui/glare-ui'
@@ -75,10 +81,14 @@ const LeaderboardComponent = ({
     index,
     data,
     flag = true,
+    currentPage,
+    itemsPerPage,
 }: {
     index: number
     data: data
     flag?: boolean
+    currentPage: number
+    itemsPerPage: number
 }) => {
     const { userGuest, getUser } = useUserLocal()
     const [user, setUser] = useState<data | null>(null)
@@ -117,7 +127,11 @@ const LeaderboardComponent = ({
                         <div className="flex justify-center items-center gap-2">
                             {index >= 3 ? (
                                 <div className="flex flex-row justify-center items-center gap-5">
-                                    <div>{index + 1}</div>
+                                    <div>
+                                        {(currentPage - 1) * itemsPerPage +
+                                            index +
+                                            1}
+                                    </div>
                                     <div>
                                         <Image
                                             src={`/throphies/badges/${getBadgeImage(
@@ -353,10 +367,29 @@ const UserScoreBoard = ({ flag }: { flag: boolean }) => {
         </>
     )
 }
-
 const LeaderBoard = () => {
     const { leaderboard, dailyLeaderboard } = useLeaderboard()
     const [flag, setFlag] = useState(true)
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 50
+
+    const handleNextPage = () => {
+        setCurrentPage((prevPage) => prevPage + 1)
+    }
+
+    const handlePreviousPage = () => {
+        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
+    }
+
+    const paginatedLeaderboard = leaderboard.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
+
+    const paginatedDailyLeaderboard = dailyLeaderboard.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
 
     return (
         <div className="flex flex-1 flex-col justify-center items-center w-full">
@@ -365,39 +398,57 @@ const LeaderBoard = () => {
 
             {flag ? (
                 <>
-                    <div className="flex flex-row h-80 mb-28 ">
-                        {leaderboard.map((data: any, index) => {
-                            if (index < 3)
-                                return (
-                                    <Stage
-                                        data={data}
-                                        flag={true}
-                                        key={index + 1}
-                                        index={index + 1}
-                                    />
-                                )
-                        })}
-                    </div>
+                    {currentPage === 1 && (
+                        <div className="flex flex-row h-80 mb-28 ">
+                            {paginatedLeaderboard.map((data: any, index) => {
+                                if (index < 3)
+                                    return (
+                                        <Stage
+                                            data={data}
+                                            flag={true}
+                                            key={
+                                                (currentPage - 1) *
+                                                    itemsPerPage +
+                                                index +
+                                                1
+                                            }
+                                            index={
+                                                (currentPage - 1) *
+                                                    itemsPerPage +
+                                                index +
+                                                1
+                                            }
+                                        />
+                                    )
+                            })}
+                        </div>
+                    )}
                     <div className="bg-white rounded-lg">
-                        {leaderboard.map((data: any, index) => {
-                            return (
-                                <div key={index}>
+                        {paginatedLeaderboard.map((data: any, index) => {
+                            if (index >= 3)
+                                return (
                                     <LeaderboardComponent
                                         data={data}
                                         index={index}
-                                        flag={!flag}
+                                        flag={flag}
+                                        currentPage={currentPage}
+                                        itemsPerPage={itemsPerPage}
+                                        key={
+                                            (currentPage - 1) * itemsPerPage +
+                                            index +
+                                            1
+                                        }
                                     />
-                                </div>
-                            )
+                                )
                         })}
                     </div>
                 </>
             ) : (
                 <>
-                    <div className="flex flex-row h-80 mb-28 ">
-                        {
-                            <>
-                                {dailyLeaderboard.map((data: any, index) => {
+                    {currentPage === 1 && (
+                        <div className="flex flex-row h-80 mb-28 ">
+                            {paginatedDailyLeaderboard.map(
+                                (data: any, index) => {
                                     if (index < 3)
                                         return (
                                             <Stage
@@ -406,35 +457,48 @@ const LeaderBoard = () => {
                                                 index={index + 1}
                                             />
                                         )
-                                })}
-                            </>
-                        }
-                    </div>
+                                }
+                            )}
+                        </div>
+                    )}
                     <div className="bg-white rounded-lg">
-                        {dailyLeaderboard.map((data: any, index) => {
+                        {paginatedDailyLeaderboard.map((data: any, index) => {
                             if (index >= 3)
                                 return (
-                                    <div key={index}>
-                                        <DailyLeaderboardComponent
-                                            data={data}
-                                            index={index}
-                                        />
-                                    </div>
+                                    <DailyLeaderboardComponent
+                                        data={data}
+                                        index={index}
+                                        key={index}
+                                    />
                                 )
                         })}
                     </div>
                 </>
-                // dailyLeaderboard.map((data: any, index) => {
-                //     return (
-                //         <div key={index}>
-                //             <DailyLeaderboardComponent
-                //                 data={data}
-                //                 index={index}
-                //             />
-                //         </div>
-                //     )
-                // })
             )}
+            <div className="flex w-full max-w-[452px] justify-between items-center mt-4 font-jetBrainsMono">
+                <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className="flex items-center  rounded-full px-4 py-2 bg-gray-400 disabled:opacity-50"
+                >
+                    <ArrowLeft />
+                    <p> Previous</p>
+                </button>
+                <p>{currentPage}</p>
+                <button
+                    onClick={handleNextPage}
+                    disabled={
+                        flag
+                            ? currentPage * itemsPerPage >= leaderboard.length
+                            : currentPage * itemsPerPage >=
+                              dailyLeaderboard.length
+                    }
+                    className="flex items-center rounded-full px-4 py-2 bg-gray-400 disabled:opacity-50"
+                >
+                    <p>Next</p>
+                    <ArrowRight />
+                </button>
+            </div>
         </div>
     )
 }

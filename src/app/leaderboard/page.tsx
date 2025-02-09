@@ -142,7 +142,7 @@ const LeaderboardComponent = ({
                                 </div>
                             )}
 
-                            <div className="" onClick={() => {}}>
+                            <div className="text-black/80" onClick={() => {}}>
                                 {usernameSlicer(data)}
                             </div>
                             <div
@@ -156,12 +156,9 @@ const LeaderboardComponent = ({
                             </div>
                         </div>
                         <div className="">
-                            <Counter
-                                number={
-                                    data.highestWpm > 0 ? data.highestWpm : 0
-                                }
-                                speed={5}
-                            />
+                            <p className="text-lg font-bold">
+                                {data.highestWpm > 0 ? data.highestWpm : 0}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -197,7 +194,7 @@ const DailyLeaderboardComponent = ({
                 {
                     'bg-yellow-200 p-3 px-10 min-w-[412px] text-lg': index == 2,
                 },
-                { 'bg-yellow-100 p-3 px-10 min-w-[412px]': index > 2 },
+                { ' p-3 px-10 min-w-[412px]': index > 2 },
                 {
                     hidden: data.dailyHighestWpm <= 0,
                 }
@@ -231,7 +228,7 @@ const DailyLeaderboardComponent = ({
                             />
                         </div>
                     )}
-                    <div className="" onClick={() => {}}>
+                    <div className="text-black/80" onClick={() => {}}>
                         {usernameSlicer(data)}
                     </div>
                     <div
@@ -245,12 +242,12 @@ const DailyLeaderboardComponent = ({
                     </div>
                 </div>
                 <div className="font-jetBrainsMono">
-                    <Counter
-                        number={
-                            data.dailyHighestWpm > 0 ? data.dailyHighestWpm : 0
-                        }
-                        speed={5}
-                    />
+                    <p className="text-lg font-bold">
+                        {' '}
+                        {data.dailyHighestWpm > 0
+                            ? data.dailyHighestWpm
+                            : 0}{' '}
+                    </p>
                 </div>
             </div>
         </div>
@@ -415,7 +412,7 @@ const LeaderBoard = () => {
                     </div>
                     <div className="bg-white rounded-lg">
                         {dailyLeaderboard.map((data: any, index) => {
-                            if (index > 3)
+                            if (index >= 3)
                                 return (
                                     <div key={index}>
                                         <DailyLeaderboardComponent

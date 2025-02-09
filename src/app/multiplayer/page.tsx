@@ -5,14 +5,10 @@ import clsx from 'clsx'
 import useTimer from '../hooks/useTimer'
 import useCalculateScore from '../hooks/useCalculateScore'
 import Score from '@/components/ScoreCard/Score'
-
-import { useCookiesScore } from '../hooks/cookies/useCookies'
 import { useTimexWpm } from '../hooks/useTimeXWpm'
 import TimexWpmRoom from '@/components/graph/timexwpmGraphRoom'
 import ShowGraph from '@/components/graph/showGraph'
 import useCursor from '../hooks/curosrAnimationHook/useCursorAnimation'
-import { RefreshCcw } from 'lucide-react'
-import useUserLocal from '../hooks/cookies/useGuest'
 import useGhostCursor from '../hooks/curosrAnimationHook/useGhostCursor'
 import useSocket from '../hooks/websockethooks/useSockets'
 import useRandomColor from '../hooks/useRandomColor'
@@ -53,7 +49,13 @@ export default function Typing() {
     const [gameOver, setGameOver] = useState(false)
     const { timer, startTimer, stopTimer } = useTimer()
     const [timerOption, setTimerOption] = useState(30)
-    const { progress, incorrectChar, cursor, charTypedInfo } = useListenTyping(
+    const {
+        progress,
+        incorrectChar,
+        cursor,
+        charTypedInfo,
+        wpm: _wpm,
+    } = useListenTyping(
         characterArray,
         charTyped,
         setCharTyped,
@@ -61,7 +63,8 @@ export default function Typing() {
         isTyping,
         setIsTyping,
         gameOver,
-        startTimer
+        startTimer,
+        { time: timer, totalCharcter: characterArray.length, timer: timer }
     )
 
     const score = useCalculateScore(
@@ -123,8 +126,8 @@ export default function Typing() {
     const cursorPosition = useCursor({ cursor })
     const [style, setStyle] = useState(false)
 
-    // useCookiesScore({ gameover: gameOver, wpm: score.wpm, data: charTypedInfo })
-    const { timexwpm } = useTimexWpm({ timer: timer, wpm: score.wpm })
+    // useCookiesScore({ gameover: gameOver, wpm: _wpm, data: charTypedInfo })
+    const { timexwpm } = useTimexWpm({ timer: timer, wpm: _wpm })
 
     const {
         roomData,
@@ -141,7 +144,7 @@ export default function Typing() {
         totalCharacter: typingSentence.length,
         setIsTyping,
         userStats: timexwpm,
-        wpm: score.wpm,
+        wpm: _wpm,
     })
 
     useEffect(() => {
@@ -149,9 +152,11 @@ export default function Typing() {
     }, [roomData.roomText])
 
     useEffect(() => {
-        console.log(gameState)
+        console.log('sending game-state: ', gameState)
+
         if (gameState == 'finished') {
-            sendResults(timexwpm, score.wpm)
+            console.log(_wpm)
+            sendResults(timexwpm, _wpm)
         }
     }, [gameState])
 
@@ -366,7 +371,7 @@ export default function Typing() {
                                 <div>
                                     <Score
                                         data={charTypedInfo}
-                                        _wpm={score.wpm}
+                                        _wpm={_wpm}
                                         timexwpm={timexwpm}
                                     />
                                 </div>
@@ -432,7 +437,7 @@ export default function Typing() {
                             <div className="text-3xl font-jetBrainsMono font-bold">
                                 <div className="flex flex-col justify-center items-center gap-3 ">
                                     <div className="flex flex-row gap-10 text-black/60">
-                                        <p>{'Wpm: ' + score.wpm}</p>
+                                        <p>{'Wpm: ' + _wpm}</p>
                                         <p>{'Time: ' + timer}</p>
                                     </div>
                                     <div>

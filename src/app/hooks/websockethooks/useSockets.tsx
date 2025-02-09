@@ -98,7 +98,6 @@ const useSocket = ({
                 connectionRef.current = null
             })
 
-            console.log('Connecting to WebSocket...')
             window.addEventListener('beforeunload', () => {
                 ws.close()
             })
@@ -200,6 +199,7 @@ const useSocket = ({
     const sendResults = useCallback(
         (data: UserStats[], wpm: number) => {
             if (connectionRef.current && gameState === GameState.FINISHED) {
+                console.log(wpm)
                 connectionRef.current.send(
                     JSON.stringify({
                         type: 'final_stats',
@@ -207,18 +207,11 @@ const useSocket = ({
                             username: roomData.username,
                             stats: {
                                 timeStats: data,
-                                wpm: wpm ?? -1,
+                                wpm: wpm.toString(),
                             },
                         },
                     })
                 )
-                console.log('Sending final stats:', {
-                    username: roomData.username,
-                    stats: {
-                        timeStats: data,
-                        wpm: wpm ?? -1,
-                    },
-                })
             }
         },
         [gameState, roomData.username]

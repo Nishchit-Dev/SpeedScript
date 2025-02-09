@@ -1,7 +1,6 @@
-import { set } from 'mongoose'
-import { eventNames } from 'process'
+
 import { useEffect, useState } from 'react'
-import useSocket from './websockethooks/useSockets'
+
 import useTypedContent from './useTypedContent'
 
 interface CharTypedInfo {
@@ -12,29 +11,6 @@ interface CharTypedInfo {
 interface TimeGapInfo {
     char: string
     timeGap: number
-}
-
-const countWords = (
-    charTypedInfomatics: { char: string; index: number; correct: boolean }[]
-) => {
-    let correctWordCount = 0
-    let currentWordCorrect = true
-
-    for (let i = 0; i < charTypedInfomatics.length; i++) {
-        if (
-            charTypedInfomatics[i].char === ' ' ||
-            i === charTypedInfomatics.length - 1
-        ) {
-            if (currentWordCorrect) {
-                correctWordCount++
-            }
-            currentWordCorrect = true
-        } else if (!charTypedInfomatics[i].correct) {
-            currentWordCorrect = false
-        }
-    }
-
-    return correctWordCount
 }
 
 export const calculateTimeGap = (
@@ -53,6 +29,7 @@ export const calculateTimeGap = (
     }
     return timeGaps
 }
+
 interface gameData {
     time: number
     totalCharcter: number

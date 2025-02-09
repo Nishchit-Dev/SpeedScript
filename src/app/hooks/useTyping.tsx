@@ -2,6 +2,7 @@ import { set } from 'mongoose'
 import { eventNames } from 'process'
 import { useEffect, useState } from 'react'
 import useSocket from './websockethooks/useSockets'
+import useTypedContent from './useTypedContent'
 
 interface CharTypedInfo {
     char: string
@@ -11,6 +12,29 @@ interface CharTypedInfo {
 interface TimeGapInfo {
     char: string
     timeGap: number
+}
+
+const countWords = (
+    charTypedInfomatics: { char: string; index: number; correct: boolean }[]
+) => {
+    let correctWordCount = 0
+    let currentWordCorrect = true
+
+    for (let i = 0; i < charTypedInfomatics.length; i++) {
+        if (
+            charTypedInfomatics[i].char === ' ' ||
+            i === charTypedInfomatics.length - 1
+        ) {
+            if (currentWordCorrect) {
+                correctWordCount++
+            }
+            currentWordCorrect = true
+        } else if (!charTypedInfomatics[i].correct) {
+            currentWordCorrect = false
+        }
+    }
+
+    return correctWordCount
 }
 
 export const calculateTimeGap = (
@@ -29,7 +53,11 @@ export const calculateTimeGap = (
     }
     return timeGaps
 }
-
+interface gameData {
+    time: number
+    totalCharcter: number
+    timer: number
+}
 const useListenTyping = (
     generatedText: string[],
     charTyped: string[],
@@ -38,7 +66,8 @@ const useListenTyping = (
     isTyping: boolean,
     setIsTyping: any,
     gameOver: boolean,
-    startTimer: any
+    startTimer: any,
+    gameData: gameData
 ) => {
     const [CapsLock, setCapslock] = useState(false)
     const [text, setText] = useState<string[]>(generatedText)
@@ -47,6 +76,15 @@ const useListenTyping = (
     }, [generatedText])
     // pointer of the cursor: where the user is tpying now...
     const [cursor, setCursor] = useState(0)
+    const [words, setWords] = useState({
+        correctWords: [{ char: '', index: 0 }],
+        incorrectWords: [{ char: '', index: 0 }],
+    })
+    const { charTypedInfomatics, setCharTypedInfomatics,wpm } = useTypedContent({
+        gameOver,
+        gameData,
+    })
+
     // total length of the text
     const totalChar = text.length
     const [progress, setProgress] = useState(0)
@@ -55,7 +93,9 @@ const useListenTyping = (
         number[]
     >([])
     const [charTypedInfo, setCharTypedInfo] = useState<any>([])
-
+    useEffect(() => {
+        console.log(charTypedInfomatics)
+    }, [charTypedInfomatics])
     useEffect(() => {
         const handleEvent = (event: KeyboardEvent) => {
             if (event.getModifierState('CapsLock') !== CapsLock) {
@@ -70,23 +110,64 @@ const useListenTyping = (
             }
 
             if (event.key == 'Backspace') {
-                if (cursor >= 1) {
+                if (cursor >= 0) {
                     setIncorrectTypeCharacter((prev) =>
-                        prev.filter((char) => char != cursor)
+                        prev.filter((char) => char !== cursor - 1)
                     )
                     setCursor(cursor - 1)
                     setCharTyped(charTyped.slice(0, -1))
                     setProgress(progress)
+                }
+                if (charTypedInfomatics.length > 0) {
+                    setCharTypedInfomatics((prev: any) => prev.slice(0, -1))
+                }
+                if (words.correctWords.length > words.incorrectWords.length) {
+                    setWords((prev: any) => {
+                        return {
+                            ...prev,
+                            correctWords: prev.correctWords.slice(0, -1),
+                        }
+                    })
+                }
+                if (text[cursor] != event.key && preventIncorrect) {
+                    setWords((prev: any) => {
+                        return {
+                            ...prev,
+                            incorrectWords: prev.incorrectWords.slice(0, -1),
+                        }
+                    })
                 }
             }
 
             // if Press Key is Space
             if (
                 event.key == ' ' &&
-                (text[cursor] == event.key || text[cursor] == '\u2000') &&
-                !preventIncorrect
+                (text[cursor] == event.key || text[cursor] == '\u2000')
             ) {
                 setCursor(cursor + 1)
+
+                setWords((prev: any) => {
+                    return {
+                        ...prev,
+                        correctWords: [
+                            ...prev.correctWords,
+                            { char: ' ', index: cursor },
+                        ],
+                    }
+                })
+                setCharTypedInfomatics((prev: any) => {
+                    return [
+                        ...prev,
+                        {
+                            char: event.key,
+                            index: cursor,
+                            correct:
+                                text[cursor] == event.key ||
+                                text[cursor] == '\u2000',
+                        },
+                    ]
+                })
+
                 setCharTyped([...charTyped, event.key])
                 setProgress(progress)
                 setCharTypedInfo([
@@ -99,10 +180,32 @@ const useListenTyping = (
 
                 // if the pressed key is a character
             } else if (event.key.length == 1) {
-                if (text[cursor] == event.key && !preventIncorrect) {
+                if (text[cursor] == event.key) {
                     // press correct key
 
-                    setCursor(cursor + 1)
+                    setCursor((prev) => {
+                        return prev + 1
+                    })
+                    setWords((prev: any) => {
+                        return {
+                            ...prev,
+                            correctWords: [
+                                ...prev.correctWords,
+                                { char: event.key, index: cursor },
+                            ],
+                        }
+                    })
+                    setCharTypedInfomatics((prev: any) => {
+                        return [
+                            ...prev,
+                            {
+                                char: event.key,
+                                index: cursor,
+                                correct: text[cursor] == event.key,
+                            },
+                        ]
+                    })
+
                     setCharTyped([...charTyped, event.key])
                     setProgress(progress)
                     setCharTypedInfo([
@@ -113,10 +216,35 @@ const useListenTyping = (
                         },
                     ])
                 } else if (preventIncorrect && text[cursor] != event.key) {
-                    // press incorrect key
+                    setWords((prev: any) => {
+                        return {
+                            ...prev,
+                            incorrectWords: [
+                                ...prev.incorrectWords,
+                                { char: event.key, index: cursor },
+                            ],
+                        }
+                    })
+                    setCharTypedInfomatics((prev: any) => {
+                        return [
+                            ...prev,
+                            {
+                                char: text[cursor] === ' ' ? ' ' : event.key,
+                                index: cursor,
+                                correct:
+                                    text[cursor] == event.key
+                                        ? true
+                                        : text[cursor] == '\u2000'
+                                        ? true
+                                        : false,
+                            },
+                        ]
+                    })
 
                     setIncorrectTypeCharacter((prev) => [...prev, cursor])
-                    setCursor(cursor + 1)
+                    setCursor((prev) => {
+                        return prev + 1
+                    })
                     setCharTyped((prev: any) => [...prev, event.key])
                     setProgress(progress)
                     setCharTypedInfo([
@@ -144,6 +272,9 @@ const useListenTyping = (
 
         if (gameOver) {
             window.removeEventListener('keydown', handleEvent)
+            console.log('CorrectWords: ', words.correctWords)
+            console.log('InCorrectWords: ', words.incorrectWords)
+            console.log('totalCorrectWords: ', countWords(charTypedInfomatics))
         }
         // start the event lister when the components mounts
 
@@ -159,6 +290,7 @@ const useListenTyping = (
         cursor,
         charTypedInfo,
         CapsLock,
+        wpm
     }
 }
 

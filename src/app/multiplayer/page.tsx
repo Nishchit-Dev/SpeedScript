@@ -327,7 +327,11 @@ export default function Typing() {
                                                             <div>
                                                                 <Image
                                                                     src={`/throphies/badges/${getBadgeImage(
-                                                                        state.highestWpm
+                                                                        Math.round(
+                                                                            Number(
+                                                                                state.highestWpm
+                                                                            )
+                                                                        )
                                                                     )}`}
                                                                     alt=""
                                                                     width={60}

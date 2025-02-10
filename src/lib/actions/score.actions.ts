@@ -9,7 +9,7 @@ import mongoose from 'mongoose'
 export async function addNewScore(
     userId: string,
     wpm: number,
-    accuracy: number
+    accuracy?: number
 ) {
     try {
         if (userId != null) {

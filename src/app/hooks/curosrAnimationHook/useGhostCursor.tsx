@@ -19,9 +19,6 @@ const useGhostCursor = ({
     useEffect(() => {
         getPosition()
     }, [countIndex])
-    useEffect(() => {
-        console.log(calculateAverageVelocity())
-    }, [])
 
     const getPosition = () => {
         const element = document.querySelector(`.character${countIndex}`)
@@ -36,32 +33,18 @@ const useGhostCursor = ({
         if (x && y) setPosition({ x: x + scrollX, y: y + scrollY })
     }
 
-    function timePerKeyPress(wpm: number) {
-        // Calculate time per word in seconds
-        const timePerWord = 60 / wpm
-
-        // Calculate time per key press (assuming 5 characters per word)
-        const timePerKey = timePerWord / 5
-
-        return timePerKey
-    }
-    const createCursorIntervalRandom = () => {
-        let randomNumber = Math.floor(Math.random() * 51)
-        console.log('randomNumber', randomNumber)
-        return randomNumber
-    }
-
     const startGhostCursor = useCallback(() => {
         // let time = getUserGhostCursor().time + createCursorIntervalRandom()
-        let time = calculateAverageVelocity() * 10
-        console.log('time', time)
-        console.log('getUserGhostCursor().time', getUserGhostCursor().time)
+        const calcualtedVelocity = calculateAverageVelocity()
+        if (calcualtedVelocity >= 0) {
+            let time = calculateAverageVelocity() * 10
 
-        if (intervalId === null) {
-            const id = setInterval(() => {
-                setCountIndex((prevCount) => prevCount + 1)
-            }, time)
-            setIntervalId(id)
+            if (intervalId === null) {
+                const id = setInterval(() => {
+                    setCountIndex((prevCount) => prevCount + 1)
+                }, time)
+                setIntervalId(id)
+            }
         }
     }, [gameOver])
     const stopTimer = useCallback(() => {

@@ -17,7 +17,7 @@ export default function useGenerateTypingText() {
     const [typingSuggestion, setTypingSuggestion] = useState('')
     useEffect(() => {
         fetchRamdomQuote(300).then((quote: any) => {
-            console.log(quote)
+
             if (quote) {
                 setTypingSuggestion(quote.story)
             }

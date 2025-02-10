@@ -67,7 +67,6 @@ const useSocket = ({
     // Handle WebSocket connection
     const connect = useCallback(
         (username: string) => {
-            console.log('username:', username)
             const user = username
             setRoomData((prev) => ({ ...prev, username: user }))
 
@@ -81,12 +80,12 @@ const useSocket = ({
 
             const ws = new WebSocket(URL)
             ws.addEventListener('open', () => {
-                console.log('WebSocket connected')
+                // console.log('WebSocket connected')
                 connectionRef.current = ws
             })
 
             ws.addEventListener('message', (event) => {
-                console.log('WebSocket message received:', event.data)
+                // console.log('WebSocket message received:', event.data)
             })
 
             ws.addEventListener('error', (error) => {
@@ -94,7 +93,7 @@ const useSocket = ({
             })
 
             ws.addEventListener('close', (event) => {
-                console.log('WebSocket closed:', event)
+                // console.log('WebSocket closed:', event)
                 connectionRef.current = null
             })
 
@@ -102,24 +101,24 @@ const useSocket = ({
                 ws.close()
             })
             const handleOpen = () => {
-                console.log('socket connected')
+                // console.log('socket connected')
                 connectionRef.current = ws
             }
 
             const handleClose = (event: CloseEvent) => {
-                console.log('socket closed ', event.code)
+                // console.log('socket closed ', event.code)
                 setGameState(GameState.CONNECTING)
                 connectionRef.current = null
             }
 
             const handleError = (error: Event) => {
-                console.log('socket error ', error)
+                // console.log('socket error ', error)
             }
 
             const handleMessage = (event: MessageEvent) => {
                 try {
                     const message = JSON.parse(event.data)
-                    console.log('Received message:', message)
+                    // console.log('Received message:', message)
 
                     switch (message.type) {
                         case 'room_state':
@@ -130,7 +129,7 @@ const useSocket = ({
                                     message.data.text || 'Default typing text',
                                 roomInfo: message.data.players,
                             }))
-                            console.log('Room state:', message.data)
+                            // console.log('Room state:', message.data)
                             setGameState(message.data.status as GameStateValue)
                             break
 
@@ -139,17 +138,17 @@ const useSocket = ({
                             break
 
                         case 'game_timeout':
-                            console.log('Game timeout received:', message)
+                            // console.log('Game timeout received:', message)
                             setGameState(GameState.FINISHED)
                             break
 
                         case 'game_finished':
                             setUserStat(message.data)
-                            console.log('Game finished Received', message.data)
+                            // console.log('Game finished Received', message.data)
                             break
 
                         case 'ws_final_stat':
-                            console.log('Final stats received', message.data)
+                            // console.log('Final stats received', message.data)
                             setFinalState(message.data.players)
                             break
                     }
@@ -199,7 +198,7 @@ const useSocket = ({
     const sendResults = useCallback(
         (data: UserStats[], wpm: number) => {
             if (connectionRef.current && gameState === GameState.FINISHED) {
-                console.log(wpm)
+                // console.log(wpm)
                 connectionRef.current.send(
                     JSON.stringify({
                         type: 'final_stats',

@@ -35,10 +35,8 @@ const CreateRoomComponents = () => {
             }
 
             const data = await response.json()
-            console.log('data.room_id', data.room_id)
-            // return data.room_id
+
             router.push(`/room/${data.room_id}?username=${username}`)
-            //   router.push(/room/${data.room_id});
         } catch (err) {
             throw new Error('Failed to create room. Please try again.')
         }

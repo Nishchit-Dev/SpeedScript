@@ -14,7 +14,6 @@ export default async function handler(
             {}, // Match all users
             { $set: { dailyHighestWpm: 0 } } // Reset dailyHighestWpm to 0
         )
-        console.log('Leaderboard reset successfully')
         res.status(200).json({ message: 'Leaderboard reset successfully' })
     } catch (error) {
         console.error('Error resetting leaderboard:', error)

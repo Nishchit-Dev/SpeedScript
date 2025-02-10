@@ -37,7 +37,6 @@ export async function addNewScore(
             return JSON.stringify({ error: 'userId should not be null' })
         }
     } catch (err) {
-        console.log(err)
     }
 }
 export async function addNewScoreById(
@@ -47,7 +46,6 @@ export async function addNewScoreById(
 ) {
     try {
         if (userId != null) {
-            console.log(userId)
             const _userId = new mongoose.Types.ObjectId(userId)
             const res = await connect().then(async () => {
                 const HighestWpm = await User.updateOne(
@@ -74,7 +72,6 @@ export async function addNewScoreById(
             return JSON.stringify({ error: 'userId should not be null' })
         }
     } catch (err) {
-        console.log(err)
     }
 }
 
@@ -158,7 +155,6 @@ export const getUserRank = async (userId: string): Promise<UserRank> => {
                     },
                 },
             ])
-            console.log(leaderboard)
             return leaderboard
         })
         if (res.length > 0) {

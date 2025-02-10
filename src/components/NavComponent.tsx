@@ -34,7 +34,7 @@ const NaivgationComponent = () => {
                             <SignedIn>
                                 <UserButton />
                             </SignedIn>
-                            <p>{user?.username}</p>
+                            <p className="">{user?.username}</p>
                         </div>
                         <SignedOut>
                             <SignedIn />
@@ -43,12 +43,18 @@ const NaivgationComponent = () => {
                 ) : (
                     <>
                         <div className="flex flex-row justify-center gap-3 items-center">
-                            <div className="font-jetBrainsMono gap-2  transition flex flex-row text-sm justify-center  bg-green-500 hover:bg-green-600 duration-300 hover:text-white items-center px-4 py-2  rounded-full">
-                                <p>Sign in</p>
-                            </div>
-                            <div className="font-jetBrainsMono gap-2  transition flex flex-row text-sm justify-center  bg-black/60 hover:bg-black/80  hover:text-white duration-300 items-center px-4 py-2  rounded-full">
+                            <Link
+                                href={'/sign-up'}
+                                className="font-jetBrainsMono gap-2  transition flex flex-row text-sm justify-center  bg-green-500 hover:bg-green-600 duration-300 hover:text-white items-center px-4 py-2  rounded-full"
+                            >
+                                <p>Sign up</p>
+                            </Link>
+                            <Link
+                                href={'/sign-in'}
+                                className="font-jetBrainsMono gap-2  transition flex flex-row text-sm justify-center  bg-black/60 hover:bg-black/80  hover:text-white duration-300 items-center px-4 py-2  rounded-full"
+                            >
                                 <p>Login</p>
-                            </div>
+                            </Link>
                         </div>
                     </>
                 )}

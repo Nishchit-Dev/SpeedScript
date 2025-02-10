@@ -44,7 +44,6 @@ const EachUserRank = ({ data, index }: { data: Data; index: number }) => {
 
 const RankUsers = ({ data }: { data: Data[] }) => {
     const RankedUser = sortByRank(data)
-    console.log(RankedUser)
     return (
         <div>
             <div className="bg-white  p-5 rounded-xl justify-center align-middle items-center">

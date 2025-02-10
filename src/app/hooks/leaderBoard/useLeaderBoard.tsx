@@ -23,7 +23,6 @@ function swapFirstTwoElements(array: any[]): any[] {
     array[0] = array[1]
     array[1] = temp
 
-    console.log(array)
     return array // Return the updated array
 }
 

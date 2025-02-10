@@ -94,11 +94,7 @@ const useUserGhostCursorTime = () => {
             (total: number, velocity: number) => total + velocity,
             0
         )
-        const averageVelocity =
-            validVelocityValues.length > 0
-                ? sum / validVelocityValues.length
-                : 19
-        console.log(averageVelocity)
+       
         return sum / validVelocityValues.length
     }
 

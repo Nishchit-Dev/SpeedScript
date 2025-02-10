@@ -197,139 +197,159 @@ export default function Typing() {
                 >
                     {/* here is the buttons for the modification of game rules */}
                     <div className="flex flex-row text-sm">
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': buttons.withSymbols },
-                                {
-                                    'text-white/60': !buttons.withSymbols,
-                                }
-                            )}
-                            onClick={() => {
-                                setButtons((prev) => {
-                                    return {
-                                        ...prev,
-                                        withSymbols: !prev.withSymbols,
-                                    }
-                                })
-                            }}
-                        >
-                            <p>@ puncutuation</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': buttons.style },
-                                {
-                                    'text-white/60': !buttons.style,
-                                }
-                            )}
-                            onClick={() => {
-                                setButtons((prev) => {
-                                    return { ...prev, style: !prev.style }
-                                })
-                            }}
-                        >
-                            <p>Style</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': buttons.ghost },
-                                {
-                                    'text-white/60': !buttons.ghost,
-                                }
-                            )}
-                            onClick={() => {
-                                setButtons((prev) => {
-                                    return {
-                                        ...prev,
-                                        ghost: !prev.ghost,
-                                    }
-                                })
-                            }}
-                        >
-                            <p>Ghost Cursor</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': !buttons.autoCorrect },
-                                {
-                                    'text-white/60': buttons.autoCorrect,
-                                }
-                            )}
-                            onClick={() => {
-                                setButtons((prev) => {
-                                    return {
-                                        ...prev,
-                                        autoCorrect: !buttons.autoCorrect,
-                                    }
-                                })
-                            }}
-                        >
-                            <p>AutoCorrect</p>
-                        </div>
-
-                        <div className="flex justify-center items-center">
-                            <div className="w-1 h-[60%] bg-gray-400 rounded-full"></div>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': timerOption == 10 },
-                                {
-                                    'text-white/60': timerOption != 10,
-                                }
-                            )}
-                            onClick={() => {
-                                setTimerOption(10)
-                            }}
-                        >
-                            <p>10s</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': timerOption == 30 },
-                                {
-                                    'text-white/60': timerOption != 30,
-                                }
-                            )}
-                            onClick={() => {
-                                setTimerOption(30)
-                            }}
-                        >
-                            <p>30s</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': timerOption == 60 },
-                                {
-                                    'text-white/60': timerOption != 60,
-                                }
-                            )}
-                            onClick={() => {
-                                setTimerOption(60)
-                            }}
-                        >
-                            <p>60s</p>
-                        </div>
-                        <div
-                            className={clsx(
-                                'm-2  hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                { 'text-green-400': timerOption == 120 },
-                                {
-                                    'text-white/60': timerOption != 120,
-                                }
-                            )}
-                            onClick={() => {
-                                setTimerOption(120)
-                            }}
-                        >
-                            <p>120s</p>
-                        </div>
+                        {!gameOver ? (
+                            <>
+                                <div
+                                    className={clsx(
+                                        'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                        {
+                                            'text-green-400':
+                                                buttons.withSymbols,
+                                        },
+                                        {
+                                            'text-white/60':
+                                                !buttons.withSymbols,
+                                        }
+                                    )}
+                                    onClick={() => {
+                                        setButtons((prev) => {
+                                            return {
+                                                ...prev,
+                                                withSymbols: !prev.withSymbols,
+                                            }
+                                        })
+                                    }}
+                                >
+                                    <p>@ puncutuation</p>
+                                </div>
+                                <div
+                                    className={clsx(
+                                        'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                        { 'text-green-400': buttons.style },
+                                        {
+                                            'text-white/60': !buttons.style,
+                                        }
+                                    )}
+                                    onClick={() => {
+                                        setButtons((prev) => {
+                                            return {
+                                                ...prev,
+                                                style: !prev.style,
+                                            }
+                                        })
+                                    }}
+                                >
+                                    <p>Style</p>
+                                </div>
+                                <div
+                                    className={clsx(
+                                        'm-2 hover:text-white/80  transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                        { 'text-green-400': buttons.ghost },
+                                        {
+                                            'text-white/60': !buttons.ghost,
+                                        }
+                                    )}
+                                    onClick={() => {
+                                        setButtons((prev) => {
+                                            return {
+                                                ...prev,
+                                                ghost: !prev.ghost,
+                                            }
+                                        })
+                                    }}
+                                >
+                                    <p>Ghost Cursor</p>
+                                </div>
+                                <div
+                                    className={clsx(
+                                        'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                        {
+                                            'text-green-400':
+                                                !buttons.autoCorrect,
+                                        },
+                                        {
+                                            'text-white/60':
+                                                buttons.autoCorrect,
+                                        }
+                                    )}
+                                    onClick={() => {
+                                        setButtons((prev) => {
+                                            return {
+                                                ...prev,
+                                                autoCorrect:
+                                                    !buttons.autoCorrect,
+                                            }
+                                        })
+                                    }}
+                                >
+                                    <p>AutoCorrect</p>
+                                </div>
+                                <div className="flex justify-center items-center">
+                                    <div className="w-1 h-[60%] bg-gray-400 rounded-full"></div>
+                                </div>
+                                <div
+                                    className={clsx(
+                                        'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                        { 'text-green-400': timerOption == 10 },
+                                        {
+                                            'text-white/60': timerOption != 10,
+                                        }
+                                    )}
+                                    onClick={() => {
+                                        setTimerOption(10)
+                                    }}
+                                >
+                                    <p>10s</p>
+                                </div>
+                                <div
+                                    className={clsx(
+                                        'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                        { 'text-green-400': timerOption == 30 },
+                                        {
+                                            'text-white/60': timerOption != 30,
+                                        }
+                                    )}
+                                    onClick={() => {
+                                        setTimerOption(30)
+                                    }}
+                                >
+                                    <p>30s</p>
+                                </div>
+                                <div
+                                    className={clsx(
+                                        'm-2 hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                        { 'text-green-400': timerOption == 60 },
+                                        {
+                                            'text-white/60': timerOption != 60,
+                                        }
+                                    )}
+                                    onClick={() => {
+                                        setTimerOption(60)
+                                    }}
+                                >
+                                    <p>60s</p>
+                                </div>
+                                <div
+                                    className={clsx(
+                                        'm-2  hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
+                                        {
+                                            'text-green-400':
+                                                timerOption == 120,
+                                        },
+                                        {
+                                            'text-white/60': timerOption != 120,
+                                        }
+                                    )}
+                                    onClick={() => {
+                                        setTimerOption(120)
+                                    }}
+                                >
+                                    <p>120s</p>
+                                </div>{' '}
+                            </>
+                        ) : (
+                            <></>
+                        )}
                         <>
                             {gameOver ? (
                                 <div
@@ -343,14 +363,17 @@ export default function Typing() {
                                             'text-white/60': timerOption != 120,
                                         }
                                     )}
+                                    onClick={() => {
+                                        location.reload()
+                                    }}
                                 >
-                                    <RefreshCcw
-                                        size={22}
-                                        className="text-gray-400 hover:text-gray-200 transition-all duration-300"
-                                        onClick={() => {
-                                            location.reload()
-                                        }}
-                                    />
+                                    <div className="flex flex-row gap-2 justify-center items-center">
+                                        <RefreshCcw
+                                            size={20}
+                                            className="text-gray-400 hover:text-gray-200 transition-all duration-300"
+                                        />
+                                        <p>Repeat </p>
+                                    </div>
                                 </div>
                             ) : (
                                 <></>

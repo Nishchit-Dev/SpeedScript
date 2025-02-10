@@ -67,14 +67,6 @@ export default function Typing() {
         { time: timer, totalCharcter: characterArray.length, timer: timer }
     )
 
-    const score = useCalculateScore(
-        isTyping,
-        timer,
-        cursor,
-        incorrectChar.length,
-        gameOver
-    )
-
     const ghostCursorPosition = useGhostCursor({
         gameOver,
         ghost: buttons.ghost,

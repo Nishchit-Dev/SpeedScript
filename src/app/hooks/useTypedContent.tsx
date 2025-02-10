@@ -49,7 +49,6 @@ const useTypedContent = ({
                 calculatedWpm = 0
             }
             setWpm(parseFloat(calculatedWpm.toFixed(2)))
-            console.log('wpm: ', wpm)
         }
     }, [gameData?.timer, gameOver])
 

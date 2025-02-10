@@ -90,7 +90,6 @@ export default function Typing() {
     const [multiplier, setMultiplier] = useState(1)
     const numberOfCharacters = 300
     useEffect(() => {
-        console.log(charIndex < numberOfCharacters * multiplier)
         if (charIndex > numberOfCharacters * multiplier) {
             setMultiplier((prev) => prev + 1)
         }

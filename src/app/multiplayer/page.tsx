@@ -82,7 +82,6 @@ export default function Typing() {
     const [multiplier, setMultiplier] = useState(1)
     const numberOfCharacters = 300
     useEffect(() => {
-        console.log(charIndex < numberOfCharacters * multiplier)
         if (charIndex > numberOfCharacters * multiplier) {
             setMultiplier((prev) => prev + 1)
         }
@@ -152,10 +151,8 @@ export default function Typing() {
     }, [roomData.roomText])
 
     useEffect(() => {
-        console.log('sending game-state: ', gameState)
 
         if (gameState == 'finished') {
-            console.log(_wpm)
             sendResults(timexwpm, _wpm)
         }
     }, [gameState])

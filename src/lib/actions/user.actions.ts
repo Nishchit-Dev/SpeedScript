@@ -10,7 +10,6 @@ export async function createUser(user: any) {
 
         return newUser
     } catch (err) {
-        console.log(err)
     }
 }
 
@@ -19,10 +18,8 @@ export async function getUserIdByClerkId(
     clerkId: string | null
 ): Promise<Object | null> {
     try {
-        console.log(clerkId)
         const res = await connect()
         const user = await User.findOne({ clerkId })
-        console.log(user)
         if (user) {
             return JSON.parse(JSON.stringify(user))
         } else {

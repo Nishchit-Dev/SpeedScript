@@ -61,7 +61,6 @@ const useCustomRoomSocket = ({ username, roomId }: UseCustomRoomProps) => {
             const handleMessage = (event: MessageEvent) => {
                 try {
                     const message = JSON.parse(event.data)
-                    console.log('Received message:', message)
 
                     switch (message.type) {
                         case 'room_state':

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 
 import useTypedContent from './useTypedContent'
@@ -234,7 +233,6 @@ const useListenTyping = (
 
                 // pressed special key
             } else if (event.key.length > 1 && cursor > 1) {
-                console.log('special key -> ', event.key)
             }
         }
         let progress = (cursor / totalChar) * 100

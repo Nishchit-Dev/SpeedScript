@@ -67,9 +67,6 @@ const useRandomColor = () => {
             console.error(error.message)
         }
     }, [])
-    useEffect(() => {
-        console.log(colors)
-    }, [colors])
 
     return { getNextUniqueColor, colors } // Return the new state and function
 }

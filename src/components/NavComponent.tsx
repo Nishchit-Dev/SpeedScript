@@ -34,7 +34,7 @@ const NaivgationComponent = () => {
                             <SignedIn>
                                 <UserButton />
                             </SignedIn>
-                            <p>{user?.username}</p>
+                            <p className="">{user?.username}</p>
                         </div>
                         <SignedOut>
                             <SignedIn />

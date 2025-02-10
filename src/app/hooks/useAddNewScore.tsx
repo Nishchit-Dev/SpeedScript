@@ -6,7 +6,6 @@ import useUserLocal from './cookies/useGuest'
 
 const useAddNewScore = (gameOver: boolean, wpm: number) => {
     const { user } = useUser()
-    const { userGuest } = useUserLocal()
     useEffect(() => {
         if (gameOver && user) {
             getUserIdByClerkId(user?.id || '').then(async () => {
@@ -14,10 +13,6 @@ const useAddNewScore = (gameOver: boolean, wpm: number) => {
                     await addNewScore(user.id, wpm, 0)
                 }
             })
-        } else if (userGuest) {
-            ;(async () => {
-                await addNewScoreById(userGuest, wpm, 0).then((res) => {})
-            })()
         }
     }, [gameOver, user?.id])
 }

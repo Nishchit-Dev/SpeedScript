@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import useListenTyping from '../hooks/useTypingRoom'
 import clsx from 'clsx'
 import useTimer from '../hooks/useTimer'
-import useCalculateScore from '../hooks/useCalculateScore'
 import Score from '@/components/ScoreCard/Score'
 import { useTimexWpm } from '../hooks/useTimeXWpm'
 import TimexWpmRoom from '@/components/graph/timexwpmGraphRoom'
@@ -15,6 +14,8 @@ import useRandomColor from '../hooks/useRandomColor'
 import RankUsers, { RankingStage } from './_ranks/rankUsers'
 import OnBoarding from './onBoarding'
 import { useUser } from '@clerk/nextjs'
+import Image from 'next/image'
+import { getBadgeImage } from '@/components/BadgeComponent'
 
 export default function Typing() {
     const { isSignedIn, user } = useUser()
@@ -143,7 +144,6 @@ export default function Typing() {
     }, [roomData.roomText])
 
     useEffect(() => {
-
         if (gameState == 'finished') {
             sendResults(timexwpm, _wpm)
         }
@@ -265,46 +265,101 @@ export default function Typing() {
                         ) : (
                             <div
                                 className={clsx(
+                                    'flex flex-col justify-center items-center',
                                     {
                                         'flex flex-row invisible transition duration-500 ease-out':
                                             isTyping,
                                     },
                                     {
-                                        'flex justify-center  flex-row relative mb-20 bg-gray-600 font-jetBrainsMono rounded-lg':
+                                        'flex justify-center  flex-row relative mb-20  font-jetBrainsMono rounded-lg':
                                             true,
                                     }
                                 )}
                             >
                                 <div>
-                                    <div className="flex flex-row">
+                                    <div className="flex flex-1 flex-col justify-center items-center mb-5">
+                                        <p className="text-2xl font-bold">
+                                            Waiting Lobby
+                                        </p>
+                                        <p className="text-xl text-black/80 ">
+                                            Players:{' '}
+                                            <span className="">
+                                                {' '}
+                                                {
+                                                    Object.keys(
+                                                        roomData.roomInfo
+                                                    ).length
+                                                }
+                                            </span>
+                                            /4
+                                        </p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div
+                                        className={clsx(
+                                            'flex flex-1 flex-col items-start  rounded-t-md pb-3',
+                                            {
+                                                'flex flex-1 flex-col items-start bg-white  rounded-t-md pb-3':
+                                                    Object.entries(
+                                                        roomData.roomInfo
+                                                    ).length > 0,
+                                            }
+                                        )}
+                                    >
                                         {Object.entries(roomData.roomInfo).map(
                                             ([player, state], index) => {
                                                 const typedValues = state as {
                                                     currentPosition: string
                                                     isReady: boolean
+                                                    highestWpm: number
                                                 }
+
                                                 return (
                                                     <div
-                                                        className="p-2 bg-white"
+                                                        className="flex flex-1 w-full px-6 py-2 justify-center items-center"
                                                         key={player}
                                                     >
+                                                        <div className="flex flex-row gap-4 justify-center items-center ">
+                                                            <p className="text-black/70 font-semibold">
+                                                                #{index + 1}
+                                                            </p>
+                                                            <div>
+                                                                <Image
+                                                                    src={`/throphies/badges/${getBadgeImage(
+                                                                        state.highestWpm
+                                                                    )}`}
+                                                                    alt=""
+                                                                    width={60}
+                                                                    height={60}
+                                                                />
+                                                            </div>
+                                                        </div>
                                                         <div
                                                             className={clsx(
-                                                                ` p-2 justify-center items-center flex cursor-pointer gap-1`,
+                                                                `  flex p-2 flex-1 items-center justify-between cursor-pointer gap-1`,
                                                                 {
-                                                                    'opacity-100':
+                                                                    'opacity-100 transition duration-300':
                                                                         typedValues.isReady,
                                                                 },
                                                                 {
-                                                                    'opacity-50':
+                                                                    'opacity-50 transition duration-300 ':
                                                                         !typedValues.isReady,
                                                                 }
                                                             )}
                                                         >
                                                             <p>{player}</p>
+                                                            {user?.username ==
+                                                            player ? (
+                                                                <span className="bg-green-500 text-white rounded-full px-2 text-xs mr-3">
+                                                                    you
+                                                                </span>
+                                                            ) : (
+                                                                <></>
+                                                            )}
                                                             <span
                                                                 className={clsx(
-                                                                    `${colors[index]} w-2 h-7 rounded-full flex flex-1`
+                                                                    `${colors[index]} w-2 h-7 rounded-full flex `
                                                                 )}
                                                             ></span>
                                                         </div>
@@ -313,32 +368,44 @@ export default function Typing() {
                                             }
                                         )}
                                     </div>
-
-                                    <div
-                                        className={clsx(
-                                            ' p-2 justify-center items-center flex cursor-pointer',
-                                            {
-                                                'bg-green-500': playerControls,
-                                            },
-                                            {
-                                                'bg-red-500': !playerControls,
-                                            }
-                                        )}
-                                        onClick={toggleReady}
-                                    >
-                                        <div className="">
-                                            <p
-                                                className={clsx({
-                                                    hidden: countDown === 0,
-                                                    'flex transition duration-500 ease-out text-2xl font-extrabold mr-5':
-                                                        countDown !== 0,
-                                                })}
-                                            >
-                                                {countDown}
-                                            </p>
+                                    {Object.entries(roomData.roomInfo).length !=
+                                    0 ? (
+                                        <div
+                                            className={clsx(
+                                                ' p-2 justify-center items-center flex cursor-pointer rounded-b-md',
+                                                {
+                                                    'bg-green-500':
+                                                        playerControls,
+                                                },
+                                                {
+                                                    'bg-red-500':
+                                                        !playerControls,
+                                                },
+                                                {
+                                                    hidden:
+                                                        Object.entries(
+                                                            roomData.roomInfo
+                                                        ).length == 0,
+                                                }
+                                            )}
+                                            onClick={toggleReady}
+                                        >
+                                            <div className="">
+                                                <p
+                                                    className={clsx({
+                                                        hidden: countDown === 0,
+                                                        'flex transition duration-500 ease-out text-2xl font-extrabold mr-5':
+                                                            countDown !== 0,
+                                                    })}
+                                                >
+                                                    {countDown}
+                                                </p>
+                                            </div>
+                                            Ready
                                         </div>
-                                        Ready
-                                    </div>
+                                    ) : (
+                                        <p>Loading...</p>
+                                    )}
                                 </div>
                             </div>
                         )}

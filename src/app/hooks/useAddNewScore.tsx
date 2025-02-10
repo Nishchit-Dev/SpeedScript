@@ -1,11 +1,9 @@
-import { addNewScore, addNewScoreById } from '@/lib/actions/score.actions'
+import { addNewScore } from '@/lib/actions/score.actions'
 import { getUserIdByClerkId } from '@/lib/actions/user.actions'
-import { useUser } from '@clerk/nextjs'
+import { UserResource } from '@clerk/types'
 import { useEffect } from 'react'
-import useUserLocal from './cookies/useGuest'
 
-const useAddNewScore = (gameOver: boolean, wpm: number) => {
-    const { user } = useUser()
+const useAddNewScore = (gameOver: boolean, wpm: number, user: UserResource | null) => {
     useEffect(() => {
         if (gameOver && user) {
             getUserIdByClerkId(user?.id || '').then(async () => {
@@ -14,7 +12,7 @@ const useAddNewScore = (gameOver: boolean, wpm: number) => {
                 }
             })
         }
-    }, [gameOver, user?.id])
+    }, [gameOver, user])
 }
 
 export default useAddNewScore

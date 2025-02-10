@@ -9,7 +9,6 @@ import ShowGraph from '@/components/graph/showGraph'
 import UserRankingSystem from './_ranks/userRanks'
 import useListenTyping from './hooks/useTyping'
 import useTimer from './hooks/useTimer'
-import useCalculateScore from './hooks/useCalculateScore'
 import useGenerateTypingText from './hooks/useGenerateTypingText'
 import { useCookiesScore } from './hooks/cookies/useCookies'
 import { useTimexWpm } from './hooks/useTimeXWpm'
@@ -19,6 +18,7 @@ import useUserLocal from './hooks/cookies/useGuest'
 import useGhostCursor from './hooks/curosrAnimationHook/useGhostCursor'
 import { addNewScore } from '@/lib/actions/score.actions'
 import useAddNewScore from './hooks/useAddNewScore'
+import { useUser } from '@clerk/nextjs'
 
 const TypingText =
     'The quick brown fox jumps over the lazy dog and enjoys the warm sunshine on a bright afternoon.'
@@ -37,7 +37,6 @@ export default function Typing() {
         withSymbols: false,
         ghost: true,
     })
-    const { getUser } = useUserLocal()
     useEffect(() => {
         let characterArray = typingSentence
             .split('')
@@ -54,7 +53,6 @@ export default function Typing() {
     }, [typingSentence, buttons.withSymbols])
 
     const charIndex = charTyped.length
-    const [autoSpacing, setAutoSpacing] = useState(false)
     const [preventIncorrect, setPreventIncorrect] = useState(false)
     const [isTyping, setIsTyping] = useState(false)
     const [gameOver, setGameOver] = useState(false)
@@ -83,13 +81,10 @@ export default function Typing() {
         gameOver,
         ghost: buttons.ghost,
     })
+    const { user } = useUser()
 
-    useEffect(() => {
-        if (gameOver) {
-            useAddNewScore(gameOver, _wpm)
-        }
-    }, [gameOver])
-    
+    useAddNewScore(gameOver, _wpm, user ?? null)
+
     const [multiplier, setMultiplier] = useState(1)
     const numberOfCharacters = 300
     useEffect(() => {

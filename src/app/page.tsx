@@ -17,6 +17,8 @@ import useCursor from './hooks/curosrAnimationHook/useCursorAnimation'
 import { RefreshCcw } from 'lucide-react'
 import useUserLocal from './hooks/cookies/useGuest'
 import useGhostCursor from './hooks/curosrAnimationHook/useGhostCursor'
+import { addNewScore } from '@/lib/actions/score.actions'
+import useAddNewScore from './hooks/useAddNewScore'
 
 const TypingText =
     'The quick brown fox jumps over the lazy dog and enjoys the warm sunshine on a bright afternoon.'
@@ -76,17 +78,18 @@ export default function Typing() {
         startTimer,
         { time: timer, totalCharcter: characterArray.length, timer: timer }
     )
-    const score = useCalculateScore(
-        isTyping,
-        timer,
-        cursor,
-        incorrectChar.length,
-        gameOver
-    )
+
     const ghostCursorPosition = useGhostCursor({
         gameOver,
         ghost: buttons.ghost,
     })
+
+    useEffect(() => {
+        if (gameOver) {
+            useAddNewScore(gameOver, _wpm)
+        }
+    }, [gameOver])
+    
     const [multiplier, setMultiplier] = useState(1)
     const numberOfCharacters = 300
     useEffect(() => {

@@ -10,6 +10,7 @@ import FireAnimation from './lottieAnimation'
 import { Analytics } from '@vercel/analytics/react'
 import NaivgationComponent from '@/components/NavComponent'
 import Head from 'next/head'
+import WhatsNewInUpdates from '@/components/WhatsNewInUpdate'
 
 const jetBrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -66,7 +67,10 @@ export default function RootLayout({
                                 <NaivgationComponent />
                             </div>
                         </div>
-                        <div className="flex flex-[0.1]"></div>
+                        <div className="flex flex-[0.1]">
+                            
+                            <WhatsNewInUpdates />
+                        </div>
                     </div>
                     <div className="py-10 ">{children}</div>
                 </body>

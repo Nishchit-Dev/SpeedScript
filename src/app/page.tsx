@@ -19,6 +19,7 @@ import useGhostCursor from './hooks/curosrAnimationHook/useGhostCursor'
 import { addNewScore } from '@/lib/actions/score.actions'
 import useAddNewScore from './hooks/useAddNewScore'
 import { useUser } from '@clerk/nextjs'
+import ReloadButton from '@/components/reload/reload'
 
 const TypingText =
     'The quick brown fox jumps over the lazy dog and enjoys the warm sunshine on a bright afternoon.'
@@ -347,35 +348,7 @@ export default function Typing() {
                         ) : (
                             <></>
                         )}
-                        <>
-                            {gameOver ? (
-                                <div
-                                    className={clsx(
-                                        'm-2  hover:text-white/80 transition duration-500 ease-out rounded-sm px-2 cursor-pointer',
-                                        {
-                                            'text-green-400':
-                                                timerOption == 120,
-                                        },
-                                        {
-                                            'text-white/60': timerOption != 120,
-                                        }
-                                    )}
-                                    onClick={() => {
-                                        location.reload()
-                                    }}
-                                >
-                                    <div className="flex flex-row gap-2 justify-center items-center">
-                                        <RefreshCcw
-                                            size={20}
-                                            className="text-gray-400 hover:text-gray-200 transition-all duration-300"
-                                        />
-                                        <p>Repeat </p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <></>
-                            )}
-                        </>
+                        <ReloadButton gameOver={gameOver} />
                     </div>
                 </div>
                 <div className="flex flex-row flex-wrap justify-start items-center gap-5">

@@ -269,7 +269,7 @@ export default function Typing() {
                                 className={clsx(
                                     'flex flex-col justify-center items-center',
                                     {
-                                        'flex flex-row hidden transition duration-500 ease-out':
+                                        ' flex-row hidden transition duration-500 ease-out':
                                             isTyping,
                                     },
                                     {

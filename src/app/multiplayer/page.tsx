@@ -16,6 +16,8 @@ import OnBoarding from './onBoarding'
 import { useUser } from '@clerk/nextjs'
 import Image from 'next/image'
 import { getBadgeImage } from '@/components/BadgeComponent'
+import Link from 'next/link'
+import ReloadButton from '@/components/reload/reload'
 
 export default function Typing() {
     const { isSignedIn, user } = useUser()
@@ -267,7 +269,7 @@ export default function Typing() {
                                 className={clsx(
                                     'flex flex-col justify-center items-center',
                                     {
-                                        'flex flex-row invisible transition duration-500 ease-out':
+                                        'flex flex-row hidden transition duration-500 ease-out':
                                             isTyping,
                                     },
                                     {
@@ -424,6 +426,8 @@ export default function Typing() {
                 </button>
             </div> */}
                         </div>
+                        <ReloadButton gameOver={gameOver} />
+
                         {gameOver ? <RankingStage data={finalState} /> : <></>}
 
                         {gameOver ? (

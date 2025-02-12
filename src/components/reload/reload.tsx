@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { RefreshCcw } from 'lucide-react'
+import { Play, RefreshCcw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 const ReloadButton = ({ gameOver }: { gameOver: boolean }) => {
@@ -23,6 +23,7 @@ const ReloadButton = ({ gameOver }: { gameOver: boolean }) => {
                         className="flex flex-row gap-2 justify-center items-center"
                         onClick={handleReload}
                     >
+                        <Play size={18}/>
                         <p>Play Again</p>
                     </div>
                 </div>

@@ -4,6 +4,7 @@ import { ClerkProvider, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { useUser } from '@clerk/nextjs'
 import { Crown, MessageCircleDashed } from 'lucide-react'
 import Link from 'next/link'
+import WhatsNewInUpdates from './WhatsNewInUpdate'
 
 const NaivgationComponent = () => {
     const { user, isSignedIn } = useUser()
@@ -58,12 +59,18 @@ const NaivgationComponent = () => {
                         </div>
                     </>
                 )}
-                <Link href={'https://forms.gle/ZMqw7MHcPvpB3V8w8'} target="_blank" rel="noopener noreferrer">
+                <Link
+                    href={'https://forms.gle/ZMqw7MHcPvpB3V8w8'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
                     <div className="flex font-jetBrainsMono justify-center items-center gap-2 flex-row px-3 py-2 text-sm text-black hover:border-white/50 border-black/40 border-[1px] hover:bg-black/20 hover:text-white duration-300 rounded-full cursor-pointer">
                         <MessageCircleDashed size={18} />
                         Feedback
                     </div>
                 </Link>
+
+               
             </div>
         </>
     )

@@ -2,14 +2,14 @@
 import FireAnimation from '@/app/lottieAnimation'
 import { ClerkProvider, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { useUser } from '@clerk/nextjs'
-import { Crown } from 'lucide-react'
+import { Crown, MessageCircleDashed } from 'lucide-react'
 import Link from 'next/link'
 
 const NaivgationComponent = () => {
     const { user, isSignedIn } = useUser()
     return (
         <>
-            <div className="flex flex-1 flex-row gap-3 items-center justify-end ">
+            <div className="flex flex-1 flex-row gap-3 items-center justify-end w-max">
                 <div className="font-jetBrainsMono flex flex-row gap-3 justify-center items-center">
                     {isSignedIn ? (
                         <Link href={'/multiplayer'}>
@@ -58,6 +58,12 @@ const NaivgationComponent = () => {
                         </div>
                     </>
                 )}
+                <Link href={'https://forms.gle/ZMqw7MHcPvpB3V8w8'} target="_blank" rel="noopener noreferrer">
+                    <div className="flex font-jetBrainsMono justify-center items-center gap-2 flex-row px-3 py-2 text-sm text-black hover:border-white/50 border-black/40 border-[1px] hover:bg-black/20 hover:text-white duration-300 rounded-full cursor-pointer">
+                        <MessageCircleDashed size={18} />
+                        Feedback
+                    </div>
+                </Link>
             </div>
         </>
     )

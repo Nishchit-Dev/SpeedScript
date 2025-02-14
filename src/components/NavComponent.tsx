@@ -2,12 +2,22 @@
 import FireAnimation from '@/app/lottieAnimation'
 import { ClerkProvider, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { useUser } from '@clerk/nextjs'
-import { Crown, MessageCircleDashed } from 'lucide-react'
+import {
+    ArrowDown,
+    Castle,
+    Crown,
+    DoorOpen,
+    LogIn,
+    MessageCircleDashed,
+} from 'lucide-react'
 import Link from 'next/link'
 import WhatsNewInUpdates from './WhatsNewInUpdate'
+import { useState } from 'react'
+import clsx from 'clsx'
 
 const NaivgationComponent = () => {
     const { user, isSignedIn } = useUser()
+    const [roomFlag, setRoomFlag] = useState(false)
     return (
         <>
             <div className="flex flex-1 flex-row gap-3 items-center justify-end w-max">
@@ -26,6 +36,45 @@ const NaivgationComponent = () => {
                         <div className="font-jetBrainsMono gap-2 duration-300 transition flex flex-row text-sm justify-center  bg-yellow-500 hover:bg-yellow-600 hover:text-white items-center px-4 py-2  rounded-full">
                             <Crown size={18} />
                             <p>Leaderboard</p>
+                        </div>
+                    </Link>
+                    <Link href={'/room'}>
+                    
+                        <div
+                            onClick={() => {
+                                setRoomFlag(!roomFlag)
+                            }}
+                            className="w-full font-jetBrainsMono gap-2 duration-300 transition flex flex-row text-sm justify-center  bg-yellow-500 hover:bg-yellow-600 hover:text-white items-center px-4 py-2  rounded-full"
+                        >
+                            <Castle size={18} />
+                            <p>Room</p>
+                            <ArrowDown size={18} />
+                            <div
+                                onClick={() => {
+                                    setRoomFlag(!roomFlag)
+                                }}
+                                className={clsx(
+                                    'absolute opacity-0 transition-all duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-green-500 hover:bg-green-600 hover:text-white items-center px-4 py-2 rounded-full',
+                                    { 'flex opacity-100 top-16': roomFlag },
+                                    { hidden: !roomFlag }
+                                )}
+                            >
+                                <DoorOpen size={18} />
+                                <p>Create</p>
+                            </div>
+                            <div
+                                onClick={() => {
+                                    setRoomFlag(!roomFlag)
+                                }}
+                                className={clsx(
+                                    'absolute transition-all duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-indigo-500 hover:bg-indigo-600 hover:text-white items-center px-4 py-2 rounded-full',
+                                    { 'flex opacity-100 top-28': roomFlag },
+                                    { hidden: !roomFlag }
+                                )}
+                            >
+                                <LogIn size={18} />
+                                <p>Join</p>
+                            </div>
                         </div>
                     </Link>
                 </div>
@@ -69,8 +118,6 @@ const NaivgationComponent = () => {
                         Feedback
                     </div>
                 </Link>
-
-               
             </div>
         </>
     )

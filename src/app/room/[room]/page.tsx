@@ -1,117 +1,604 @@
 'use client'
+import useCursor from '@/app/hooks/curosrAnimationHook/useCursorAnimation'
+import useRandomColor from '@/app/hooks/useRandomColor'
+import useTimer from '@/app/hooks/useTimer'
+import { useTimexWpm } from '@/app/hooks/useTimeXWpm'
+import useListenTyping from '@/app/hooks/useTypingRoom'
 import useCustomRoomSocket from '@/app/hooks/websockethooks/useCustomSocketRoom'
+import { RankingStage } from '@/app/leaderboard/rankUsers'
+import RankUsers from '@/app/multiplayer/_ranks/rankUsers'
+import OnBoarding from '@/app/multiplayer/onBoarding'
 import { getBadgeImage } from '@/components/BadgeComponent'
+import ShowGraph from '@/components/graph/showGraph'
+import TimexWpmRoom from '@/components/graph/timexwpmGraphRoom'
+import ReloadButton from '@/components/reload/reload'
+import Score from '@/components/ScoreCard/Score'
+import { useUser } from '@clerk/nextjs'
+import clsx from 'clsx'
 import { get } from 'http'
-import { Copy, Cross, Crosshair, CrossIcon, X } from 'lucide-react'
+import { Copy, Cross, Crosshair, CrossIcon, CrownIcon, X } from 'lucide-react'
 import Image from 'next/image'
 import { useParams, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 const Room = () => {
     const route: any = useParams()
     const query = useSearchParams()
+    const { user, isSignedIn } = useUser()
+    const { colors } = useRandomColor()
+    const [charTyped, setCharTyped] = useState([])
+    const [typingSentence, setTypingSentence] = useState('')
+    const [characterArray, setCharacterArray] = useState<string[]>([])
+    const charIndex = charTyped.length
 
-    const generateRandomCode = useCallback((): string => {
-        const letters = Array.from({ length: 4 }, () =>
-            String.fromCharCode(65 + Math.floor(Math.random() * 26))
-        ).join('')
-        const digits = Math.floor(10 + Math.random() * 90).toString()
-        return letters + digits
-    }, [])
+    const [preventIncorrect, setPreventIncorrect] = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
+    const [gameOver, setGameOver] = useState(false)
+    const { timer, startTimer, stopTimer } = useTimer()
+    const [timerOption, setTimerOption] = useState(30)
+    const {
+        progress,
+        incorrectChar,
+        cursor,
+        charTypedInfo,
+        wpm: _wpm,
+    } = useListenTyping(
+        characterArray,
+        charTyped,
+        setCharTyped,
+        preventIncorrect,
+        isTyping,
+        setIsTyping,
+        gameOver,
+        startTimer,
+        { time: timer, totalCharcter: characterArray.length, timer: timer }
+    )
+    const [multiplier, setMultiplier] = useState(1)
+    const numberOfCharacters = 300
+
+    const cursorPosition = useCursor({ cursor })
+
+    useEffect(() => {
+        if (charIndex > numberOfCharacters * multiplier) {
+            setMultiplier((prev) => prev + 1)
+        }
+    }, [charIndex])
+    useEffect(() => {
+        let characterArray = typingSentence
+            .split('')
+            .map((element: string) =>
+                element === ' ' ? `\u2000` : element.toLowerCase()
+            )
+        const onlyAlphabetsAndSpace = [...characterArray].filter((char) =>
+            /[a-zA-Z\u2000\s]/.test(char)
+        )
+
+        setCharacterArray(onlyAlphabetsAndSpace)
+    }, [typingSentence])
+
+    useEffect(() => {
+        if (isTyping && cursor < 1 && timerOption >= timer) {
+            startTimer()
+        }
+        if (timerOption <= timer && isTyping) {
+            stopTimer()
+            setIsTyping(!isTyping)
+
+            setGameOver(true)
+            sendTimeout()
+        }
+    }, [timer, cursor, isTyping])
+    useEffect(() => {
+        if (
+            charIndex == characterArray.length - 1 &&
+            characterArray.length > 0 &&
+            gameState == 'in_progress'
+        ) {
+            stopTimer()
+            setIsTyping(!isTyping)
+            setGameState('finished')
+
+            setGameOver(true)
+        }
+    }, [charIndex])
+
     useEffect(() => {}, [])
-    const { joinRoom, isAdmin, kickPlayer, roomData } = useCustomRoomSocket({
-        username: query?.get('username') || generateRandomCode(),
+    const {
+        joinRoom,
+        toggleReady,
+        isAdmin,
+        kickPlayer,
+        roomData,
+        countDown,
+        gameState,
+        sendTimeout,
+        setGameState,
+        finalState,
+        sendResults,
+    } = useCustomRoomSocket({
+        username: user?.username || '',
         roomId: route.room,
     })
 
     useEffect(() => {
-        joinRoom()
-    }, [])
+        console.log(countDown)
+    }, [countDown])
+    useEffect(() => {
+        setTypingSentence(roomData.roomText)
+    }, [roomData.roomText])
+
+    useEffect(() => {
+        if (gameState == 'finished') {
+            setGameOver(true)
+            setIsTyping(false)
+            sendResults(timexwpm, _wpm)
+        }
+    }, [gameState])
+
+    const { timexwpm } = useTimexWpm({ timer: timer, wpm: _wpm })
+    useEffect(() => {
+        console.log(characterArray)
+    }, [characterArray])
+
+    useEffect(() => {
+        if (gameState === 'in_progress') {
+            setIsTyping(true)
+        }
+    }, [gameState])
     return (
-        <div className="flex justify-center items-center font-jetBrainsMono">
-            <div className="flex flex-col gap-4">
-                {isAdmin && query?.get('username') === roomData.roomAdmin && (
-                    <div className="flex flex-row justify-between items-center bg-gray-400  text-white py-1 rounded-full  pointer-cursor">
-                        <div className=" rounded-full pl-4">
-                            <p>Copy Room URL</p>
-                        </div>
-                        <div
-                            className="bg-gray-500 rounded-full p-2 mr-1 cursor-pointer duration-300 hover:bg-gray-600"
-                            onClick={() => {
-                                const link =
-                                    'http://localhost:3000/room/' + route.room
-                                navigator.clipboard.writeText(link)
-                            }}
-                        >
-                            <Copy size={18} />
-                        </div>
-                    </div>
-                )}
-
-                <div className="flex flex-row justify-between items-center bg-gray-500  text-white py-1 rounded-full  pointer-cursor">
-                    <div className=" rounded-full pl-4">
-                        <p> Room Code - </p>
-                    </div>
-                    <div
-                        className="bg-gray-400 rounded-full p-2 mr-1 cursor-pointer duration-300 hover:bg-gray-500"
-                        onClick={() => {
-                            const link =
-                                'http://localhost:3000/room/' + route.room
-                            navigator.clipboard.writeText(link)
-                        }}
-                    >
-                        {route.room}
-                    </div>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-5">
-                    {Object.keys(roomData.roomInfo).map((player, index) => (
-                        <li
-                            key={player}
-                            className="flex justify-left items-center py-2 px-1 gap-5 "
-                        >
-                            <span className="font-medium text-lg">
-                                {index + 1}
-                            </span>
-
-                            <Image
-                                alt=""
-                                src={`/throphies/badges/${getBadgeImage(
-                                    115 - (index + 0) * 15
-                                )}`}
-                                width={50}
-                                height={50}
-                            />
-                            <div className="flex items-center ">
-                                <span className="font-medium text-lg">
-                                    {player}
-                                </span>
-                                {player === roomData.roomAdmin && (
-                                    <span className="ml-2 text-sm text-blue-500 font-medium">
-                                        (Admin)
-                                    </span>
+        <>
+            {gameState === 'connecting' || gameState === 'waiting' ? (
+                <>
+                    <div className="flex justify-center items-center font-jetBrainsMono ">
+                        <div className="flex flex-col gap-4 ">
+                            {isAdmin &&
+                                query?.get('username') ===
+                                    roomData.roomAdmin && (
+                                    <div className="flex flex-row justify-between items-center bg-gray-400  text-white py-1 rounded-full  pointer-cursor">
+                                        <div className=" rounded-full pl-4">
+                                            <p>Copy Room URL</p>
+                                        </div>
+                                        <div
+                                            className="bg-gray-500 rounded-full p-2 mr-1 cursor-pointer duration-300 hover:bg-gray-600"
+                                            onClick={() => {
+                                                const link =
+                                                    'http://localhost:3000/room/' +
+                                                    route.room
+                                                navigator.clipboard.writeText(
+                                                    link
+                                                )
+                                            }}
+                                        >
+                                            <Copy size={18} />
+                                        </div>
+                                    </div>
                                 )}
+
+                            <div className="flex flex-row justify-between items-center bg-gray-500  text-white py-1 rounded-full  pointer-cursor">
+                                <div className=" rounded-full pl-4">
+                                    <p> Room Code - </p>
+                                </div>
+                                <div
+                                    className="bg-gray-400 rounded-full p-2 mr-1 cursor-pointer duration-300 hover:bg-gray-500"
+                                    onClick={() => {
+                                        const link =
+                                            'http://localhost:3000/room/' +
+                                            route.room
+                                        navigator.clipboard.writeText(link)
+                                    }}
+                                >
+                                    {route.room}
+                                </div>
                             </div>
-                            {isAdmin && player !== roomData.roomAdmin && (
-                                <div className="flex justify-end flex-1">
+
+                            <div className="bg-gray-50 rounded-lg overflow-clip">
+                                <div
+                                    className={clsx(
+                                        `bg-green-400 h-2 top-0 transition duration-300`,
+                                        {
+                                            'w-[33.33%]': countDown === 3,
+                                            'w-[66.66%]': countDown === 2,
+                                            'w-[100%]': countDown === 1,
+                                            'w-0': countDown === 0,
+                                        }
+                                    )}
+                                ></div>
+
+                                <div className="m-5">
+                                    {Object.entries(roomData.roomInfo).map(
+                                        ([player, state], index) => {
+                                            const typedValues = state as {
+                                                currentPosition: string
+                                                isReady: boolean
+                                                highestWpm: number
+                                            }
+
+                                            return (
+                                                <div
+                                                    className="flex flex-1 w-full px-0 py-2 justify-center items-center"
+                                                    key={player}
+                                                >
+                                                    <div className="mr-3 ">
+                                                        {roomData.roomAdmin ===
+                                                        player ? (
+                                                            <div className="p-2 rounded-full bg-yellow-500 opacity-100 ">
+                                                                <CrownIcon
+                                                                    size={18}
+                                                                />{' '}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="invisible p-2 rounded-full bg-yellow-500 opacity-100 ">
+                                                                <CrownIcon
+                                                                    size={18}
+                                                                />{' '}
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex flex-row gap-4 justify-center items-center ">
+                                                        <p className="text-black/70 font-semibold">
+                                                            #{index + 1}
+                                                        </p>
+
+                                                        <div>
+                                                            <Image
+                                                                src={`/throphies/badges/${getBadgeImage(
+                                                                    Math.round(
+                                                                        Number(
+                                                                            state.highestWpm
+                                                                        )
+                                                                    )
+                                                                )}`}
+                                                                alt=""
+                                                                width={60}
+                                                                height={60}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        className={clsx(
+                                                            `  flex p-2 flex-1 items-center justify-between cursor-pointer gap-1`,
+                                                            {
+                                                                'opacity-100 transition duration-300':
+                                                                    typedValues.isReady,
+                                                            },
+                                                            {
+                                                                'opacity-50 transition duration-300 ':
+                                                                    !typedValues.isReady,
+                                                            }
+                                                        )}
+                                                    >
+                                                        <p>{player}</p>
+                                                        {user?.username ==
+                                                        player ? (
+                                                            <span className="bg-green-500 text-white rounded-full px-2 text-xs mr-3">
+                                                                you
+                                                            </span>
+                                                        ) : (
+                                                            <></>
+                                                        )}
+                                                        <span
+                                                            className={clsx(
+                                                                `${colors[index]} w-2 h-7 rounded-full flex `
+                                                            )}
+                                                        ></span>
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+                                    )}
+                                    {Object.entries(roomData.roomInfo).length !=
+                                    0 ? (
+                                        // <div
+                                        //     className={clsx(
+                                        //         ' p-2 justify-center items-center flex cursor-pointer rounded-b-md',
+                                        //         {
+                                        //             'bg-green-500': playerControls,
+                                        //         },
+                                        //         {
+                                        //             'bg-red-500': !playerControls,
+                                        //         },
+                                        //         {
+                                        //             hidden:
+                                        //                 Object.entries(roomData.roomInfo)
+                                        //                     .length == 0,
+                                        //         }
+                                        //     )}
+                                        //     onClick={toggleReady}
+                                        // >
+                                        //     <div className="">
+                                        //         <p
+                                        //             className={clsx({
+                                        //                 hidden: countDown === 0,
+                                        //                 'flex transition duration-500 ease-out text-2xl font-extrabold mr-5':
+                                        //                     countDown !== 0,
+                                        //             })}
+                                        //         >
+                                        //             {countDown}
+                                        //         </p>
+                                        //     </div>
+                                        //     Ready
+                                        // </div>
+                                        <div
+                                            onClick={() => {
+                                                toggleReady()
+                                            }}
+                                            className="flex justify-center items-center bg-green-400 rounded-md py-2 px-4 cursor-pointer hover:bg-green-500 duration-300"
+                                        >
+                                            <div>Ready</div>
+                                        </div>
+                                    ) : (
+                                        <p>Loading...</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <></>
+            )}
+            {gameState === 'in_progress' || gameState === 'finished' ? (
+                <>
+                    <>
+                        {user?.username && isSignedIn ? (
+                            <>
+                                <p>{gameOver}</p>
+                                <div
+                                    className={clsx(
+                                        {
+                                            'relative w-full justify-center items-center':
+                                                !gameOver,
+                                        },
+                                        {
+                                            invisible: gameOver,
+                                        }
+                                    )}
+                                >
                                     <div
-                                        onClick={() => {
-                                            kickPlayer(player)
+                                        className={
+                                            'absolute w-1 h-8 transition duration-300 bg-yellow-500 sm:h-2 md:h-7 lg:h-8'
+                                        }
+                                        style={{
+                                            transform: `translate(${
+                                                cursorPosition.x - 2
+                                            }px, ${cursorPosition.y - 99}px)`,
                                         }}
-                                        className=" bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors cursor-pointer "
+                                    ></div>
+                                </div>
+                                <div className="flex flex-1 flex-col justify-center items-center w-screen overflow-hidden min-h-[70vh] bg-[#E1E1E3]">
+                                    {gameOver ? (
+                                        <></>
+                                    ) : (
+                                        <div
+                                            className={clsx(
+                                                'flex flex-col justify-center items-center',
+                                                {
+                                                    ' flex-row hidden transition duration-500 ease-out':
+                                                        isTyping,
+                                                },
+                                                {
+                                                    'flex justify-center  flex-row relative mb-20  font-jetBrainsMono rounded-lg':
+                                                        true,
+                                                }
+                                            )}
+                                        ></div>
+                                    )}
+
+                                    <ReloadButton gameOver={gameOver} />
+
+                                    {/* {gameOver ? (
+                                        <RankingStage data={finalState} />
+                                    ) : (
+                                        <></>
+                                    )} */}
+
+                                    {gameOver ? (
+                                        <div className="flex flex-1 flex-row mt-20">
+                                            <div>
+                                                <Score
+                                                    data={charTypedInfo}
+                                                    _wpm={_wpm}
+                                                    timexwpm={timexwpm}
+                                                />
+                                            </div>
+                                            <div>
+                                                <div
+                                                    className={clsx(
+                                                        'overflow-hidden transition-all duration-700 ease-in-out',
+                                                        {
+                                                            'max-h-0 opacity-0 scale-0 ':
+                                                                !gameOver,
+                                                        },
+                                                        {
+                                                            'max-h-[500px] opacity-100 scale-100':
+                                                                gameOver,
+                                                        }
+                                                    )}
+                                                >
+                                                    <TimexWpmRoom
+                                                        data={finalState}
+                                                        timer={timer}
+                                                    />
+                                                </div>
+
+                                                <div
+                                                    className={clsx(
+                                                        'overflow-hidden transition-all duration-700 ease-in-out',
+                                                        {
+                                                            'max-h-0 opacity-0 scale-0 ':
+                                                                !gameOver,
+                                                        },
+                                                        {
+                                                            'max-h-[500px] opacity-100 scale-100':
+                                                                gameOver,
+                                                        }
+                                                    )}
+                                                >
+                                                    <ShowGraph
+                                                        data={charTypedInfo}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <RankUsers data={finalState} />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <></>
+                                    )}
+
+                                    <div
+                                        className={clsx(
+                                            'transition duration-500',
+                                            {
+                                                'max-h-0 opacity-0 scale-0 ':
+                                                    gameOver,
+                                            },
+                                            {
+                                                'max-h-[500px] opacity-100 scale-100':
+                                                    !gameOver,
+                                            },
+                                            {
+                                                hidden: !isTyping,
+                                            }
+                                        )}
                                     >
-                                        <X size={14} />
+                                        <div className="text-3xl font-jetBrainsMono font-bold">
+                                            <div className="flex flex-col justify-center items-center gap-3 ">
+                                                <div className="flex flex-row gap-10 text-black/60">
+                                                    <p>{'Wpm: ' + _wpm}</p>
+                                                    <p>{'Time: ' + timer}</p>
+                                                </div>
+                                                <div>
+                                                    {characterArray.length >
+                                                    0 ? (
+                                                        <p className="mb-3">
+                                                            {characterArray[
+                                                                cursor
+                                                            ] == ' ' ||
+                                                            characterArray[
+                                                                cursor
+                                                            ] == '\u2000'
+                                                                ? 'space'
+                                                                : characterArray[
+                                                                      cursor
+                                                                  ]}
+                                                        </p>
+                                                    ) : (
+                                                        <p className="mb-3 invisible">
+                                                            a
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* <p>{'Accuracy: ' + score.accuracy}</p> */}
+                                            {/* <p>{isTyping ? 'Typing' : 'Not Typing'}</p> */}
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        className={clsx(
+                                            'max-w-full relative overflow-hidden w-full transition-all duration-700 ease-in-out',
+
+                                            {
+                                                'max-h-0 opacity-0 scale-0 ':
+                                                    gameOver,
+                                            },
+                                            {
+                                                'max-h-[500px] opacity-100 scale-100':
+                                                    !gameOver,
+                                            }
+                                        )}
+                                    >
+                                        <div
+                                            // style={{ transform: `translateX(-${progress}%)` }}
+                                            className={clsx(
+                                                `flex flex-1   flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl relative left-[25%] transition duration-2000 ease-out `,
+                                                {
+                                                    hidden: !isTyping,
+                                                }
+                                            )}
+                                        >
+                                            {characterArray.length > 0 ? (
+                                                characterArray.map(
+                                                    (character, index) => {
+                                                        if (
+                                                            index >=
+                                                                numberOfCharacters *
+                                                                    (multiplier -
+                                                                        1) &&
+                                                            index <=
+                                                                numberOfCharacters *
+                                                                    multiplier
+                                                        )
+                                                            return (
+                                                                <p
+                                                                    key={index}
+                                                                    className={clsx(
+                                                                        `character${index}  `,
+                                                                        {
+                                                                            'text-gray-400':
+                                                                                index >
+                                                                                charIndex,
+                                                                        },
+                                                                        {
+                                                                            'text-black':
+                                                                                index <
+                                                                                    charIndex ||
+                                                                                !incorrectChar.includes(
+                                                                                    index
+                                                                                ),
+                                                                        },
+                                                                        {
+                                                                            'text-red-500':
+                                                                                index <
+                                                                                    charIndex &&
+                                                                                incorrectChar.includes(
+                                                                                    index
+                                                                                ) &&
+                                                                                !preventIncorrect,
+                                                                        },
+
+                                                                        {
+                                                                            'font-bold':
+                                                                                index ==
+                                                                                charIndex,
+                                                                            'text-3xl':
+                                                                                index ==
+                                                                                charIndex,
+                                                                            'text-green-500 cursorIsHere':
+                                                                                index ==
+                                                                                charIndex,
+                                                                        }
+                                                                    )}
+                                                                >
+                                                                    {character}
+                                                                </p>
+                                                            )
+                                                    }
+                                                )
+                                            ) : (
+                                                <div className="">
+                                                    <h1 className="moving-text ">
+                                                        generating
+                                                    </h1>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            )}
-                        </li>
-                    ))}
-                </div>
-                <div className="flex justify-center items-center bg-green-400 rounded-md py-2 px-4 cursor-pointer hover:bg-green-500 duration-300">
-                    <div>Ready</div>
-                </div>
-            </div>
-        </div>
+                            </>
+                        ) : (
+                            <OnBoarding />
+                        )}
+                    </>
+                </>
+            ) : (
+                <></>
+            )}
+        </>
     )
 }
 

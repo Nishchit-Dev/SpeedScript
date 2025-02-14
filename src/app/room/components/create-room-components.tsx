@@ -50,13 +50,14 @@ const CreateRoomComponents = () => {
                 <div
                     className="px-4 py-2 bg-green-400 rounded-full cursor-pointer"
                     onClick={() => {
-                        handleCreateRoom({
-                            username: '0xAdmin',
-                            roomCapacity: 4,
-                        })
+                        if (user?.username)
+                            handleCreateRoom({
+                                username: user?.username,
+                                roomCapacity: 4,
+                            })
                     }}
                 >
-                    Create Room
+                    Create
                 </div>
             </div>
         </>

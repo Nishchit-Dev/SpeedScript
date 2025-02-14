@@ -14,10 +14,50 @@ import Link from 'next/link'
 import WhatsNewInUpdates from './WhatsNewInUpdate'
 import { useState } from 'react'
 import clsx from 'clsx'
+import { useRouter } from 'next/navigation'
 
 const NaivgationComponent = () => {
     const { user, isSignedIn } = useUser()
     const [roomFlag, setRoomFlag] = useState(false)
+
+    const router = useRouter()
+    const handleCreateRoom = async ({
+        username,
+        roomCapacity,
+    }: {
+        username: string
+        roomCapacity: number
+    }) => {
+        if (!user?.username) {
+            throw new Error('Username is required')
+        }
+
+        try {
+            const response = await fetch(
+                'http://localhost:8080/api/create-room',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: user?.username,
+                        maxCapacity: Number(roomCapacity),
+                    }),
+                }
+            )
+
+            if (!response.ok) {
+                throw new Error('Failed to create room')
+            }
+
+            const data = await response.json()
+
+            router.push(`/room/${data.room_id}?username=${user?.username}`)
+        } catch (err) {
+            throw new Error('Failed to create room. Please try again.')
+        }
+    }
     return (
         <>
             <div className="flex flex-1 flex-row gap-3 items-center justify-end w-max">
@@ -38,8 +78,7 @@ const NaivgationComponent = () => {
                             <p>Leaderboard</p>
                         </div>
                     </Link>
-                    <Link href={'/room'}>
-                    
+                    <>
                         <div
                             onClick={() => {
                                 setRoomFlag(!roomFlag)
@@ -52,6 +91,11 @@ const NaivgationComponent = () => {
                             <div
                                 onClick={() => {
                                     setRoomFlag(!roomFlag)
+                                    if (user?.username)
+                                        handleCreateRoom({
+                                            username: user?.username,
+                                            roomCapacity: 4,
+                                        })
                                 }}
                                 className={clsx(
                                     'absolute opacity-0 transition-all duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-green-500 hover:bg-green-600 hover:text-white items-center px-4 py-2 rounded-full',
@@ -76,7 +120,7 @@ const NaivgationComponent = () => {
                                 <p>Join</p>
                             </div>
                         </div>
-                    </Link>
+                    </>
                 </div>
                 {isSignedIn ? (
                     <>

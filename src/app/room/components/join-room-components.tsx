@@ -7,7 +7,7 @@ const JoinRoom = () => {
                     // joinRoom({ username: 'test', roomCapacity: 4 })
                 }}
             >
-                <p>Join Room</p>
+                <p>Join</p>
             </div>
         </>
     )

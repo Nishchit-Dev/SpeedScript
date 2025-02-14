@@ -1,8 +1,10 @@
 'use client'
 
+import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 
 const CreateRoomComponents = () => {
+    const { user } = useUser()
     const router = useRouter()
     const handleCreateRoom = async ({
         username,
@@ -11,7 +13,7 @@ const CreateRoomComponents = () => {
         username: string
         roomCapacity: number
     }) => {
-        if (!username) {
+        if (!user?.username) {
             throw new Error('Username is required')
         }
 
@@ -24,7 +26,7 @@ const CreateRoomComponents = () => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        username,
+                        username: user?.username,
                         maxCapacity: Number(roomCapacity),
                     }),
                 }
@@ -36,7 +38,7 @@ const CreateRoomComponents = () => {
 
             const data = await response.json()
 
-            router.push(`/room/${data.room_id}?username=${username}`)
+            router.push(`/room/${data.room_id}?username=${user?.username}`)
         } catch (err) {
             throw new Error('Failed to create room. Please try again.')
         }

@@ -44,11 +44,26 @@ export default function RootLayout({
         <ClerkProvider>
             <Analytics />
             <html lang="en" suppressHydrationWarning>
-                <Head>
+                <head>
                     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
                     {/* Alternative for better compatibility */}
                     <link rel="icon" href="/favicon.ico" sizes="any" />
-                </Head>
+                    <script
+                        async
+                        src="https://www.googletagmanager.com/gtag/js?id=G-2C0LWZS558"
+                    ></script>
+                    <script
+                        dangerouslySetInnerHTML={{
+                            __html: `
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            gtag('js', new Date());
+                            gtag('config', 'G-2C0LWZS558');
+                        `,
+                        }}
+                    />
+                </head>
+
                 <body
                     className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased bg-[#E1E1E3]`}
                     cz-shortcut-listen="true"
@@ -68,7 +83,6 @@ export default function RootLayout({
                             </div>
                         </div>
                         <div className="flex flex-[0.1]">
-                            
                             <WhatsNewInUpdates />
                         </div>
                     </div>

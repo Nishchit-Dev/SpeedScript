@@ -17,6 +17,7 @@ export type Data = {
 }
 
 const sortByRank = (data: Data[]) => {
+    console.log(data)
     return data.sort((a, b) => b.wpm - a.wpm)
 }
 
@@ -42,7 +43,7 @@ const EachUserRank = ({ data, index }: { data: Data; index: number }) => {
     )
 }
 
-const RankUsers = ({ data }: { data: Data[] }) => {
+const RankUsers = ({ data }: { data: any[] }) => {
     const RankedUser = sortByRank(data)
     return (
         <div>

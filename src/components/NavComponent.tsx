@@ -46,8 +46,9 @@ const NaivgationComponent = () => {
                     }),
                 }
             )
-
+            
             if (!response.ok) {
+                console.log(response)
                 throw new Error('Failed to create room')
             }
 
@@ -78,49 +79,53 @@ const NaivgationComponent = () => {
                             <p>Leaderboard</p>
                         </div>
                     </Link>
-                    <>
-                        <div
-                            onClick={() => {
-                                setRoomFlag(!roomFlag)
-                            }}
-                            className="w-full font-jetBrainsMono gap-2 duration-300 transition flex flex-row text-sm justify-center  bg-yellow-500 hover:bg-yellow-600 hover:text-white items-center px-4 py-2  rounded-full"
-                        >
-                            <Castle size={18} />
-                            <p>Room</p>
-                            <ArrowDown size={18} />
-                            <div
-                                onClick={() => {
-                                    setRoomFlag(!roomFlag)
-                                    if (user?.username)
-                                        handleCreateRoom({
-                                            username: user?.username,
-                                            roomCapacity: 4,
-                                        })
-                                }}
-                                className={clsx(
-                                    'absolute opacity-0 transition-all duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-green-500 hover:bg-green-600 hover:text-white items-center px-4 py-2 rounded-full',
-                                    { 'flex opacity-100 top-16': roomFlag },
-                                    { hidden: !roomFlag }
-                                )}
-                            >
-                                <DoorOpen size={18} />
-                                <p>Create</p>
-                            </div>
+                    {isSignedIn ? (
+                        <>
                             <div
                                 onClick={() => {
                                     setRoomFlag(!roomFlag)
                                 }}
-                                className={clsx(
-                                    'absolute transition-all duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-indigo-500 hover:bg-indigo-600 hover:text-white items-center px-4 py-2 rounded-full',
-                                    { 'flex opacity-100 top-28': roomFlag },
-                                    { hidden: !roomFlag }
-                                )}
+                                className="w-full font-jetBrainsMono gap-2 duration-300 transition flex flex-row text-sm justify-center  bg-yellow-500 hover:bg-yellow-600 hover:text-white items-center px-4 py-2  rounded-full"
                             >
-                                <LogIn size={18} />
-                                <p>Join</p>
+                                <Castle size={18} />
+                                <p>Room</p>
+                                <ArrowDown size={18} />
+                                <div
+                                    onClick={() => {
+                                        setRoomFlag(!roomFlag)
+                                        if (user?.username)
+                                            handleCreateRoom({
+                                                username: user?.username,
+                                                roomCapacity: 4,
+                                            })
+                                    }}
+                                    className={clsx(
+                                        'absolute opacity-0 transition-all duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-green-500 hover:bg-green-600 hover:text-white items-center px-4 py-2 rounded-full',
+                                        { 'flex opacity-100 top-16': roomFlag },
+                                        { hidden: !roomFlag }
+                                    )}
+                                >
+                                    <DoorOpen size={18} />
+                                    <p>Create</p>
+                                </div>
+                                <div
+                                    onClick={() => {
+                                        setRoomFlag(!roomFlag)
+                                    }}
+                                    className={clsx(
+                                        'absolute transition-all duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-indigo-500 hover:bg-indigo-600 hover:text-white items-center px-4 py-2 rounded-full',
+                                        { 'flex opacity-100 top-28': roomFlag },
+                                        { hidden: !roomFlag }
+                                    )}
+                                >
+                                    <LogIn size={18} />
+                                    <p>Join</p>
+                                </div>
                             </div>
-                        </div>
-                    </>
+                        </>
+                    ) : (
+                        <></>
+                    )}
                 </div>
                 {isSignedIn ? (
                     <>

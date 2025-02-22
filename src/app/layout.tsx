@@ -2,14 +2,14 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import { ClerkProvider, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
-
+import Head from 'next/head'
 import { JetBrains_Mono } from 'next/font/google'
 import { Crown } from 'lucide-react'
 import Link from 'next/link'
 import FireAnimation from './lottieAnimation'
 import { Analytics } from '@vercel/analytics/react'
 import NaivgationComponent from '@/components/NavComponent'
-import Head from 'next/head'
+
 import WhatsNewInUpdates from '@/components/WhatsNewInUpdate'
 
 const jetBrainsMono = JetBrains_Mono({
@@ -45,7 +45,7 @@ const Layout = () => {
             />
             <meta
                 name="title"
-                content="SpeedScript – Multiplayer Typing Game & Speed Test"
+                content="SpeedScript  Multiplayer Typing Game & Speed Test"
             />
             <meta
                 name="description"
@@ -62,7 +62,7 @@ const Layout = () => {
             <meta property="og:url" content="https://speedscript.com/" />
             <meta
                 property="og:title"
-                content="SpeedScript – Multiplayer Typing Game & Speed Test"
+                content="SpeedScript  Multiplayer Typing Game & Speed Test"
             />
             <meta
                 property="og:description"
@@ -78,7 +78,7 @@ const Layout = () => {
             <meta name="twitter:url" content="https://speedscript.com/" />
             <meta
                 name="twitter:title"
-                content="SpeedScript – Multiplayer Typing Game & Speed Test"
+                content="SpeedScript  Multiplayer Typing Game & Speed Test"
             />
             <meta
                 name="twitter:description"
@@ -89,7 +89,7 @@ const Layout = () => {
                 content="https://speedscript.com/twitter-image.jpg"
             />
 
-            <title>SpeedScript – Multiplayer Typing Game & Speed Test</title>
+            <title>SpeedScript Multiplayer Typing Game & Speed Test</title>
         </head>
     )
 }
@@ -103,7 +103,7 @@ export default function RootLayout({
         <ClerkProvider>
             <Analytics />
             <html lang="en" suppressHydrationWarning>
-                <Layout />
+              
                 <body
                     className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased bg-[#E1E1E3]`}
                     cz-shortcut-listen="true"

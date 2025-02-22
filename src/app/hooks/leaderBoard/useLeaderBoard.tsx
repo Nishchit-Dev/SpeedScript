@@ -3,7 +3,7 @@ import {
     getLeaderboard,
     getUserRank,
 } from '@/lib/actions/score.actions'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface UserRank {
     _id: string
@@ -31,19 +31,23 @@ export const useLeaderboard = () => {
     const [dailyLeaderboard, setDailyLeaderboard] = useState<UserRank[]>([])
     const [userRank, setUserRank] = useState<UserRank | undefined>(undefined)
 
-    const getRank = async (userId: string) => {
-        await getUserRank(userId).then((res) => {
-            setUserRank(res)
-        })
-    }
-    useEffect(() => {
-        getLeaderboard().then((res) => {
-            setLeaderboard(swapFirstTwoElements(res))
-        })
-        getDailyLeaderboard().then((res) => {
-            setDailyLeaderboard(swapFirstTwoElements(res))
-        })
+    const fetchLeaderboards = useCallback(async () => {
+        const [leaderboardRes, dailyLeaderboardRes] = await Promise.all([
+            getLeaderboard(),
+            getDailyLeaderboard(),
+        ])
+        setLeaderboard(swapFirstTwoElements(leaderboardRes))
+        setDailyLeaderboard(swapFirstTwoElements(dailyLeaderboardRes))
     }, [])
+
+    const getRank = useCallback(async (userId: string) => {
+        const res = await getUserRank(userId)
+        setUserRank(res)
+    }, [])
+
+    useEffect(() => {
+        fetchLeaderboards()
+    }, [fetchLeaderboards])
 
     return { leaderboard, dailyLeaderboard, getRank, userRank }
 }

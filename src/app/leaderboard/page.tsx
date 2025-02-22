@@ -309,7 +309,7 @@ const UserScoreBoard = ({ flag }: { flag: boolean }) => {
     const [_user, setUser] = useState<data | null>(null)
 
     useEffect(() => {
-        if (user) {
+        if (user  ) {
             getRank(user.id)
             if (user?.username) {
                 setUser((prev: any) => {
@@ -318,7 +318,7 @@ const UserScoreBoard = ({ flag }: { flag: boolean }) => {
             }
         }
     }, [user?.username])
-
+    
     return (
         <>
             {user?.username ? (

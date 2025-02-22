@@ -37,7 +37,6 @@ const Room = () => {
     const { timer, startTimer, stopTimer } = useTimer()
     const [timerOption, setTimerOption] = useState(30)
     const {
-        progress,
         incorrectChar,
         cursor,
         charTypedInfo,
@@ -102,30 +101,38 @@ const Room = () => {
         }
     }, [charIndex])
 
-    useEffect(() => {}, [])
     const {
-        joinRoom,
-        toggleReady,
-        isAdmin,
-        kickPlayer,
-        roomData,
-        countDown,
-        gameState,
-        sendTimeout,
-        setGameState,
-        finalState,
-        sendResults,
+        state: {
+            roomData,
+            isConnected,
+            error,
+            isAdmin,
+            countDown,
+            gameState,
+            finalState,
+        },
+        actions: {
+            kickPlayer,
+            joinRoom,
+            updateCapacity,
+            toggleReady,
+            sendTimeout,
+            setGameState,
+            sendResults,
+            sendWpmUpdate,
+            kickPlayerByUsername,
+            updateRoomCapacity,
+            sendFinalStats,
+            notifyTimeout,
+        },
     } = useCustomRoomSocket({
         username: user?.username || '',
         roomId: route.room,
     })
 
     useEffect(() => {
-        console.log(countDown)
-    }, [countDown])
-    useEffect(() => {
-        setTypingSentence(roomData.roomText)
-    }, [roomData.roomText])
+        setTypingSentence(roomData.data.text)
+    }, [roomData.data.text])
 
     useEffect(() => {
         if (gameState == 'finished') {
@@ -136,9 +143,6 @@ const Room = () => {
     }, [gameState])
 
     const { timexwpm } = useTimexWpm({ timer: timer, wpm: _wpm })
-    useEffect(() => {
-        console.log(characterArray)
-    }, [characterArray])
 
     useEffect(() => {
         if (gameState === 'in_progress') {
@@ -153,7 +157,7 @@ const Room = () => {
                         <div className="flex flex-col gap-4 ">
                             {isAdmin &&
                                 query?.get('username') ===
-                                    roomData.roomAdmin && (
+                                    roomData.room_admin && (
                                     <div className="flex flex-row justify-between items-center bg-gray-400  text-white py-1 rounded-full  pointer-cursor">
                                         <div className=" rounded-full pl-4">
                                             <p>Copy Room URL</p>
@@ -205,21 +209,16 @@ const Room = () => {
                                 ></div>
 
                                 <div className="m-5">
-                                    {Object.entries(roomData.roomInfo).map(
+                                    {Object.entries(roomData.data.players).map(
                                         ([player, state], index) => {
-                                            const typedValues = state as {
-                                                currentPosition: string
-                                                isReady: boolean
-                                                highestWpm: number
-                                            }
-
+                                            const { highestWpm } = state as any
                                             return (
                                                 <div
                                                     className="flex flex-1 w-full px-0 py-2 justify-center items-center"
                                                     key={player}
                                                 >
                                                     <div className="mr-3 ">
-                                                        {roomData.roomAdmin ===
+                                                        {roomData.room_admin ===
                                                         player ? (
                                                             <div className="p-2 rounded-full bg-yellow-500 opacity-100 ">
                                                                 <CrownIcon
@@ -230,7 +229,7 @@ const Room = () => {
                                                             <div className="invisible p-2 rounded-full bg-yellow-500 opacity-100 ">
                                                                 <CrownIcon
                                                                     size={18}
-                                                                />{' '}
+                                                                />
                                                             </div>
                                                         )}
                                                     </div>
@@ -245,7 +244,7 @@ const Room = () => {
                                                                 src={`/throphies/badges/${getBadgeImage(
                                                                     Math.round(
                                                                         Number(
-                                                                            state.highestWpm
+                                                                            highestWpm
                                                                         )
                                                                     )
                                                                 )}`}
@@ -260,11 +259,11 @@ const Room = () => {
                                                             `  flex p-2 flex-1 items-center justify-between cursor-pointer gap-1`,
                                                             {
                                                                 'opacity-100 transition duration-300':
-                                                                    typedValues.isReady,
+                                                                    state.isReady,
                                                             },
                                                             {
                                                                 'opacity-50 transition duration-300 ':
-                                                                    !typedValues.isReady,
+                                                                    !state.isReady,
                                                             }
                                                         )}
                                                     >
@@ -287,48 +286,20 @@ const Room = () => {
                                             )
                                         }
                                     )}
-                                    {Object.entries(roomData.roomInfo).length !=
-                                    0 ? (
-                                        // <div
-                                        //     className={clsx(
-                                        //         ' p-2 justify-center items-center flex cursor-pointer rounded-b-md',
-                                        //         {
-                                        //             'bg-green-500': playerControls,
-                                        //         },
-                                        //         {
-                                        //             'bg-red-500': !playerControls,
-                                        //         },
-                                        //         {
-                                        //             hidden:
-                                        //                 Object.entries(roomData.roomInfo)
-                                        //                     .length == 0,
-                                        //         }
-                                        //     )}
-                                        //     onClick={toggleReady}
-                                        // >
-                                        //     <div className="">
-                                        //         <p
-                                        //             className={clsx({
-                                        //                 hidden: countDown === 0,
-                                        //                 'flex transition duration-500 ease-out text-2xl font-extrabold mr-5':
-                                        //                     countDown !== 0,
-                                        //             })}
-                                        //         >
-                                        //             {countDown}
-                                        //         </p>
-                                        //     </div>
-                                        //     Ready
-                                        // </div>
-                                        <div
-                                            onClick={() => {
-                                                toggleReady()
-                                            }}
-                                            className="flex justify-center items-center bg-green-400 rounded-md py-2 px-4 cursor-pointer hover:bg-green-500 duration-300"
-                                        >
-                                            <div>Ready</div>
-                                        </div>
+                                    {isAdmin ? (
+                                        <>
+                                            {' '}
+                                            <div
+                                                onClick={() => {
+                                                    toggleReady()
+                                                }}
+                                                className="flex justify-center items-center bg-green-400 rounded-md py-2 px-4 cursor-pointer hover:bg-green-500 duration-300"
+                                            >
+                                                <div>Ready</div>
+                                            </div>
+                                        </>
                                     ) : (
-                                        <p>Loading...</p>
+                                        <></>
                                     )}
                                 </div>
                             </div>
@@ -416,10 +387,10 @@ const Room = () => {
                                                         }
                                                     )}
                                                 >
-                                                    <TimexWpmRoom
+                                                    {/* <TimexWpmRoom
                                                         data={finalState}
                                                         timer={timer}
-                                                    />
+                                                    /> */}
                                                 </div>
 
                                                 <div
@@ -441,7 +412,16 @@ const Room = () => {
                                                 </div>
                                             </div>
                                             <div>
-                                                <RankUsers data={finalState} />
+                                                {/* {finalState?.players.length >
+                                                0 ? (
+                                                    <RankUsers
+                                                        data={
+                                                            finalState?.players
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <></>
+                                                )} */}
                                             </div>
                                         </div>
                                     ) : (

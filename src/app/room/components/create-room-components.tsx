@@ -7,10 +7,8 @@ const CreateRoomComponents = () => {
     const { user } = useUser()
     const router = useRouter()
     const handleCreateRoom = async ({
-        username,
         roomCapacity,
     }: {
-        username: string
         roomCapacity: number
     }) => {
         if (!user?.username) {
@@ -52,7 +50,6 @@ const CreateRoomComponents = () => {
                     onClick={() => {
                         if (user?.username)
                             handleCreateRoom({
-                                username: user?.username,
                                 roomCapacity: 4,
                             })
                     }}

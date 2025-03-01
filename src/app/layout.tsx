@@ -103,7 +103,30 @@ export default function RootLayout({
         <ClerkProvider>
             <Analytics />
             <html lang="en" suppressHydrationWarning>
+<<<<<<< HEAD
               
+=======
+                <head>
+                    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+                    {/* Alternative for better compatibility */}
+                    <link rel="icon" href="/favicon.ico" sizes="any" />
+                    <script
+                        async
+                        src="https://www.googletagmanager.com/gtag/js?id=G-2C0LWZS558"
+                    ></script>
+                    <script
+                        dangerouslySetInnerHTML={{
+                            __html: `
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            gtag('js', new Date());
+                            gtag('config', 'G-2C0LWZS558');
+                        `,
+                        }}
+                    />
+                </head>
+
+>>>>>>> 12c2d7f1b6480297c3af2811a4747e5a85e42ac8
                 <body
                     className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased bg-[#E1E1E3]`}
                     cz-shortcut-listen="true"

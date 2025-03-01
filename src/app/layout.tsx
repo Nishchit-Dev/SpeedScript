@@ -103,9 +103,6 @@ export default function RootLayout({
         <ClerkProvider>
             <Analytics />
             <html lang="en" suppressHydrationWarning>
-<<<<<<< HEAD
-              
-=======
                 <head>
                     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
                     {/* Alternative for better compatibility */}
@@ -126,7 +123,6 @@ export default function RootLayout({
                     />
                 </head>
 
->>>>>>> 12c2d7f1b6480297c3af2811a4747e5a85e42ac8
                 <body
                     className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased bg-[#E1E1E3]`}
                     cz-shortcut-listen="true"

@@ -300,7 +300,7 @@ export default function Typing() {
                                 <div>
                                     <div
                                         className={clsx(
-                                            'flex flex-1 flex-col items-start  rounded-t-md pb-3',
+                                            'flex flex-1 flex-col items-start  rounded-t-md pb-3 ',
                                             {
                                                 'flex flex-1 flex-col items-start bg-white  rounded-t-md pb-3':
                                                     Object.entries(
@@ -309,69 +309,115 @@ export default function Typing() {
                                             }
                                         )}
                                     >
-                                        {Object.entries(roomData.roomInfo).map(
-                                            ([player, state], index) => {
-                                                const typedValues = state as {
-                                                    currentPosition: string
-                                                    isReady: boolean
-                                                    highestWpm: number
-                                                }
+                                        {Object.entries(roomData.roomInfo)
+                                            .length != 0 ? (
+                                            <>
+                                                {Array.from({ length: 4 }).map(
+                                                    (_, index) => {
+                                                        const playerData =
+                                                            Object.entries(
+                                                                roomData.roomInfo
+                                                            )[index]
+                                                        const player =
+                                                            playerData
+                                                                ? playerData[0]
+                                                                : `Player ${
+                                                                      index + 1
+                                                                  }`
+                                                        const notNull =
+                                                            playerData
+                                                                ? true
+                                                                : false
+                                                        const state = playerData
+                                                            ? playerData[1]
+                                                            : {
+                                                                  currentPosition:
+                                                                      '',
+                                                                  isReady:
+                                                                      false,
+                                                                  highestWpm: 0,
+                                                              }
+                                                        const typedValues =
+                                                            state as {
+                                                                currentPosition: string
+                                                                isReady: boolean
+                                                                highestWpm: number
+                                                            }
 
-                                                return (
-                                                    <div
-                                                        className="flex flex-1 w-full px-6 py-2 justify-center items-center"
-                                                        key={player}
-                                                    >
-                                                        <div className="flex flex-row gap-4 justify-center items-center ">
-                                                            <p className="text-black/70 font-semibold">
-                                                                #{index + 1}
-                                                            </p>
-                                                            <div>
-                                                                <Image
-                                                                    src={`/throphies/badges/${getBadgeImage(
-                                                                        Math.round(
-                                                                            Number(
-                                                                                state.highestWpm
-                                                                            )
-                                                                        )
-                                                                    )}`}
-                                                                    alt=""
-                                                                    width={60}
-                                                                    height={60}
-                                                                />
+                                                        return (
+                                                            <div
+                                                                className="flex flex-1 w-full px-6 py-2 justify-center items-center"
+                                                                key={player}
+                                                            >
+                                                                <div className="flex flex-row gap-4 justify-center items-center ">
+                                                                    <p className="text-black/70 font-semibold">
+                                                                        #
+                                                                        {index +
+                                                                            1}
+                                                                    </p>
+                                                                    <div>
+                                                                        <Image
+                                                                            src={`/throphies/${
+                                                                                notNull
+                                                                                    ? `badges/${getBadgeImage(
+                                                                                          Math.round(
+                                                                                              Number(
+                                                                                                  state.highestWpm
+                                                                                              )
+                                                                                          )
+                                                                                      )}`
+                                                                                    : `dummy/Badge_0${
+                                                                                          index -
+                                                                                          1
+                                                                                      }.svg`
+                                                                            }`}
+                                                                            alt=""
+                                                                            width={
+                                                                                60
+                                                                            }
+                                                                            height={
+                                                                                60
+                                                                            }
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div
+                                                                    className={clsx(
+                                                                        `  flex p-2 flex-1 items-center justify-between cursor-pointer gap-1`,
+                                                                        {
+                                                                            'opacity-100 transition duration-300':
+                                                                                typedValues.isReady,
+                                                                        },
+                                                                        {
+                                                                            'opacity-50 transition duration-300 ':
+                                                                                !typedValues.isReady,
+                                                                        }
+                                                                    )}
+                                                                >
+                                                                    <p>
+                                                                        {player}
+                                                                    </p>
+                                                                    {user?.username ==
+                                                                    player ? (
+                                                                        <span className="bg-green-500 text-white rounded-full px-2 text-xs mr-3">
+                                                                            you
+                                                                        </span>
+                                                                    ) : (
+                                                                        <></>
+                                                                    )}
+                                                                    <span
+                                                                        className={clsx(
+                                                                            `${colors[index]} w-2 h-7 rounded-full flex `
+                                                                        )}
+                                                                    ></span>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div
-                                                            className={clsx(
-                                                                `  flex p-2 flex-1 items-center justify-between cursor-pointer gap-1`,
-                                                                {
-                                                                    'opacity-100 transition duration-300':
-                                                                        typedValues.isReady,
-                                                                },
-                                                                {
-                                                                    'opacity-50 transition duration-300 ':
-                                                                        !typedValues.isReady,
-                                                                }
-                                                            )}
-                                                        >
-                                                            <p>{player}</p>
-                                                            {user?.username ==
-                                                            player ? (
-                                                                <span className="bg-green-500 text-white rounded-full px-2 text-xs mr-3">
-                                                                    you
-                                                                </span>
-                                                            ) : (
-                                                                <></>
-                                                            )}
-                                                            <span
-                                                                className={clsx(
-                                                                    `${colors[index]} w-2 h-7 rounded-full flex `
-                                                                )}
-                                                            ></span>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            }
+                                                        )
+                                                    }
+                                                )}
+                                            </>
+                                        ) : (
+                                            <></>
                                         )}
                                     </div>
                                     {Object.entries(roomData.roomInfo).length !=

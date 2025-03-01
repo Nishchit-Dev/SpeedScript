@@ -74,15 +74,15 @@ const useListenTyping = (
     useEffect(() => {
         const handleEvent = (event: KeyboardEvent) => {
             // if Press Key is BackSpace
-            // if (!isTyping) {
-            //     if (event.key.length == 1) {
-            //         setIsTyping(true)
-            //         startTimer()
-            //     }
-            // }
             if (!isTyping) {
-                return
+                if (event.key.length == 1) {
+                    setIsTyping(true)
+                    startTimer()
+                }
             }
+            // if (!isTyping) {
+            //     return
+            // }
             if (event.getModifierState('CapsLock') !== CapsLock) {
                 setCapslock(event.getModifierState('CapsLock'))
             }

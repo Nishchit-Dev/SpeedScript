@@ -78,7 +78,7 @@ const NaivgationComponent = () => {
                             <p>Leaderboard</p>
                         </div>
                     </Link>
-                    {isSignedIn && false? (
+                    {isSignedIn ? (
                         <>
                             <div
                                 onClick={() => {

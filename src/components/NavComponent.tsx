@@ -16,6 +16,7 @@ import { useState } from 'react'
 import clsx from 'clsx'
 import { useRouter } from 'next/navigation'
 import { getWebSocketUrl } from '@/lib/helper'
+import useBeta from '@/app/hooks/cookies/useBeta'
 
 const NaivgationComponent = () => {
     const { user, isSignedIn } = useUser()
@@ -58,6 +59,8 @@ const NaivgationComponent = () => {
             throw new Error('Failed to create room. Please try again.')
         }
     }
+
+    const { betaTester } = useBeta()
     return (
         <>
             <div className="flex flex-1 flex-row gap-3 items-center justify-end w-max">
@@ -78,7 +81,7 @@ const NaivgationComponent = () => {
                             <p>Leaderboard</p>
                         </div>
                     </Link>
-                    {isSignedIn && false? (
+                    {isSignedIn && betaTester ? (
                         <>
                             <div
                                 onClick={() => {

@@ -1,5 +1,6 @@
 'use client'
 
+import { getWebSocketUrl } from '@/lib/helper'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 
@@ -16,19 +17,17 @@ const CreateRoomComponents = () => {
         }
 
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/create-room',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username: user?.username,
-                        maxCapacity: Number(roomCapacity),
-                    }),
-                }
-            )
+            const url = getWebSocketUrl().routes.https.createRoom
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: user?.username,
+                    maxCapacity: Number(roomCapacity),
+                }),
+            })
 
             if (!response.ok) {
                 throw new Error('Failed to create room')

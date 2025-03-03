@@ -1,3 +1,4 @@
+import { getWebSocketUrl } from '@/lib/helper'
 import { useUser } from '@clerk/nextjs'
 import { MessageSquare } from 'lucide-react'
 import { set } from 'mongoose'
@@ -335,23 +336,21 @@ const useCustomRoomSocket = ({
 
     const toggleAdminRole = useCallback(async () => {
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/admin/change-role',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        room_id: roomId,
-                        admin_role:
-                            roomData.admin_role == 'spectator'
-                                ? 'player'
-                                : 'spectator',
-                    }),
-                }
-            )
+            const url = getWebSocketUrl().routes.wss.adminRole
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    room_id: roomId,
+                    admin_role:
+                        roomData.admin_role == 'spectator'
+                            ? 'player'
+                            : 'spectator',
+                }),
+            })
 
             if (!response.ok) {
                 console.log(response)

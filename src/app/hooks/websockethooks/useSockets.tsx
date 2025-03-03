@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react'
 import useUserCookies from '../cookies/useUser'
 import { useUser } from '@clerk/nextjs'
+import { getWebSocketUrl } from '@/lib/helper'
 const GameState = {
     CONNECTING: 'connecting',
     WAITING: 'waiting',
@@ -69,14 +70,10 @@ const useSocket = ({
         (username: string) => {
             const user = username
             setRoomData((prev) => ({ ...prev, username: user }))
-
-            const URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL
-                ? `wss://${
-                      process.env.NEXT_PUBLIC_WEBSOCKET_URL
-                  }/ws/room?username=${encodeURIComponent(user ? user : '')}`
-                : `ws://localhost:8080/ws/room?username=${encodeURIComponent(
-                      user ? user : ''
-                  )}`
+            const url = getWebSocketUrl().routes.wss.joinRoom
+            const URL = `${url}?username=${encodeURIComponent(
+                user ? user : ''
+            )}`
 
             const ws = new WebSocket(URL)
             ws.addEventListener('open', () => {

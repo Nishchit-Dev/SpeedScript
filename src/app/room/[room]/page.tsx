@@ -237,9 +237,10 @@ const Room = () => {
                                         <div
                                             className="bg-gray-600 rounded-lg p-2 mr-1 cursor-pointer duration-300 hover:text-green-400"
                                             onClick={() => {
-                                                const link =
-                                                    'http://localhost:3000/room/' +
-                                                    route.room
+                                                const link = new URL(
+                                                    '/room/' + route.room,
+                                                    window.location.origin
+                                                ).toString()
                                                 navigator.clipboard.writeText(
                                                     link
                                                 )
@@ -257,9 +258,10 @@ const Room = () => {
                                 <div
                                     className=" rounded-lg p-2 mr-1 cursor-pointer duration-300 hover:text-green-400 "
                                     onClick={() => {
-                                        const link =
-                                            'http://localhost:3000/room/' +
-                                            route.room
+                                        const link = new URL(
+                                            '/room/' + route.room,
+                                            window.location.origin
+                                        ).toString()
                                         navigator.clipboard.writeText(link)
                                     }}
                                 >

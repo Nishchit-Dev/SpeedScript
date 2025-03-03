@@ -15,6 +15,7 @@ import WhatsNewInUpdates from './WhatsNewInUpdate'
 import { useState } from 'react'
 import clsx from 'clsx'
 import { useRouter } from 'next/navigation'
+import { getWebSocketUrl } from '@/lib/helper'
 
 const NaivgationComponent = () => {
     const { user, isSignedIn } = useUser()
@@ -33,20 +34,18 @@ const NaivgationComponent = () => {
         }
 
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/create-room',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username: user?.username,
-                        maxCapacity: Number(roomCapacity),
-                    }),
-                }
-            )
-            
+            const url = getWebSocketUrl().routes.https.createRoom
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: user?.username,
+                    maxCapacity: Number(roomCapacity),
+                }),
+            })
+
             if (!response.ok) {
                 console.log(response)
                 throw new Error('Failed to create room')
@@ -79,7 +78,7 @@ const NaivgationComponent = () => {
                             <p>Leaderboard</p>
                         </div>
                     </Link>
-                    {isSignedIn ? (
+                    {isSignedIn && false? (
                         <>
                             <div
                                 onClick={() => {

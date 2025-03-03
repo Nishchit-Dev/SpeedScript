@@ -152,11 +152,18 @@ const useCustomRoomSocket = ({
         if (username == '' || roomId == '') {
             console.log('Already connected')
         } else {
-            const ws = new WebSocket(
-                `ws://localhost:8080/ws/room?username=${encodeURIComponent(
-                    username
-                )}&room_id=${roomId}`
-            )
+            const url = process.env.NEXT_PUBLIC_WEBSOCKET_URL
+            if (!url) {
+                console.error('NEXT_PUBLIC_WEBSOCKET_URL is not defined')
+                return
+            }
+            console.log(url)
+            const URL = `wss://${url}/ws/room?username=${encodeURIComponent(
+                username
+            )}&room_id=${roomId}`
+            console.log(URL)
+
+            const ws = new WebSocket(URL)
             const handleOpen = () => {
                 setIsConnected(true)
                 connectionRef.current = ws || null
@@ -576,7 +583,7 @@ const useCustomRoomSocket = ({
             countDown,
             gameState,
             finalState,
-            scoreBoardState
+            scoreBoardState,
         },
         actions: {
             kickPlayer,

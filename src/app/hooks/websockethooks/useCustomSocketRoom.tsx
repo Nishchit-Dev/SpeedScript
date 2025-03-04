@@ -153,15 +153,17 @@ const useCustomRoomSocket = ({
         if (username == '' || roomId == '') {
             console.log('Already connected')
         } else {
-            const url = process.env.NEXT_PUBLIC_WEBSOCKET_URL
+            const url = getWebSocketUrl().routes.wss.joinRoom
+
             if (!url) {
                 console.error('NEXT_PUBLIC_WEBSOCKET_URL is not defined')
                 return
             }
-            console.log(url)
-            const URL = `wss://${url}/ws/room?username=${encodeURIComponent(
+
+            const URL = `${url}?username=${encodeURIComponent(
                 username
             )}&room_id=${roomId}`
+
             console.log(URL)
 
             const ws = new WebSocket(URL)

@@ -604,19 +604,6 @@ export default function Typing() {
                         </div>
                     )}
                 </div>
-
-                {/* {gameOver ? (
-                    <ModalProvider>
-                        <Score
-                            trigger={gameOver}
-                            data={charTypedInfo}
-                            _wpm={_wpm}
-                            timexwpm={timexwpm}
-                        />
-                    </ModalProvider>
-                ) : (
-                    <></>
-                )} */}
             </div>
         </>
     )

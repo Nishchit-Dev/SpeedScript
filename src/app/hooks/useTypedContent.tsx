@@ -41,6 +41,12 @@ const useTypedContent = ({
     ])
     const [wpm, setWpm] = useState(0)
 
+    // this should be called when the game is in_progress
+    const resetWpm = () => {
+        console.log('reset wpm')
+        setWpm(0)
+        setCharTypedInfomatics([{ char: '', index: 0, correct: true }])
+    }
     useEffect(() => {
         if (gameData) {
             const wordsTyped = countWords(charTypedInfomatics)
@@ -52,7 +58,7 @@ const useTypedContent = ({
         }
     }, [gameData?.timer, gameOver])
 
-    return { charTypedInfomatics, setCharTypedInfomatics, wpm }
+    return { charTypedInfomatics, setCharTypedInfomatics, wpm, resetWpm }
 }
 
 export default useTypedContent

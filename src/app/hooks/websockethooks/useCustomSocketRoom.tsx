@@ -37,6 +37,7 @@ interface UseCustomRoomProps {
     roomId: string
     functions: {
         ResetTimer: () => void
+        ResetLobby: () => void
     }
 }
 interface UserStats {
@@ -81,7 +82,7 @@ interface finalRoomState {
             time: number
             wpm: number
         }[]
-        finalWPM: number
+        wpm: number
         rank: number
         finishTime: number
         roomId: string
@@ -136,6 +137,7 @@ const useCustomRoomSocket = ({
         players: [],
         roomId: '',
     })
+
     const [playerControls, setPlayerControls] = useState(false)
     const [isConnected, setIsConnected] = useState(false)
     const [error, setError] = useState('')
@@ -147,21 +149,29 @@ const useCustomRoomSocket = ({
     )
     const { user } = useUser()
     // const { ws, setWs } = useWebConnectionHook({ username, roomId })
+    useEffect(() => {
+        if (gameState == 'waiting') {
+            functions.ResetLobby()
+            setCountDown(0)
+        }
+    }, [gameState])
 
     const joinRoom = useCallback(() => {
         const username = user?.username || ''
         if (username == '' || roomId == '') {
             console.log('Already connected')
         } else {
-            const url = process.env.NEXT_PUBLIC_WEBSOCKET_URL
+            const url = getWebSocketUrl().routes.wss.joinRoom
+
             if (!url) {
                 console.error('NEXT_PUBLIC_WEBSOCKET_URL is not defined')
                 return
             }
-            console.log(url)
-            const URL = `wss://${url}/ws/room?username=${encodeURIComponent(
+
+            const URL = `${url}?username=${encodeURIComponent(
                 username
             )}&room_id=${roomId}`
+
             console.log(URL)
 
             const ws = new WebSocket(URL)
@@ -188,7 +198,7 @@ const useCustomRoomSocket = ({
                         case 'countdown':
                             setCountDown(message.data)
                             console.log(message.data)
-                            if (countDown == 3) {
+                            if (countDown == 9) {
                                 setGameState(GameState.IN_PROGRESS)
                             }
                             break
@@ -276,25 +286,29 @@ const useCustomRoomSocket = ({
                             break
 
                         case 'ws_final_stat':
-                            setFinalState(message.data as finalRoomState)
-                            break
-
-                        case 'ws_final_stat':
-                            // console.log('Final stats received', message.data)
-                            setFinalState(message.data.players)
+                           
+                            setFinalState(message.data)
                             break
 
                         case 'game_finished':
+                           
                             setGameState(message.data.status as GameStateValue)
+                            functions.ResetLobby()
                             break
 
                         case 'game_reset':
                             console.log('Game reset')
-                            functions.ResetTimer()
-                            setCountDown(0)
-                            setGameState(GameState.WAITING)
+                            // functions.ResetTimer()
+                            // setCountDown(0)
+                            // setGameState(GameState.WAITING)
                             break
 
+                        case 'reseted_room':
+                            setCountDown(0)
+                            setGameState(GameState.WAITING)
+                            functions.ResetTimer()
+                            functions.ResetLobby()
+                            break
                         case 'error':
                             setError(message.data)
                             break
@@ -333,6 +347,21 @@ const useCustomRoomSocket = ({
             }
         }
     }, [username, roomId])
+
+    const resetConnectionState = useCallback(() => {
+        if (
+            connectionRef.current &&
+            gameState === GameState.FINISHED &&
+            isAdmin
+        ) {
+            // console.log(wpm)
+            connectionRef.current.send(
+                JSON.stringify({
+                    type: 'reset_state',
+                })
+            )
+        }
+    }, [gameState, username])
 
     const toggleAdminRole = useCallback(async () => {
         try {
@@ -589,6 +618,7 @@ const useCustomRoomSocket = ({
             updateCapacity,
             toggleReady,
             sendTimeout,
+            resetConnectionState,
             setGameState,
             sendResults,
             sendWpmUpdate,

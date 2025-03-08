@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import useReset from './useResetHook';
 
 interface timeXwpmInterface {
     time: number
@@ -7,6 +8,10 @@ interface timeXwpmInterface {
 
 export const useTimexWpm = ({ timer, wpm }: { timer: number; wpm: number }) => {
     const [timexwpm, setTimeXWpm] = useState<timeXwpmInterface[]>([])
+
+    const ResetTimexWpm = ()=>{
+        setTimeXWpm([])
+    }
     useEffect(() => {
         setTimeXWpm((prev: timeXwpmInterface[]) => [
             ...prev,
@@ -14,5 +19,5 @@ export const useTimexWpm = ({ timer, wpm }: { timer: number; wpm: number }) => {
         ])
     }, [timer])
 
-    return { timexwpm }
+    return { timexwpm,ResetTimexWpm }
 }

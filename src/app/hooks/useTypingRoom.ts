@@ -47,6 +47,10 @@ const useListenTyping = (
 ) => {
     const [CapsLock, setCapslock] = useState(false)
     const [text, setText] = useState<string[]>(generatedText)
+    const [totalChar, setTotalChar] = useState(text.length)
+    useEffect(() => {
+        setTotalChar(text.length)
+    }, [text])
     useEffect(() => {
         setText(generatedText)
     }, [generatedText])
@@ -56,20 +60,36 @@ const useListenTyping = (
         correctWords: [{ char: '', index: 0 }],
         incorrectWords: [{ char: '', index: 0 }],
     })
-    const { charTypedInfomatics, setCharTypedInfomatics, wpm } =
+
+    const { charTypedInfomatics, setCharTypedInfomatics, wpm, resetWpm } =
         useTypedContent({
             gameOver,
             gameData,
         })
 
     // total length of the text
-    const totalChar = text.length
+
     const [progress, setProgress] = useState(0)
     // array for incorrect characters
     const [incorrectTypeCharacter, setIncorrectTypeCharacter] = useState<
         number[]
     >([])
     const [charTypedInfo, setCharTypedInfo] = useState<any>([])
+    const resetCursor = () => {
+        setCursor(0)
+    }
+    const resetGameInfo = () => {
+        setWords({
+            correctWords: [{ char: '', index: 0 }],
+            incorrectWords: [{ char: '', index: 0 }],
+        })
+        setProgress(0) 
+        setText([])
+        setCharTypedInfo([])
+        setCharTyped([])
+        setIncorrectTypeCharacter([])
+        resetWpm()
+    }
 
     useEffect(() => {
         const handleEvent = (event: KeyboardEvent) => {
@@ -264,6 +284,9 @@ const useListenTyping = (
         charTypedInfo,
         CapsLock,
         wpm,
+        resetCursor,
+        resetGameInfo,
+        resetWpm,
     }
 }
 

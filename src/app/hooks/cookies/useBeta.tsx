@@ -17,6 +17,8 @@ const useBeta = () => {
             if (!betaTester && !JSON.parse(beta)) {
                 localStorage.setItem('Beta', JSON.stringify(true))
                 setBetaTester(true)
+            }else{
+                setBetaTester(true)
             }
         }
     }, [])

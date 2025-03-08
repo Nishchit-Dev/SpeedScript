@@ -12,11 +12,15 @@ import ReloadButton from '@/components/reload/reload'
 import Score from '@/components/ScoreCard/Score'
 import { useUser } from '@clerk/nextjs'
 import clsx from 'clsx'
-import { Copy, CrownIcon } from 'lucide-react'
+import { Copy, CrownIcon, Play } from 'lucide-react'
 import Image from 'next/image'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import AdminScoreBoard from './adminScoreBoard'
+import AdminScoreBoard, { UserScoreBoard } from './ScoreBoard'
+import useReset from '@/app/hooks/useResetHook'
+import { LoadingAnimation } from '@/app/lottieAnimation'
+import TimexWpm from '@/components/graph/timexwpmGraph'
+import UserScoreDisplay from './userScoreDisplay'
 
 const ToggleSpectator = ({
     toggle,
@@ -93,7 +97,7 @@ const Room = () => {
     const [preventIncorrect, setPreventIncorrect] = useState(false)
     const [isTyping, setIsTyping] = useState(false)
     const [gameOver, setGameOver] = useState(false)
-    const { timer, startTimer, stopTimer } = useTimer()
+    const { timer, startTimer, stopTimer, resetTimer } = useTimer()
     const [timerOption, setTimerOption] = useState(30)
     const ResetTimer = () => {
         setTimerOption(30)
@@ -103,6 +107,8 @@ const Room = () => {
         cursor,
         charTypedInfo,
         wpm: _wpm,
+        resetCursor,
+        resetGameInfo,
     } = useListenTyping(
         characterArray,
         charTyped,
@@ -116,13 +122,13 @@ const Room = () => {
     )
     const [multiplier, setMultiplier] = useState(1)
     const numberOfCharacters = 300
-
     const cursorPosition = useCursor({ cursor })
     useEffect(() => {
         if (charIndex > numberOfCharacters * multiplier) {
             setMultiplier((prev) => prev + 1)
         }
     }, [charIndex])
+
     useEffect(() => {
         let characterArray = typingSentence
             .split('')
@@ -136,29 +142,24 @@ const Room = () => {
     }, [typingSentence])
 
     useEffect(() => {
-        if (isTyping && cursor < 1 && timerOption >= timer) {
-            startTimer()
-        }
-        if (timerOption <= timer && isTyping) {
-            stopTimer()
-            setIsTyping(!isTyping)
-
-            setGameOver(true)
-            sendTimeout()
-        }
-    }, [timer, cursor, isTyping])
-    useEffect(() => {
         if (
             charIndex == characterArray.length - 1 &&
             characterArray.length > 0 &&
             gameState == 'in_progress'
         ) {
-            stopTimer()
             setIsTyping(!isTyping)
             setGameState('finished')
             setGameOver(true)
         }
     }, [charIndex])
+
+    const resetGameOptions = () => {
+        setIsTyping(false)
+        setGameOver(false)
+        setTimerOption(30)
+        stopTimer()
+        setMultiplier(1)
+    }
 
     const {
         state: {
@@ -175,6 +176,7 @@ const Room = () => {
             kickPlayer,
             updateCapacity,
             toggleReady,
+            resetConnectionState,
             sendTimeout,
             setGameState,
             sendResults,
@@ -188,8 +190,27 @@ const Room = () => {
     } = useCustomRoomSocket({
         username: user?.username || '',
         roomId: route.room,
-        functions: { ResetTimer: ResetTimer },
+        functions: { ResetTimer: ResetTimer, ResetLobby: resetGameOptions },
     })
+
+    useEffect(() => {
+        if (
+            isTyping &&
+            cursor < 1 &&
+            gameState == 'in_progress' &&
+            timerOption >= timer
+        ) {
+            // startTimer()
+        } else {
+            if (gameState != 'in_progress') stopTimer()
+        }
+        if (timerOption <= timer && isTyping) {
+            stopTimer()
+            setIsTyping(!isTyping)
+            setGameOver(true)
+            sendTimeout()
+        }
+    }, [timer, cursor, isTyping, gameState])
 
     useEffect(() => {
         setTypingSentence(roomData.data.text)
@@ -201,10 +222,14 @@ const Room = () => {
             setIsTyping(false)
             sendResults(timexwpm, _wpm)
         }
+        if (gameState == 'in_progress') {
+            setGameOver(false)
+            setIsTyping(true)
+        }
     }, [gameState])
 
-    const { timexwpm } = useTimexWpm({ timer: timer, wpm: _wpm })
-
+    const { timexwpm, ResetTimexWpm } = useTimexWpm({ timer: timer, wpm: _wpm })
+    useReset({ gameState, function: { resetInWaiting: ResetTimexWpm } })
     useEffect(() => {
         let interval: any = null
         if (gameState == 'in_progress') {
@@ -218,11 +243,53 @@ const Room = () => {
 
     useEffect(() => {
         if (gameState === 'in_progress') {
+            startTimer()
             setIsTyping(true)
+            setGameOver(false)
         }
     }, [gameState])
+
+    const ResetFunction = () => {
+        resetConnectionState()
+        resetGameOptions()
+    }
+
+    useReset({
+        gameState: gameState,
+        function: { resetFunction: resetCursor },
+    })
+
+    useEffect(() => {
+        if (gameState === 'waiting') {
+            resetGameOptions()
+            // stopTimer()
+            resetTimer()
+            resetGameInfo()
+        }
+    }, [gameState])
+    useEffect(() => {
+        console.log(timexwpm)
+    }, [timexwpm])
+
     return (
         <>
+            <div className="flex justify-center items-center">
+                {gameState === 'finished' && isAdmin ? (
+                    <p
+                        className={clsx(
+                            'flex flex-row m-2 w-max gap-2 justify-center items-center  bg-gray-600 max-w-48 text-center py-[3px] text-lg font-jetBrainsMono hover:text-green-400 text-gray-400  transition duration-500 ease-out rounded-sm px-2 cursor-pointer'
+                        )}
+                        onClick={() => {
+                            ResetFunction()
+                        }}
+                    >
+                        <Play size={18} />
+                        Play Again
+                    </p>
+                ) : (
+                    <></>
+                )}
+            </div>
             {gameState === 'connecting' || gameState === 'waiting' ? (
                 <>
                     <div className="flex justify-center items-center font-jetBrainsMono ">
@@ -284,12 +351,19 @@ const Room = () => {
                             >
                                 <div
                                     className={clsx(
-                                        `bg-green-400 h-2 top-0 transition duration-300`,
+                                        'bg-green-400 h-2 top-0 transition-all duration-300 ease-in-out',
                                         {
-                                            'w-[33.33%]': countDown === 3,
-                                            'w-[66.66%]': countDown === 2,
+                                            'w-[10.11%]': countDown === 10,
+                                            'w-[20.22%]': countDown === 9,
+                                            'w-[30.33%]': countDown === 8,
+                                            'w-[40.44%]': countDown === 7,
+                                            'w-[50.55%]': countDown === 6,
+                                            'w-[60.66%]': countDown === 5,
+                                            'w-[70.77%]': countDown === 4,
+                                            'w-[80.88%]': countDown === 3,
+                                            'w-[90.99%]': countDown === 2,
                                             'w-[100%]': countDown === 1,
-                                            'w-0': countDown === 0,
+                                            'w-0': countDown == 0,
                                         }
                                     )}
                                 ></div>
@@ -401,11 +475,16 @@ const Room = () => {
                         <>
                             {' '}
                             {roomData.admin_role === 'spectator' ? (
-                                <AdminScoreBoard
-                                    roomData={scoreBoardState || []}
-                                    isAdmin={isAdmin}
-                                    roomAdmin={roomData.room_admin || ''}
-                                />
+                                <>
+                                    <AdminScoreBoard
+                                        gameStatus={gameState}
+                                        finalState={finalState}
+                                        roomData={scoreBoardState || []}
+                                        isAdmin={isAdmin}
+                                        roomAdmin={roomData.room_admin || ''}
+                                        ResetFunction={ResetFunction}
+                                    />
+                                </>
                             ) : (
                                 <></>
                             )}
@@ -425,7 +504,6 @@ const Room = () => {
                                     <>
                                         {user?.username && isSignedIn ? (
                                             <>
-                                                <p>{gameOver}</p>
                                                 <div
                                                     className={clsx(
                                                         {
@@ -452,6 +530,7 @@ const Room = () => {
                                                         }}
                                                     ></div>
                                                 </div>
+
                                                 <div className="flex flex-1 flex-col justify-center items-center w-screen overflow-hidden min-h-[70vh] bg-[#E1E1E3]">
                                                     {gameOver ? (
                                                         <></>
@@ -471,82 +550,95 @@ const Room = () => {
                                                         ></div>
                                                     )}
 
-                                                    <ReloadButton
-                                                        gameOver={gameOver}
-                                                    />
-
-                                                    {/* {gameOver ? (
-                                        <RankingStage data={finalState} />
-                                    ) : (
-                                        <></>
-                                    )} */}
-
                                                     {gameOver ? (
-                                                        <div className="flex flex-1 flex-row mt-20">
+                                                        <>
                                                             <div>
-                                                                <Score
+                                                                <UserScoreDisplay
                                                                     data={
-                                                                        charTypedInfo
+                                                                        finalState
                                                                     }
-                                                                    _wpm={_wpm}
-                                                                    timexwpm={
-                                                                        timexwpm
+                                                                    wpm={_wpm}
+                                                                    gameState={
+                                                                        gameState
                                                                     }
                                                                 />
                                                             </div>
-                                                            <div>
-                                                                <div
-                                                                    className={clsx(
-                                                                        'overflow-hidden transition-all duration-700 ease-in-out',
-                                                                        {
-                                                                            'max-h-0 opacity-0 scale-0 ':
-                                                                                !gameOver,
-                                                                        },
-                                                                        {
-                                                                            'max-h-[500px] opacity-100 scale-100':
-                                                                                gameOver,
-                                                                        }
-                                                                    )}
-                                                                >
-                                                                    {/* <TimexWpmRoom
-                                                        data={finalState}
-                                                        timer={timer}
-                                                    /> */}
-                                                                </div>
-
-                                                                <div
-                                                                    className={clsx(
-                                                                        'overflow-hidden transition-all duration-700 ease-in-out',
-                                                                        {
-                                                                            'max-h-0 opacity-0 scale-0 ':
-                                                                                !gameOver,
-                                                                        },
-                                                                        {
-                                                                            'max-h-[500px] opacity-100 scale-100':
-                                                                                gameOver,
-                                                                        }
-                                                                    )}
-                                                                >
-                                                                    <ShowGraph
+                                                            <div className="flex flex-1 flex-row mt-20">
+                                                                <div>
+                                                                    <Score
                                                                         data={
                                                                             charTypedInfo
                                                                         }
+                                                                        _wpm={
+                                                                            _wpm
+                                                                        }
+                                                                        timexwpm={
+                                                                            timexwpm
+                                                                        }
                                                                     />
                                                                 </div>
+                                                                <div>
+                                                                    <div
+                                                                        className={clsx(
+                                                                            'overflow-hidden transition-all duration-700 ease-in-out',
+                                                                            {
+                                                                                'max-h-0 opacity-0 scale-0 ':
+                                                                                    !gameOver,
+                                                                            },
+                                                                            {
+                                                                                'max-h-[500px] opacity-100 scale-100':
+                                                                                    gameOver,
+                                                                            }
+                                                                        )}
+                                                                    >
+                                                                        <TimexWpm
+                                                                            data={
+                                                                                timexwpm
+                                                                            }
+                                                                            timer={
+                                                                                timer
+                                                                            }
+                                                                        />
+                                                                    </div>
+
+                                                                    <div
+                                                                        className={clsx(
+                                                                            'overflow-hidden transition-all duration-700 ease-in-out',
+                                                                            {
+                                                                                'max-h-0 opacity-0 scale-0 ':
+                                                                                    !gameOver,
+                                                                            },
+                                                                            {
+                                                                                'max-h-[500px] opacity-100 scale-100':
+                                                                                    gameOver,
+                                                                            }
+                                                                        )}
+                                                                    >
+                                                                        <ShowGraph
+                                                                            data={
+                                                                                charTypedInfo
+                                                                            }
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                {/* <div></div> */}
+                                                                <UserScoreBoard
+                                                                    gameStatus={
+                                                                        gameState
+                                                                    }
+                                                                    finalState={
+                                                                        finalState
+                                                                    }
+                                                                    roomData={
+                                                                        scoreBoardState ||
+                                                                        []
+                                                                    }
+                                                                    ResetFunction={
+                                                                        ResetFunction
+                                                                    }
+                                                                />
                                                             </div>
-                                                            <div>
-                                                                {/* {finalState?.players.length >
-                                                0 ? (
-                                                    <RankUsers
-                                                        data={
-                                                            finalState?.players
-                                                        }
-                                                    />
-                                                ) : (
-                                                    <></>
-                                                )} */}
-                                                            </div>
-                                                        </div>
+                                                        </>
                                                     ) : (
                                                         <></>
                                                     )}
@@ -729,7 +821,6 @@ const Room = () => {
                             <>
                                 {user?.username && isSignedIn ? (
                                     <>
-                                        <p>{gameOver}</p>
                                         <div
                                             className={clsx(
                                                 {
@@ -773,76 +864,92 @@ const Room = () => {
                                                 ></div>
                                             )}
 
-                                            <ReloadButton gameOver={gameOver} />
-
-                                            {/* {gameOver ? (
-                                        <RankingStage data={finalState} />
-                                    ) : (
-                                        <></>
-                                    )} */}
-
                                             {gameOver ? (
-                                                <div className="flex flex-1 flex-row mt-20">
+                                                <>
                                                     <div>
-                                                        <Score
-                                                            data={charTypedInfo}
-                                                            _wpm={_wpm}
-                                                            timexwpm={timexwpm}
+                                                        <UserScoreDisplay
+                                                            data={finalState}
+                                                            wpm={_wpm}
+                                                            gameState={
+                                                                gameState
+                                                            }
                                                         />
                                                     </div>
-                                                    <div>
-                                                        <div
-                                                            className={clsx(
-                                                                'overflow-hidden transition-all duration-700 ease-in-out',
-                                                                {
-                                                                    'max-h-0 opacity-0 scale-0 ':
-                                                                        !gameOver,
-                                                                },
-                                                                {
-                                                                    'max-h-[500px] opacity-100 scale-100':
-                                                                        gameOver,
-                                                                }
-                                                            )}
-                                                        >
-                                                            {/* <TimexWpmRoom
-                                                        data={finalState}
-                                                        timer={timer}
-                                                    /> */}
-                                                        </div>
 
-                                                        <div
-                                                            className={clsx(
-                                                                'overflow-hidden transition-all duration-700 ease-in-out',
-                                                                {
-                                                                    'max-h-0 opacity-0 scale-0 ':
-                                                                        !gameOver,
-                                                                },
-                                                                {
-                                                                    'max-h-[500px] opacity-100 scale-100':
-                                                                        gameOver,
-                                                                }
-                                                            )}
-                                                        >
-                                                            <ShowGraph
+                                                    <div className="flex flex-1 flex-row mt-20">
+                                                        <div>
+                                                            <Score
                                                                 data={
                                                                     charTypedInfo
                                                                 }
+                                                                _wpm={_wpm}
+                                                                timexwpm={
+                                                                    timexwpm
+                                                                }
                                                             />
                                                         </div>
+                                                        <div>
+                                                            <div
+                                                                className={clsx(
+                                                                    'overflow-hidden transition-all duration-700 ease-in-out',
+                                                                    {
+                                                                        'max-h-0 opacity-0 scale-0 ':
+                                                                            !gameOver,
+                                                                    },
+                                                                    {
+                                                                        'max-h-[500px] opacity-100 scale-100':
+                                                                            gameOver,
+                                                                    }
+                                                                )}
+                                                            >
+                                                                <TimexWpm
+                                                                    data={
+                                                                        timexwpm
+                                                                    }
+                                                                    timer={
+                                                                        timer
+                                                                    }
+                                                                />
+                                                            </div>
+
+                                                            <div
+                                                                className={clsx(
+                                                                    'overflow-hidden transition-all duration-700 ease-in-out',
+                                                                    {
+                                                                        'max-h-0 opacity-0 scale-0 ':
+                                                                            !gameOver,
+                                                                    },
+                                                                    {
+                                                                        'max-h-[500px] opacity-100 scale-100':
+                                                                            gameOver,
+                                                                    }
+                                                                )}
+                                                            >
+                                                                <ShowGraph
+                                                                    data={
+                                                                        charTypedInfo
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div></div>
+                                                        <UserScoreBoard
+                                                            gameStatus={
+                                                                gameState
+                                                            }
+                                                            finalState={
+                                                                finalState
+                                                            }
+                                                            roomData={
+                                                                scoreBoardState ||
+                                                                []
+                                                            }
+                                                            ResetFunction={
+                                                                ResetFunction
+                                                            }
+                                                        />
                                                     </div>
-                                                    <div>
-                                                        {/* {finalState?.players.length >
-                                                0 ? (
-                                                    <RankUsers
-                                                        data={
-                                                            finalState?.players
-                                                        }
-                                                    />
-                                                ) : (
-                                                    <></>
-                                                )} */}
-                                                    </div>
-                                                </div>
+                                                </>
                                             ) : (
                                                 <></>
                                             )}
@@ -906,7 +1013,6 @@ const Room = () => {
                                             <div
                                                 className={clsx(
                                                     'max-w-full relative overflow-hidden w-full transition-all duration-700 ease-in-out',
-
                                                     {
                                                         'max-h-0 opacity-0 scale-0 ':
                                                             gameOver,

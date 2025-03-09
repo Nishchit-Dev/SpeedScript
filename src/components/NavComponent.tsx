@@ -17,6 +17,8 @@ import clsx from 'clsx'
 import { useRouter } from 'next/navigation'
 import { getWebSocketUrl } from '@/lib/helper'
 import useBeta from '@/app/hooks/cookies/useBeta'
+import useLivePlayer from '@/app/hooks/websockethooks/useLivePlayers'
+import { motion } from 'framer-motion'
 
 const NaivgationComponent = () => {
     const { user, isSignedIn } = useUser()
@@ -61,10 +63,37 @@ const NaivgationComponent = () => {
     }
 
     const { betaTester } = useBeta()
+    const onlineDotVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                duration: 1,
+                yoyo: Infinity,
+            },
+        },
+    }
+    const { playersOnline } = useLivePlayer()
     return (
         <>
             <div className="flex flex-1 flex-row gap-3 items-center justify-end w-max">
                 <div className="font-jetBrainsMono flex flex-row gap-3 justify-center items-center">
+                    <motion.div
+                        className="flex flex-row  shadow-md shadow-[#a3e5bb] justify-center items-center px-5 py-2 text-sm text-black bg-white border-[1px] rounded-full cursor-pointer"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 1 }}
+                    >
+                        <motion.div
+                            className="mr-2 w-2 h-2 bg-green-400 rounded-full"
+                            variants={onlineDotVariants}
+                            initial={{ scale: 1, opacity:1 }}
+                            animate={{ scale: [1, 1.3, 1],opacity:[1,0.2,1] }}
+                            transition={{ duration: 2.5, repeat: Infinity }}
+                        />
+                        {playersOnline}
+                       <p className='ml-2'>players</p>
+                    </motion.div>
                     {isSignedIn ? (
                         <Link href={'/multiplayer'}>
                             <div className="flex flex-row px-5 py-2 text-sm text-black bg-white hover:bg-black/20 hover:text-white duration-300 rounded-full cursor-pointer">

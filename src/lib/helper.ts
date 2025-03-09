@@ -47,12 +47,14 @@ interface WebSocketUrl {
             joinRoom: string;
             adminRole: string;
             createRoom: string;
+            globalOnline: string;
         };
 
         https: {
             joinRoom: string;
             adminRole: string;
             createRoom: string;
+            globalOnline: string;
         };
     };
 }
@@ -75,11 +77,13 @@ export const getWebSocketUrl = (): WebSocketUrl => {
                     joinRoom: `wss://${envUrl}/ws/room`,
                     adminRole: `wss://${envUrl}/api/admin/change-role`,
                     createRoom: `wss://${envUrl}/api/create-room`,
+                    globalOnline:`wss://${envUrl}/ws/global-online`
                 },
                 https: {
                     joinRoom: `https://${envUrl}/ws/room`,
                     adminRole: `https://${envUrl}/api/admin/change-role`,
                     createRoom: `https://${envUrl}/api/create-room`,
+                    globalOnline:`https://${envUrl}/ws/global-online`
                 },
             },
         }
@@ -92,11 +96,13 @@ export const getWebSocketUrl = (): WebSocketUrl => {
                     joinRoom: `ws://${envUrl}/ws/room`,
                     adminRole: `ws://${envUrl}/api/admin/change-role`,
                     createRoom: `ws://${envUrl}/api/create-room`,
+                    globalOnline:`ws://${envUrl}/ws/global-online`
                 },
                 https: {
                     joinRoom: `http://${envUrl}/ws/room`,
                     adminRole: `http://${envUrl}/api/admin/change-role`,
                     createRoom: `http://${envUrl}/api/create-room`,
+                    globalOnline:`http://${envUrl}/ws/global-online`
                 },
             },
         }

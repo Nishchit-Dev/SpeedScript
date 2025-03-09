@@ -92,9 +92,6 @@ export default function Typing() {
         }
     }, [isTyping])
     useEffect(() => {
-        if (isTyping && cursor < 1 && timerOption >= timer) {
-            startTimer()
-        }
         if (timerOption <= timer && isTyping) {
             stopTimer()
             setIsTyping(!isTyping)
@@ -103,6 +100,7 @@ export default function Typing() {
             sendTimeout()
         }
     }, [timer, cursor, isTyping])
+
     useEffect(() => {
         if (
             charIndex == characterArray.length - 1 &&
@@ -140,6 +138,11 @@ export default function Typing() {
         userStats: timexwpm,
         wpm: _wpm,
     })
+    useEffect(() => {
+        if (gameState === 'in_progress') {
+            startTimer()
+        }
+    }, [gameState])
 
     useEffect(() => {
         setTypingSentence(roomData.roomText)

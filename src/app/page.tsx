@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import clsx from 'clsx'
 import Image from 'next/image'
@@ -20,6 +20,8 @@ import { addNewScore } from '@/lib/actions/score.actions'
 import useAddNewScore from './hooks/useAddNewScore'
 import { useUser } from '@clerk/nextjs'
 import ReloadButton from '@/components/reload/reload'
+import useLivePlayer from './hooks/websockethooks/useLivePlayers'
+import LobbyText from './multiplayer/component/LobbyText'
 
 const TypingText =
     'The quick brown fox jumps over the lazy dog and enjoys the warm sunshine on a bright afternoon.'
@@ -94,7 +96,6 @@ export default function Typing() {
         }
     }, [charIndex])
 
-    useEffect(() => {}, [])
     useEffect(() => {
         if (buttons.ghost) {
             if (isTyping) {
@@ -133,8 +134,118 @@ export default function Typing() {
     const { timexwpm } = useTimexWpm({ timer: timer, wpm: _wpm })
 
     const charactersToShow = 200 // Number of characters to display at a time
+
     const startIndex =
         Math.floor(charIndex / charactersToShow) * charactersToShow // Calculate the starting index based on the cursor position
+
+    useEffect(() => {
+        const splitIntoWordSpaceSegments = (characterArray: string[]) => {
+            const segments: Array<{
+                type: 'word' | 'space'
+                chars: string[]
+                indices: number[]
+            }> = []
+            let currentSegment: string[] = []
+            let currentIndices: number[] = []
+
+            characterArray.forEach((char, index) => {
+                if (char === '\u2000') {
+                    if (currentSegment.length > 0) {
+                        segments.push({
+                            type: 'word',
+                            chars: currentSegment,
+                            indices: currentIndices,
+                        })
+                        currentSegment = []
+                        currentIndices = []
+                    }
+                    segments.push({
+                        type: 'space',
+                        chars: [char],
+                        indices: [index],
+                    })
+                } else {
+                    currentSegment.push(char)
+                    currentIndices.push(index)
+                }
+            })
+
+            if (currentSegment.length > 0) {
+                segments.push({
+                    type: 'word',
+                    chars: currentSegment,
+                    indices: currentIndices,
+                })
+            }
+
+            return segments
+        }
+        const segments = splitIntoWordSpaceSegments(characterArray)
+
+        const findClosestSpace = (
+            characterArray: string[],
+            targetIndex: number
+        ) => {
+            let closestSpaceIndex = targetIndex
+            let minDistance = Infinity
+
+            characterArray.forEach((char, index) => {
+                if (char === '\u2000') {
+                    const distance = Math.abs(index - targetIndex)
+                    if (distance < minDistance) {
+                        closestSpaceIndex = index
+                        minDistance = distance
+                    }
+                }
+            })
+        }
+
+        findClosestSpace(characterArray, charactersToShow)
+    }, [characterArray])
+
+    // Inside the component, generate the segments
+    const [newText, setText] = useState<string[][]>([])
+
+    useMemo(() => {
+        const segments: string[][] = []
+        let currentSegment: string[] = []
+        let spaceCount = 0
+
+        characterArray.forEach((char, index) => {
+            currentSegment.push(char)
+            if (char === '\u2000') {
+                spaceCount++
+            }
+
+            if (window.innerWidth >= 1200 && spaceCount === 14) {
+                segments.push([...currentSegment])
+                currentSegment = []
+                spaceCount = 0
+            } else if (window.innerWidth >= 1000 && spaceCount === 10) {
+                segments.push([...currentSegment])
+                currentSegment = []
+                spaceCount = 0
+            } else if (
+                window.innerWidth >= 768 &&
+                window.innerWidth < 1200 &&
+                spaceCount === 10
+            ) {
+                segments.push([...currentSegment])
+                currentSegment = []
+                spaceCount = 0
+            } else if (window.innerWidth < 768 && spaceCount === 6) {
+                segments.push([...currentSegment])
+                currentSegment = []
+                spaceCount = 0
+            }
+        })
+
+        if (currentSegment.length > 0) {
+            segments.push([...currentSegment])
+        }
+
+        setText(segments)
+    }, [characterArray])
 
     return (
         <>
@@ -506,8 +617,7 @@ export default function Typing() {
                                                             index < charIndex &&
                                                             incorrectChar.includes(
                                                                 index
-                                                            ) &&
-                                                            !preventIncorrect,
+                                                            ),
                                                     },
 
                                                     {
@@ -543,65 +653,17 @@ export default function Typing() {
                             </div>
                         </div>
                     ) : (
-                        <div
-                            // style={{ transform: `translateX(-${progress}%)` }}
-                            className={clsx(
-                                `flex flex-1   flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl relative left-[25%] transition duration-2000 ease-out `
-                            )}
-                        >
-                            {characterArray.length > 0 ? (
-                                characterArray.map((character, index) => {
-                                    if (
-                                        index >=
-                                            numberOfCharacters *
-                                                (multiplier - 1) &&
-                                        index <= numberOfCharacters * multiplier
-                                    )
-                                        return (
-                                            <p
-                                                key={index}
-                                                className={clsx(
-                                                    `character${index}  `,
-                                                    {
-                                                        'text-gray-400':
-                                                            index > charIndex,
-                                                    },
-                                                    {
-                                                        'text-black':
-                                                            index < charIndex ||
-                                                            !incorrectChar.includes(
-                                                                index
-                                                            ),
-                                                    },
-                                                    {
-                                                        'text-red-500':
-                                                            index < charIndex &&
-                                                            incorrectChar.includes(
-                                                                index
-                                                            ) &&
-                                                            !preventIncorrect,
-                                                    },
-
-                                                    {
-                                                        'font-bold':
-                                                            index == charIndex,
-                                                        'text-3xl':
-                                                            index == charIndex,
-                                                        'text-green-500 cursorIsHere':
-                                                            index == charIndex,
-                                                    }
-                                                )}
-                                            >
-                                                {character}
-                                            </p>
-                                        )
-                                })
-                            ) : (
-                                <div className="">
-                                    <h1 className="moving-text ">generating</h1>
-                                </div>
-                            )}
-                        </div>
+                        <>
+                            <LobbyText
+                                characterArray={characterArray}
+                                charactersToShow={charactersToShow}
+                                charIndex={charIndex}
+                                numberOfCharacters={numberOfCharacters}
+                                multiplier={multiplier}
+                                incorrectChar={incorrectChar}
+                                isTyping={true}
+                            />
+                        </>
                     )}
                 </div>
             </div>

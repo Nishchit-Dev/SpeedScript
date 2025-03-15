@@ -81,10 +81,6 @@ const useSocket = ({
                 connectionRef.current = ws
             })
 
-            ws.addEventListener('message', (event) => {
-                // console.log('WebSocket message received:', event.data)
-            })
-
             ws.addEventListener('error', (error) => {
                 console.error('WebSocket error:', error)
             })
@@ -126,7 +122,6 @@ const useSocket = ({
                                     message.data.text || 'Default typing text',
                                 roomInfo: message.data.players,
                             }))
-                            // console.log('Room state:', message.data)
                             setGameState(message.data.status as GameStateValue)
                             break
 

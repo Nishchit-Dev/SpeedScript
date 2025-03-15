@@ -18,6 +18,7 @@ import Image from 'next/image'
 import { getBadgeImage } from '@/components/BadgeComponent'
 import Link from 'next/link'
 import ReloadButton from '@/components/reload/reload'
+import LobbyText from './component/LobbyText'
 
 export default function Typing() {
     const { isSignedIn, user } = useUser()
@@ -587,77 +588,21 @@ export default function Typing() {
                                 }
                             )}
                         >
-                            <div
-                                // style={{ transform: `translateX(-${progress}%)` }}
-                                className={clsx(
-                                    `flex flex-1   flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl relative left-[25%] transition duration-2000 ease-out `,
-                                    {
-                                        hidden: !isTyping,
-                                    }
-                                )}
-                            >
-                                {characterArray.length > 0 ? (
-                                    characterArray.map((character, index) => {
-                                        if (
-                                            index >=
-                                                numberOfCharacters *
-                                                    (multiplier - 1) &&
-                                            index <=
-                                                numberOfCharacters * multiplier
-                                        )
-                                            return (
-                                                <p
-                                                    key={index}
-                                                    className={clsx(
-                                                        `character${index}  `,
-                                                        {
-                                                            'text-gray-400':
-                                                                index >
-                                                                charIndex,
-                                                        },
-                                                        {
-                                                            'text-black':
-                                                                index <
-                                                                    charIndex ||
-                                                                !incorrectChar.includes(
-                                                                    index
-                                                                ),
-                                                        },
-                                                        {
-                                                            'text-red-500':
-                                                                index <
-                                                                    charIndex &&
-                                                                incorrectChar.includes(
-                                                                    index
-                                                                ) &&
-                                                                !preventIncorrect,
-                                                        },
-
-                                                        {
-                                                            'font-bold':
-                                                                index ==
-                                                                charIndex,
-                                                            'text-3xl':
-                                                                index ==
-                                                                charIndex,
-                                                            'text-green-500 cursorIsHere':
-                                                                index ==
-                                                                charIndex,
-                                                        }
-                                                    )}
-                                                >
-                                                    {character}
-                                                </p>
-                                            )
-                                    })
-                                ) : (
-                                    <div className="">
-                                        <h1 className="moving-text ">
-                                            generating
-                                        </h1>
-                                    </div>
-                                )}
-                            </div>
+                            {characterArray.length > 0 ? (
+                                <LobbyText
+                                    characterArray={characterArray}
+                                    charactersToShow={charactersToShow}
+                                    charIndex={charIndex}
+                                    numberOfCharacters={numberOfCharacters}
+                                    multiplier={multiplier}
+                                    incorrectChar={incorrectChar}
+                                    isTyping={isTyping}
+                                />
+                            ) : (
+                                <div className="">
+                                    <h1 className="moving-text ">generating</h1>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </>

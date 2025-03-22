@@ -1,271 +1,34 @@
 'use client'
 import { clsx } from 'clsx'
 import { useLeaderboard } from '../hooks/leaderBoard/useLeaderBoard'
-import Counter from '@/components/ui/countingNumberAnimation'
-import {
-    ArrowBigRight,
-    ArrowLeft,
-    ArrowLeftCircle,
-    ArrowRight,
-    User,
-} from 'lucide-react'
-import useUserLocal from '../hooks/cookies/useGuest'
-import { useEffect, useState } from 'react'
+import { ArrowLeft, ArrowRight, User } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { GlareCard } from '@/components/ui/glare-ui'
 import Image from 'next/image'
 import React from 'react'
 import { getBadgeImage } from '@/components/BadgeComponent'
 import { useUser } from '@clerk/nextjs'
-import { set } from 'mongoose'
+import { DurationSelector } from './durationSelector'
+import DynamicDailyLeaderboardComponent from './component/DynamicDailyLeaderboard'
+import DynamicLeaderBoardComponent from './component/DynamicLeaderboard'
+import DynamicStage from './component/DynamicStage'
 
 interface data {
     username: string
     clerkId: string
     _id: string
-    highestWpm: number
-    dailyHighestWpm: number
-}
-
-const usernameSlicer = (data: data) => {
-    return data.username
-        ? data.username
-        : 'user' + data._id.slice(data._id.length - 4, data._id.length)
-}
-
-const Stage = ({
-    data,
-    index,
-    flag,
-}: {
-    data: data
-    index: number
-    flag?: boolean
-}) => {
-    return (
-        <div className="p-2 h-80">
-            <div
-                className={clsx(
-                    'relative  items-center flex flex-col',
-                    { ' top-[0%]': index == 2 },
-                    { 'top-[30%]': index == 1 },
-                    { ' top-[45%]': index == 3 }
-                )}
-            >
-                <div>
-                    <Image
-                        src={`/throphies/LeaderboardRank${index}.svg`}
-                        alt=""
-                        width={180}
-                        height={180}
-                    />
-                </div>
-                <div className="font-jetBrainsMono font-bold text-2xl ">
-                    {flag ? (
-                        <p> {data.highestWpm}</p>
-                    ) : (
-                        <p> {data.dailyHighestWpm}</p>
-                    )}
-                </div>
-                <div className="flex flex-row gap-2 font-jetBrainsMono bg-white/80 px-3 py-2 rounded-full justify-center items-center">
-                    <div className="bg-slate-400 rounded-full p-[2px]">
-                        <User />
-                    </div>
-                    <p> {usernameSlicer(data)}</p>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-const LeaderboardComponent = ({
-    index,
-    data,
-    flag = true,
-    currentPage,
-    itemsPerPage,
-}: {
-    index: number
-    data: data
-    flag?: boolean
-    currentPage: number
-    itemsPerPage: number
-}) => {
-    const { userGuest, getUser } = useUserLocal()
-    const [user, setUser] = useState<data | null>(null)
-    useEffect(() => {
-        if (userGuest) {
-            setUser(userGuest)
-        }
-    }, [userGuest])
-
-    return (
-        <div className="">
-            {index < 3 ? (
-                <></>
-            ) : (
-                <div
-                    className={clsx(
-                        {
-                            'bg-yellow-400 p-3 px-10 min-w-[612px] text-2xl':
-                                index == 0,
-                        },
-                        {
-                            'bg-yellow-300 p-3 px-10 min-w-[562px] text-xl':
-                                index == 1,
-                        },
-                        {
-                            'bg-yellow-200 p-3 px-10 min-w-[512px] text-lg':
-                                index == 2,
-                        },
-                        { ' p-3 px-10 min-w-[452px]': index > 2 },
-                        {
-                            hidden: data.highestWpm <= 0,
-                        }
-                    )}
-                >
-                    <div className="flex flex-1 justify-between items-center font-jetBrainsMono ">
-                        <div className="flex justify-center items-center gap-2">
-                            {index >= 3 ? (
-                                <div className="flex flex-row justify-center items-center gap-5">
-                                    <div>
-                                        {(currentPage - 1) * itemsPerPage +
-                                            index +
-                                            1}
-                                    </div>
-                                    <div>
-                                        <Image
-                                            src={`/throphies/badges/${getBadgeImage(
-                                                data.highestWpm
-                                            )}`}
-                                            alt=""
-                                            width={50}
-                                            height={50}
-                                        />
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="bg-white rounded-full">
-                                    <Image
-                                        src={`/throphies/LeaderboardRank${
-                                            index + 1
-                                        }.svg`}
-                                        alt=""
-                                        height={60}
-                                        width={60}
-                                    />
-                                </div>
-                            )}
-
-                            <div className="text-black/80" onClick={() => {}}>
-                                {usernameSlicer(data)}
-                            </div>
-                            <div
-                                className={clsx('', {
-                                    invisible: user?._id != data._id,
-                                })}
-                            >
-                                <div className="px-3 py-1 bg-white/80  text-black text-xs rounded-full">
-                                    <p>you</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="">
-                            <p className="text-lg font-bold">
-                                {data.highestWpm > 0 ? data.highestWpm : 0}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    )
-}
-
-const DailyLeaderboardComponent = ({
-    index,
-    data,
-}: {
-    index: number
-    data: data
-}) => {
-    const { userGuest, getUser } = useUserLocal()
-    const [user, setUser] = useState<data | null>(null)
-    useEffect(() => {
-        if (userGuest) {
-            setUser(userGuest)
-        }
-    }, [userGuest])
-    return (
-        <div
-            className={clsx(
-                {
-                    'bg-yellow-400 p-3 px-10 min-w-[512px] text-2xl':
-                        index == 0,
-                },
-                {
-                    'bg-yellow-300 p-3 px-10 min-w-[462px] text-xl': index == 1,
-                },
-                {
-                    'bg-yellow-200 p-3 px-10 min-w-[412px] text-lg': index == 2,
-                },
-                { ' p-3 px-10 min-w-[412px]': index > 2 },
-                {
-                    hidden: data.dailyHighestWpm <= 0,
-                }
-            )}
-        >
-            <div className="flex flex-1 justify-between items-center font-jetBrainsMono ">
-                <div className="flex justify-center items-center gap-5">
-                    {index >= 3 ? (
-                        <div className="flex flex-row justify-center items-center gap-5">
-                            <div>{index + 1}</div>
-                            <div>
-                                <Image
-                                    src={`/throphies/badges/${getBadgeImage(
-                                        data.dailyHighestWpm
-                                    )}`}
-                                    alt=""
-                                    width={50}
-                                    height={50}
-                                />
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="bg-white rounded-full">
-                            <Image
-                                src={`/throphies/LeaderboardRank${
-                                    index + 1
-                                }.svg`}
-                                alt=""
-                                height={60}
-                                width={60}
-                            />
-                        </div>
-                    )}
-                    <div className="text-black/80" onClick={() => {}}>
-                        {usernameSlicer(data)}
-                    </div>
-                    <div
-                        className={clsx('', {
-                            invisible: user?._id != data._id,
-                        })}
-                    >
-                        <div className="px-3 py-1 bg-white/80  text-black text-xs rounded-full">
-                            <p>you</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="font-jetBrainsMono">
-                    <p className="text-lg font-bold">
-                        {' '}
-                        {data.dailyHighestWpm > 0
-                            ? data.dailyHighestWpm
-                            : 0}{' '}
-                    </p>
-                </div>
-            </div>
-        </div>
-    )
+    highestWpm: {
+        highestScore10s: number
+        highestScore30s: number
+        highestScore60s: number
+        highestScore120s: number
+    }
+    dailyHighestWpm: {
+        dailyHighestScore10s: number
+        dailyHighestScore30s: number
+        dailyHighestScore60s: number
+        dailyHighestScore120s: number
+    }
 }
 
 const LeaderboardButton = ({
@@ -277,12 +40,12 @@ const LeaderboardButton = ({
 }) => {
     return (
         <>
-            <div className="bg-black/70 flex flex-row rounded-full p-1 text-black/70 font-jetBrainsMono mb-5 gap-2">
+            <div className="bg-gray-600 flex flex-row rounded-sm p-1 text-black/70 font-jetBrainsMono mb-5 gap-2">
                 <div
                     className={clsx(
-                        ' px-5 py-2 rounded-full cursor-pointer',
-                        { 'bg-yellow-300 text-black': flag },
-                        { 'text-white/70': !flag }
+                        ' px-5 py-2 rounded-full cursor-pointer ',
+                        { 'text-green-400 ': flag },
+                        { 'text-white/70 hover:opacity-65': !flag }
                     )}
                     onClick={() => setFlag(!flag)}
                 >
@@ -291,9 +54,9 @@ const LeaderboardButton = ({
                 <div
                     onClick={() => setFlag(!flag)}
                     className={clsx(
-                        ' px-5 py-2 rounded-full text-black cursor-pointer',
-                        { 'bg-yellow-300': !flag },
-                        { 'text-white/70': flag }
+                        ' px-5 py-2 rounded-full  cursor-pointer hover:opacity-65',
+                        { 'text-green-300': !flag },
+                        { 'text-white/70 hover:opacity-65': flag }
                     )}
                 >
                     <p>Daily</p>
@@ -303,22 +66,31 @@ const LeaderboardButton = ({
     )
 }
 
+interface UserRank {
+    _id: string
+    clerkId: string
+    highestWpm: number
+    dailyHighestWpm: number
+    highestRank: number
+    dailyRank: number
+    rank: number // Add this line if the API actually returns a rank property
+}
 const UserScoreBoard = ({ flag }: { flag: boolean }) => {
-    const { getRank, userRank } = useLeaderboard()
+    const { getRank, userRank, duration } = useLeaderboard({})
     const { user } = useUser()
     const [_user, setUser] = useState<data | null>(null)
 
     useEffect(() => {
-        if (user  ) {
-            getRank(user.id)
+        if (user) {
+            getRank(user.id, duration)
             if (user?.username) {
                 setUser((prev: any) => {
                     return { ...prev, username: user.username || null }
                 })
             }
         }
-    }, [user?.username])
-    
+    }, [user?.username, duration, getRank])
+
     return (
         <>
             {user?.username ? (
@@ -326,8 +98,8 @@ const UserScoreBoard = ({ flag }: { flag: boolean }) => {
                     className={clsx(
                         'mb-5',
                         { hidden: !flag },
-                        { visible: userRank?.rank != -1 },
-                        { hidden: userRank?.rank == -1 }
+                        { visible: userRank?.highestRank != -1 }, // Changed rank to highestRank
+                        { hidden: userRank?.highestRank == -1 } // Changed rank to highestRank
                     )}
                 >
                     <div>
@@ -335,12 +107,16 @@ const UserScoreBoard = ({ flag }: { flag: boolean }) => {
                             <div className="w-[600px] h-24 font-jetBrainsMono">
                                 <div className="flex flex-col justify-center items-center my-2">
                                     <div className="text-white">
-                                        <p>All Time Leaderboard Rank</p>
+                                        <p>
+                                            All Time Leaderboard Rank (
+                                            {duration})
+                                        </p>
                                     </div>
                                     <div className="text-white/80 flex flex-row justify-center items-center flex-1 gap-3">
                                         <p className="text-6xl font-bold flex justify-center items-center">
                                             <span className="text-lg">#</span>
-                                            {userRank?.rank}
+                                            {userRank?.highestRank}{' '}
+                                            {/* Changed rank to highestRank */}
                                         </p>
                                         <p className="text-xl">
                                             {_user ? (
@@ -367,11 +143,155 @@ const UserScoreBoard = ({ flag }: { flag: boolean }) => {
         </>
     )
 }
+
+// Define the data type interface to match what's expected by components
+interface WpmScores {
+    highestScore10s: number
+    highestScore30s: number
+    highestScore60s: number
+    highestScore120s: number
+}
+
+interface DailyWpmScores {
+    dailyHighestScore10s: number
+    dailyHighestScore30s: number
+    dailyHighestScore60s: number
+    dailyHighestScore120s: number
+}
+
+interface LeaderboardData {
+    _id: string
+    username: string
+    clerkId?: string
+    highestWpm: WpmScores
+    dailyHighestWpm: DailyWpmScores
+}
+interface LeaderboardEntry {
+    _id: string
+    clerkId: string
+    username: string
+    highestWpm?: {
+        highestScore10s?: number
+        highestScore30s?: number
+        highestScore60s?: number
+        highestScore120s?: number
+    }
+    dailyHighestWpm?: {
+        dailyHighestScore10s?: number
+        dailyHighestScore30s?: number
+        dailyHighestScore60s?: number
+        dailyHighestScore120s?: number
+    }
+}
+
+const DailyLeaderboardContent = ({
+    currentPage,
+    paginatedDailyLeaderboard,
+    ActiveDuration,
+    user,
+    flag,
+    itemsPerPage,
+}: {
+    currentPage: number
+    paginatedDailyLeaderboard: LeaderboardEntry[]
+    ActiveDuration: '10s' | '30s' | '60s' | '120s'
+    user: any
+    flag: boolean
+    itemsPerPage: number
+}) => {
+    return (
+        <>
+            {currentPage === 1 && (
+                <div className="flex flex-row h-80 mb-28">
+                    {paginatedDailyLeaderboard.slice(0, 3).map((data, index) => (
+                            <DynamicStage
+                                flag={flag}
+                                duration={ActiveDuration}
+                                data={data}
+                                key={`daily-top-${data._id}-${index}`}
+                                index={index + 1}
+                            />
+                        ))}
+                </div>
+            )}
+            <div className="bg-white rounded-lg">
+                {paginatedDailyLeaderboard.slice(3).map((data, index) => (
+                    <DynamicDailyLeaderboardComponent
+                        duration={ActiveDuration}
+                        user={user}
+                        data={data}
+                        index={index + 3}
+                        key={`daily-board-${data._id}-${index}`}
+                    />
+                ))}
+            </div>
+        </>
+    )
+}
+
+const LeaderboardContent = ({
+    currentPage,
+    paginatedLeaderboard,
+    ActiveDuration,
+    user,
+    flag,
+    itemsPerPage,
+}: {
+    currentPage: number
+    paginatedLeaderboard: LeaderboardData[]
+    ActiveDuration: '10s' | '30s' | '60s' | '120s'
+    user: any
+    flag: boolean
+    itemsPerPage: number
+}) => {
+    return (
+        <>
+            {currentPage === 1 && (
+                <div className="flex flex-row h-80 mb-28">
+                    {paginatedLeaderboard.slice(0, 3).map((data, index) => (
+                        <DynamicStage
+                            data={data}
+                            flag={true}
+                            duration={ActiveDuration}
+                            key={`top-${data._id}-${index}`}
+                            index={index + 1}
+                        />
+                    ))}
+                </div>
+            )}
+            <div className="bg-white rounded-lg">
+                {paginatedLeaderboard.slice(3).map((data, index) => (
+                    <DynamicLeaderBoardComponent
+                        duration={ActiveDuration}
+                        user={user}
+                        data={data}
+                        index={index + 3}
+                        flag={flag}
+                        currentPage={currentPage}
+                        itemsPerPage={itemsPerPage}
+                        key={`board-${data._id}-${index}`}
+                    />
+                ))}
+            </div>
+        </>
+    )
+}
 const LeaderBoard = () => {
-    const { leaderboard, dailyLeaderboard } = useLeaderboard()
-    const [flag, setFlag] = useState(true)
+    const [ActiveDuration, setActiveDuration] = useState<
+        '10s' | '30s' | '60s' | '120s'
+    >('10s')
+    const { leaderboard, dailyLeaderboard, duration, changeDuration } =
+        useLeaderboard({ duration: ActiveDuration, setActiveDuration })
+
     const [currentPage, setCurrentPage] = useState(1)
+    const [flag, setFlag] = useState(true)
     const itemsPerPage = 50
+    const { user } = useUser()
+
+    // Reset to page 1 when changing duration or leaderboard type
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [duration, flag])
 
     const handleNextPage = () => {
         setCurrentPage((prevPage) => prevPage + 1)
@@ -381,105 +301,90 @@ const LeaderBoard = () => {
         setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
     }
 
-    const paginatedLeaderboard = leaderboard.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    )
+    const handleDurationChange = (
+        newDuration: '10s' | '30s' | '60s' | '120s'
+    ) => {
+        changeDuration(newDuration)
+    }
 
-    const paginatedDailyLeaderboard = dailyLeaderboard.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    )
+    // Process leaderboard data for consistency
+    const processedLeaderboard = useMemo(() => {
+        return leaderboard.map((entry) => ({
+            username: entry.username,
+            clerkId: entry.clerkId,
+            _id: entry._id,
+            highestWpm: {
+                highestScore10s: entry.highestWpm?.highestScore10s || 0,
+                highestScore30s: entry.highestWpm?.highestScore30s || 0,
+                highestScore60s: entry.highestWpm?.highestScore60s || 0,
+                highestScore120s: entry.highestWpm?.highestScore120s || 0,
+            },
+            dailyHighestWpm: {
+                dailyHighestScore10s:
+                    entry.dailyHighestWpm?.dailyHighestScore10s || 0,
+                dailyHighestScore30s:
+                    entry.dailyHighestWpm?.dailyHighestScore30s || 0,
+                dailyHighestScore60s:
+                    entry.dailyHighestWpm?.dailyHighestScore60s || 0,
+                dailyHighestScore120s:
+                    entry.dailyHighestWpm?.dailyHighestScore120s || 0,
+            },
+        }))
+    }, [leaderboard])
+
+    // Calculate paginated data
+    const paginatedLeaderboard = useMemo(() => {
+        return processedLeaderboard.slice(
+            (currentPage - 1) * itemsPerPage,
+            currentPage * itemsPerPage
+        )
+    }, [processedLeaderboard, currentPage, itemsPerPage])
+
+    const paginatedDailyLeaderboard = useMemo(() => {
+        return dailyLeaderboard.slice(
+            (currentPage - 1) * itemsPerPage,
+            currentPage * itemsPerPage
+        )
+    }, [dailyLeaderboard, currentPage, itemsPerPage])
 
     return (
         <div className="flex flex-1 flex-col justify-center items-center w-full">
             <LeaderboardButton flag={flag} setFlag={setFlag} />
-            {<UserScoreBoard flag={flag} />}
+
+            {/* Duration Selector */}
+            <DurationSelector
+                activeDuration={ActiveDuration}
+                onDurationChange={handleDurationChange}
+            />
 
             {flag ? (
                 <>
-                    {currentPage === 1 && (
-                        <div className="flex flex-row h-80 mb-28 ">
-                            {paginatedLeaderboard.map((data: any, index) => {
-                                if (index < 3)
-                                    return (
-                                        <Stage
-                                            data={data}
-                                            flag={true}
-                                            key={
-                                                (currentPage - 1) *
-                                                    itemsPerPage +
-                                                index +
-                                                1
-                                            }
-                                            index={
-                                                (currentPage - 1) *
-                                                    itemsPerPage +
-                                                index +
-                                                1
-                                            }
-                                        />
-                                    )
-                            })}
-                        </div>
-                    )}
-                    <div className="bg-white rounded-lg">
-                        {paginatedLeaderboard.map((data: any, index) => {
-                            if (index >= 3)
-                                return (
-                                    <LeaderboardComponent
-                                        data={data}
-                                        index={index}
-                                        flag={flag}
-                                        currentPage={currentPage}
-                                        itemsPerPage={itemsPerPage}
-                                        key={
-                                            (currentPage - 1) * itemsPerPage +
-                                            index +
-                                            1
-                                        }
-                                    />
-                                )
-                        })}
-                    </div>
+                    <LeaderboardContent
+                        currentPage={currentPage}
+                        paginatedLeaderboard={paginatedLeaderboard}
+                        ActiveDuration={ActiveDuration}
+                        user={user}
+                        flag={flag}
+                        itemsPerPage={itemsPerPage}
+                    />
                 </>
             ) : (
                 <>
-                    {currentPage === 1 && (
-                        <div className="flex flex-row h-80 mb-28 ">
-                            {paginatedDailyLeaderboard.map(
-                                (data: any, index) => {
-                                    if (index < 3)
-                                        return (
-                                            <Stage
-                                                data={data}
-                                                key={index + 1}
-                                                index={index + 1}
-                                            />
-                                        )
-                                }
-                            )}
-                        </div>
-                    )}
-                    <div className="bg-white rounded-lg">
-                        {paginatedDailyLeaderboard.map((data: any, index) => {
-                            if (index >= 3)
-                                return (
-                                    <DailyLeaderboardComponent
-                                        data={data}
-                                        index={index}
-                                        key={index}
-                                    />
-                                )
-                        })}
-                    </div>
+                    <DailyLeaderboardContent
+                        currentPage={currentPage}
+                        paginatedDailyLeaderboard={paginatedDailyLeaderboard}
+                        ActiveDuration={ActiveDuration}
+                        user={user}
+                        flag={flag}
+                        itemsPerPage={itemsPerPage} />
                 </>
             )}
+
             <div className="flex w-full max-w-[452px] justify-between items-center mt-4 font-jetBrainsMono">
                 <button
                     onClick={handlePreviousPage}
                     disabled={currentPage === 1}
-                    className="flex items-center  rounded-full px-4 py-2 bg-gray-400 disabled:opacity-50"
+                    className="flex items-center rounded-full px-4 py-2 bg-gray-400 disabled:opacity-50"
                 >
                     <ArrowLeft />
                     <p> Previous</p>

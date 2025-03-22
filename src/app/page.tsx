@@ -86,7 +86,7 @@ export default function Typing() {
     })
     const { user } = useUser()
 
-    useAddNewScore(gameOver, _wpm, user ?? null)
+    useAddNewScore(gameOver, _wpm, user ?? null,timerOption)
 
     const [multiplier, setMultiplier] = useState(1)
     const numberOfCharacters = 300

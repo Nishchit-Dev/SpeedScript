@@ -7,13 +7,12 @@ const useLivePlayer = () => {
     const [playersOnline, setOnlinePlayer] = useState(0)
 
     useEffect(() => {
-        if (user?.username ) {
+        if (user?.username) {
             const url = getWebSocketUrl().routes.wss.globalOnline
             const ws = new WebSocket(url)
 
             const onMessage = (event: MessageEvent) => {
                 const message = JSON.parse(event.data)
-                console.log(message)
                 switch (message.type) {
                     case 'global_online':
                         setOnlinePlayer(message.data)

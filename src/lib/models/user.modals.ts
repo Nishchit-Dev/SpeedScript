@@ -14,12 +14,40 @@ const UserSchema = new Schema({
         type: String,
     },
     highestWpm: {
-        type: Number,
-        default: 0,
+        highestScore10s: {
+            type: Number,
+            default: 0,
+        },
+        highestScore30s: {
+            type: Number,
+            default: 0,
+        },
+        highestScore60s: {
+            type: Number,
+            default: 0,
+        },
+        highestScore120s: {
+            type: Number,
+            default: 0,
+        },
     },
     dailyHighestWpm: {
-        type: Number,
-        default: 0,
+        dailyHighestScore10s: {
+            type: Number,
+            default: 0,
+        },
+        dailyHighestScore60s: {
+            type: Number,
+            default: 0,
+        },
+        dailyHighestScore30s: {
+            type: Number,
+            default: 0,
+        },
+        dailyHighestScore120s: {
+            type: Number,
+            default: 0,
+        },
     },
 })
 const User = models?.User || model('User', UserSchema)

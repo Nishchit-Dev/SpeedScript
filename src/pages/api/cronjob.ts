@@ -12,7 +12,16 @@ export default async function handler(
 
         await User.updateMany(
             {}, // Match all users
-            { $set: { dailyHighestWpm: 0 } } // Reset dailyHighestWpm to 0
+            {
+                $set: {
+                    dailyHighestWpm: {
+                        dailyHighestScore10s: 0,
+                        dailyHighestScore30s: 0,
+                        dailyHighestScore60s: 0,
+                        dailyHighestScore120s: 0,
+                    },
+                },
+            } // Reset dailyHighestWpm to 0
         )
         res.status(200).json({ message: 'Leaderboard reset successfully' })
     } catch (error) {

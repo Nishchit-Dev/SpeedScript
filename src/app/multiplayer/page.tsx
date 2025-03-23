@@ -141,6 +141,7 @@ export default function Typing() {
     })
     useEffect(() => {
         if (gameState === 'in_progress') {
+            setIsTyping(true)
             startTimer()
         }
     }, [gameState])

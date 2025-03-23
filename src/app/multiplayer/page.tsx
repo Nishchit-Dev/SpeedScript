@@ -470,17 +470,7 @@ export default function Typing() {
                                 </div>
                             </div>
                         )}
-                        <div className="flex flex-row flex-wrap justify-start items-center gap-5">
-                            {/* <div className="flex flex-row justify-start items-center bg-blue-600 px-5 py-2 rounded-full hover:bg-purple-700 transition duration-1000 ease-out ">
-                <button
-                    onClick={() => setPreventIncorrect(!preventIncorrect)}
-                >
-                    {preventIncorrect
-                        ? 'Enable prevent incorrect'
-                        : 'Disable Prevent Incorret'}
-                </button>
-            </div> */}
-                        </div>
+                        <div className="flex flex-row flex-wrap justify-start items-center gap-5"></div>
                         <ReloadButton gameOver={gameOver} />
 
                         {gameOver ? <RankingStage data={finalState} /> : <></>}

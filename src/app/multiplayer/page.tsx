@@ -445,7 +445,11 @@ export default function Typing() {
                                                         ).length == 0,
                                                 }
                                             )}
-                                            onClick={toggleReady}
+                                            onClick={() => {
+                                                if (gameState !== 'countdown') {
+                                                    toggleReady()
+                                                }
+                                            }}
                                         >
                                             <div className="">
                                                 <p

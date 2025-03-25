@@ -1,10 +1,7 @@
 'use client'
-import { UserProfile, useUser } from '@clerk/nextjs'
+import { useUser } from '@clerk/nextjs'
 import Heatmap from './Heatmap.tsx/HeatMap'
 import { useEffect, useState } from 'react'
-import { populateData } from '@/lib/actions/user.actions'
-import { set } from 'mongoose'
-import Image from 'next/image'
 import ProfileComponent from './profile/profile'
 
 export default function Profile() {

@@ -25,7 +25,7 @@ const useAddNewScore = (
         }
     }
     useEffect(() => {
-        if (gameOver && user) {
+        if (gameOver && user?.id) {
             getUserIdByClerkId(user?.id || '').then(async () => {
                 if (user && wpm) {
                     await addNewScore(user.id, wpm, 0, timerOptions)

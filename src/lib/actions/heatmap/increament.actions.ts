@@ -1,3 +1,4 @@
+import { connect } from '@/lib/db'
 import User from '@/lib/models/user.modals' // Adjust the import path as necessary
 import { Types } from 'mongoose'
 
@@ -11,21 +12,34 @@ export async function updateHeatmap(
     clerkId: string,
     date: string
 ): Promise<{ success: boolean; error?: string }> {
-    try {
-        // 1. First try to increment existing date
-        const updateResult = await User.updateOne(
-            { clerkId, 'heatmap.date': date },
-            { $inc: { 'heatmap.$.count': 1 } }
-        )
-
-        // 2. If no document was modified (date didn't exist), add new entry
-        if (updateResult.modifiedCount === 0) {
-            await User.updateOne(
-                { clerkId },
-                { $push: { heatmap: { date, count: 1 } } },
-                { upsert: true }
-            )
+    // Validate inputs first (fast operation)
+    if (!clerkId || !date) {
+        return {
+            success: false,
+            error: 'Missing clerkId or date',
         }
+    }
+
+    try {
+        // 1. Connect with timeout settings
+        await connect()
+
+        // 2. Combine operations in a single transaction when possible
+        const result = await User.bulkWrite([
+            {
+                updateOne: {
+                    filter: { clerkId, 'heatmap.date': date },
+                    update: { $inc: { 'heatmap.$.count': 1 } },
+                },
+            },
+            {
+                updateOne: {
+                    filter: { clerkId, 'heatmap.date': { $ne: date } },
+                    update: { $push: { heatmap: { date, count: 1 } } },
+                    upsert: true,
+                },
+            },
+        ])
 
         return { success: true }
     } catch (error) {

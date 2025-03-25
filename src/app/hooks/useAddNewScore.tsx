@@ -10,20 +10,20 @@ const useAddNewScore = (
     user: UserResource | null,
     timerOptions: number
 ) => {
-    const _updateHeatMap = async (clerkId: string) => {
+    const updateHeatMap = async (clerkId: string) => {
         const currentDate = new Date().toISOString().split('T')[0] // "YYYY-MM-DD"
 
-        // const response = await fetch(`/api/user/update-heatmap?clerkId=${clerkId}&date=${currentDate}`, {
-        //     method: 'GET',
-        //     headers: { 'Content-Type': 'application/json' }
-        // })
-        updateHeatmap(clerkId, currentDate)
-            .then((res) => {
-                console.log(res)
-            })
-            .catch((err) => {
-                console.log(err.error)
-            })
+        const response = await fetch('/api/user/update-heatmap', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clerkId, date: currentDate }),
+        })
+
+        const result = await response.json()
+
+        if (!result.success) {
+            console.error('Failed to update heatmap:', result.error)
+        }
     }
     useEffect(() => {
         if (gameOver && user?.id) {
@@ -32,7 +32,7 @@ const useAddNewScore = (
                     await addNewScore(user.id, wpm, 0, timerOptions)
                 }
             })
-            _updateHeatMap(user.id)
+            updateHeatMap(user.id)
             addRecentWpmScore(user.id, wpm, timerOptions)
         }
     }, [gameOver, user, timerOptions])

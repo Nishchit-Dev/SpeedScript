@@ -1,6 +1,6 @@
 import { connect } from '@/lib/db'
 import User from '@/lib/models/user.modals' // Adjust the import path as necessary
-import { Types } from 'mongoose'
+
 
 /**
  * Updates the heatmap for a user by incrementing the count for a specific date.

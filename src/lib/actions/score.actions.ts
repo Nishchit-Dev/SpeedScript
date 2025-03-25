@@ -523,3 +523,55 @@ export const GetUserRank = async (userId="", duration = '10s') => {
         return undefined; // Changed from throwing to returning undefined
     }
 };
+
+
+export async function addRecentWpmScore(
+    userId: string,
+    wpm: number,
+    timeOptions: number
+) {
+    try {
+        if (userId != null) {
+            await connect();
+            const user = await User.exists({ clerkId: userId });
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            let scoresArrayName = '';
+            switch (timeOptions) {
+                case 10:
+                    scoresArrayName = 'recentWpmScores.scores10s';
+                    break;
+                case 30:
+                    scoresArrayName = 'recentWpmScores.scores30s';
+                    break;
+                case 60:
+                    scoresArrayName = 'recentWpmScores.scores60s';
+                    break;
+                case 120:
+                    scoresArrayName = 'recentWpmScores.scores120s';
+                    break;
+                default:
+                    throw new Error('Invalid time option');
+            }
+
+            const update = {
+                $push: {
+                    [scoresArrayName]: {
+                        $each: [wpm],
+                        $slice: -10
+                    }
+                }
+            };
+
+            await User.updateOne({ clerkId: userId }, update);
+            return { success: true };
+        } else {
+            return { error: 'userId should not be null' };
+        }
+    } catch (err) {
+        console.error('Error adding recent WPM score:', err);
+        throw err;
+    }
+}

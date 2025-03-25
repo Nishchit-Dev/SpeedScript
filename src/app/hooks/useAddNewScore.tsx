@@ -9,13 +9,13 @@ const useAddNewScore = (
     user: UserResource | null,
     timerOptions: number
 ) => {
-    const updateHeatMap = async(clerkId:string) => {
+    const updateHeatMap = async (clerkId: string) => {
         const currentDate = new Date().toISOString().split('T')[0] // "YYYY-MM-DD"
-        
+
         const response = await fetch('/api/user/update-heatmap', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ clerkId, date: '2025-03-24' }),
+            body: JSON.stringify({ clerkId, date: currentDate }),
         })
 
         const result = await response.json()

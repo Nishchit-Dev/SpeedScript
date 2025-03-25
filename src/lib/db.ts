@@ -7,7 +7,7 @@ interface MongooseConn {
 }
 
 let cached: MongooseConn = (global as any).mongoose
-mongoose.set('debug', true)
+// mongoose.set('debug', true)
 if (!cached) {
     cached = (global as any).mongoose = {
         conn: null,

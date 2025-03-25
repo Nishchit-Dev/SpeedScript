@@ -79,20 +79,27 @@ const NaivgationComponent = () => {
             <div className="flex flex-1 flex-row gap-3 items-center justify-end w-max">
                 <div className="font-jetBrainsMono flex flex-row gap-3 justify-center items-center">
                     <motion.div
-                        className="flex flex-row  shadow-md shadow-[#a3e5bb] justify-center items-center px-5 py-2 text-sm text-black bg-white border-[1px] rounded-full cursor-pointer"
+                        className="flex flex-row  shadow-md  justify-center items-center px-5 py-2 text-sm text-black/60 bg-white border-[1px] rounded-full cursor-pointer"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 1 }}
                     >
-                        <motion.div
-                            className="mr-2 w-2 h-2 bg-green-400 rounded-full"
-                            variants={onlineDotVariants}
-                            initial={{ scale: 1, opacity:1 }}
-                            animate={{ scale: [1, 1.3, 1],opacity:[1,0.2,1] }}
-                            transition={{ duration: 2.5, repeat: Infinity }}
-                        />
+                        <div className="relative top-[40%] flex flex-row items-center justify-center mr-2">
+                            <motion.div
+                                className="absolute mr-2 w-2 h-2 bg-green-400 rounded-full"
+                                variants={onlineDotVariants}
+                                // initial={{ scale: 1, opacity: 1 }}
+                                animate={{
+                                    scale: [1, 3.0,0,1],
+                                    opacity: [1, 0,0,0],
+                                }}
+                                transition={{ duration: 2.5, repeat: Infinity }}
+                            />
+                            <motion.div className="absolute mr-2 w-2 h-2 bg-green-400 rounded-full" />
+                        </div>
+
                         {playersOnline}
-                       <p className='ml-2'>players</p>
+                        <p className="ml-2">players</p>
                     </motion.div>
                     {isSignedIn ? (
                         <Link href={'/multiplayer'}>

@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
     images: {
         domains: ['img.clerk.com'],
     },
-    hostname: 'img.clerk.com',
 }
 
 export default nextConfig

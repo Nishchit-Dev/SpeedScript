@@ -1,16 +1,17 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
-import { ClerkProvider, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
-import Head from 'next/head'
+import { ClerkProvider } from '@clerk/nextjs'
+
 import { JetBrains_Mono } from 'next/font/google'
-import { Crown } from 'lucide-react'
+
 import Link from 'next/link'
-import FireAnimation from './lottieAnimation'
+
 import { Analytics } from '@vercel/analytics/react'
 import NaivgationComponent from '@/components/NavComponent'
 
 import WhatsNewInUpdates from '@/components/WhatsNewInUpdate'
+import Footer from '@/components/Footer'
 
 const jetBrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -124,7 +125,7 @@ export default function RootLayout({
                 </head>
 
                 <body
-                    className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased bg-[#E1E1E3]`}
+                    className={`${geistSans.variable} ${geistMono.variable} ${jetBrainsMono.variable} antialiased bg-[#E1E1E3] `}
                     cz-shortcut-listen="true"
                 >
                     <div className="flex flex-1 justify-between items-center p-3 px-10 ">
@@ -145,7 +146,8 @@ export default function RootLayout({
                             <WhatsNewInUpdates />
                         </div>
                     </div>
-                    <div className="py-10 ">{children}</div>
+                    <div className="py-10  ">{children}</div>
+                    {/* <Footer /> */}
                 </body>
             </html>
         </ClerkProvider>

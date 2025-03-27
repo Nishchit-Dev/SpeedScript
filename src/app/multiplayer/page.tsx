@@ -367,7 +367,9 @@ export default function Typing() {
                                                                                     ? `badges/${getBadgeImage(
                                                                                           Math.round(
                                                                                               Number(
-                                                                                                  state.highestWpm
+                                                                                                  state
+                                                                                                      .highestWpm
+                                                                                                      .highestScore30s
                                                                                               )
                                                                                           )
                                                                                       )}`

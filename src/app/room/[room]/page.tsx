@@ -169,6 +169,7 @@ const Room = () => {
             error,
             isAdmin,
             countDown,
+            userRank,
             gameState,
             finalState,
             scoreBoardState,
@@ -1020,6 +1021,10 @@ const Room = () => {
                                                             <p>
                                                                 {'Time: ' +
                                                                     timer}
+                                                            </p>
+                                                            <p>
+                                                                {'Rank: ' +
+                                                                    userRank}
                                                             </p>
                                                         </div>
                                                         <div>

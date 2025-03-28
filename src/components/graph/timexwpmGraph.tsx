@@ -14,8 +14,8 @@ const TimexWpm = ({ data, timer }: { data: any[]; timer: number }) => {
 
     return (
         <LineChart
-            height={400}
-            width={innerWidth * 0.6}
+            height={Math.min(innerWidth * 0.9, 300)}
+            width={Math.min(innerWidth * 0.9, 800)}
             data={data}
             margin={{
                 top: 5,
@@ -30,7 +30,7 @@ const TimexWpm = ({ data, timer }: { data: any[]; timer: number }) => {
                 dataKey="time"
                 name="Time (s)"
                 label={{
-                    value: 'Time (s)',
+                    // value: 'Time (s)',
                     position: 'insideBottomCenter',
                     offset: 0,
                 }}
@@ -38,7 +38,7 @@ const TimexWpm = ({ data, timer }: { data: any[]; timer: number }) => {
             <YAxis
                 dataKey="wpm"
                 name="WPM"
-                label={{ value: 'WPM', angle: -90, position: 'insideLeft' }}
+                label={{  angle: -90, position: 'insideLeft' }}
                 domain={[0, 100]}
             />
 

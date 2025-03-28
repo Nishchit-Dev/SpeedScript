@@ -1,6 +1,6 @@
 'use client'
 import FireAnimation from '@/app/lottieAnimation'
-import { ClerkProvider, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { useUser } from '@clerk/nextjs'
 import {
     ArrowDown,
@@ -11,12 +11,10 @@ import {
     MessageCircleDashed,
 } from 'lucide-react'
 import Link from 'next/link'
-import WhatsNewInUpdates from './WhatsNewInUpdate'
 import { useState } from 'react'
 import clsx from 'clsx'
 import { useRouter } from 'next/navigation'
 import { getWebSocketUrl } from '@/lib/helper'
-import useBeta from '@/app/hooks/cookies/useBeta'
 import useLivePlayer from '@/app/hooks/websockethooks/useLivePlayers'
 import { motion } from 'framer-motion'
 
@@ -62,7 +60,6 @@ const NaivgationComponent = () => {
         }
     }
 
-    const { betaTester } = useBeta()
     const onlineDotVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -90,8 +87,8 @@ const NaivgationComponent = () => {
                                 variants={onlineDotVariants}
                                 // initial={{ scale: 1, opacity: 1 }}
                                 animate={{
-                                    scale: [1, 3.0,0,1],
-                                    opacity: [1, 0,0,0],
+                                    scale: [1, 3.0, 0, 1],
+                                    opacity: [1, 0, 0, 0],
                                 }}
                                 transition={{ duration: 2.5, repeat: Infinity }}
                             />
@@ -117,7 +114,7 @@ const NaivgationComponent = () => {
                             <p>Leaderboard</p>
                         </div>
                     </Link>
-                    {isSignedIn && betaTester ? (
+                    {isSignedIn ? (
                         <>
                             <div
                                 onClick={() => {
@@ -167,7 +164,10 @@ const NaivgationComponent = () => {
                 </div>
                 {isSignedIn ? (
                     <>
-                        <div className="min-h-[39.2px] font-jetBrainsMono duration-300 transition hover:bg-green-700 flex flex-row justify-center items-center border-[2px] border-solid  bg-green-600 text-white/90 text-black rounded-full pl-1 pr-4 py-1 gap-2 text-sm">
+                        <div
+                            className="min-h-[39.2px] font-jetBrainsMono duration-300 transition hover:bg-green-700 flex flex-row justify-center items-center border-[2px] border-solid bg-green-600 text-white/90 text-black rounded-full pl-1 pr-4 py-1 gap-2 text-sm cursor-pointer"
+                            onClick={() => router.push('/profile')}
+                        >
                             <SignedIn>
                                 <UserButton />
                             </SignedIn>

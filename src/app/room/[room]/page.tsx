@@ -21,6 +21,7 @@ import useReset from '@/app/hooks/useResetHook'
 import { LoadingAnimation } from '@/app/lottieAnimation'
 import TimexWpm from '@/components/graph/timexwpmGraph'
 import UserScoreDisplay from './userScoreDisplay'
+import LobbyText from '@/app/multiplayer/component/LobbyText'
 
 const ToggleSpectator = ({
     toggle,
@@ -93,7 +94,7 @@ const Room = () => {
     const [typingSentence, setTypingSentence] = useState('')
     const [characterArray, setCharacterArray] = useState<string[]>([])
     const charIndex = charTyped.length
-
+    const charactersToShow = 200
     const [preventIncorrect, setPreventIncorrect] = useState(false)
     const [isTyping, setIsTyping] = useState(false)
     const [gameOver, setGameOver] = useState(false)
@@ -272,7 +273,7 @@ const Room = () => {
     }, [timexwpm])
 
     return (
-        <>
+        <div className="">
             <div className="flex justify-center items-center">
                 {gameState === 'finished' && isAdmin ? (
                     <p
@@ -325,24 +326,22 @@ const Room = () => {
                                 <div
                                     className=" rounded-lg p-2 mr-1 cursor-pointer duration-300 hover:text-green-400 "
                                     onClick={() => {
-                                        const link = new URL(
-                                            '/room/' + route.room,
-                                            window.location.origin
-                                        ).toString()
-                                        navigator.clipboard.writeText(link)
+                                        navigator.clipboard.writeText(
+                                            route.room
+                                        )
                                     }}
                                 >
                                     {route.room}
                                 </div>
                             </div>
 
-                            <ToggleSpectator
+                            {/* <ToggleSpectator
                                 toggle={() => {
                                     toggleAdminRole()
                                 }}
                                 role={roomData.admin_role}
                                 isAdmin={isAdmin}
-                            />
+                            /> */}
 
                             <div
                                 className={clsx(
@@ -366,8 +365,35 @@ const Room = () => {
                                             'w-0': countDown == 0,
                                         }
                                     )}
-                                ></div>
-
+                                ></div>{' '}
+                                <div className="flex justify-center items-center mt-2">
+                                    <p className="">
+                                        Total Players:{' '}
+                                        <span className="font-bold  ">
+                                            {' '}
+                                            {
+                                                Object.keys(
+                                                    roomData.data.players
+                                                ).length
+                                            }
+                                        </span>
+                                    </p>
+                                </div>
+                                {isAdmin ? (
+                                    <div className="m-5 mt-3">
+                                        {' '}
+                                        <div
+                                            onClick={() => {
+                                                toggleReady()
+                                            }}
+                                            className="flex justify-center items-center text-white bg-green-400 rounded-md py-2 px-4 cursor-pointer hover:bg-green-500 duration-300"
+                                        >
+                                            <div>Start Game</div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <></>
+                                )}
                                 <div className="m-5">
                                     {Object.entries(roomData.data.players).map(
                                         ([player, state], index) => {
@@ -380,10 +406,17 @@ const Room = () => {
                                                     <div className="mr-3 ">
                                                         {roomData.room_admin ===
                                                         player ? (
-                                                            <div className="p-2 rounded-full bg-yellow-500 opacity-100 ">
-                                                                <CrownIcon
-                                                                    size={18}
-                                                                />{' '}
+                                                            <div className="flex flex-col justify-center items-center">
+                                                                <div className="p-2 rounded-full bg-yellow-500 opacity-100 ">
+                                                                    <CrownIcon
+                                                                        size={
+                                                                            18
+                                                                        }
+                                                                    />{' '}
+                                                                </div>
+                                                                <p className="text-sm">
+                                                                    admin
+                                                                </p>
                                                             </div>
                                                         ) : (
                                                             <div className="invisible p-2 rounded-full bg-yellow-500 opacity-100 ">
@@ -404,7 +437,7 @@ const Room = () => {
                                                                 src={`/throphies/badges/${getBadgeImage(
                                                                     Math.round(
                                                                         Number(
-                                                                            highestWpm
+                                                                            highestWpm.highestScore30s
                                                                         )
                                                                     )
                                                                 )}`}
@@ -445,21 +478,6 @@ const Room = () => {
                                                 </div>
                                             )
                                         }
-                                    )}
-                                    {isAdmin ? (
-                                        <>
-                                            {' '}
-                                            <div
-                                                onClick={() => {
-                                                    toggleReady()
-                                                }}
-                                                className="flex justify-center items-center bg-green-400 rounded-md py-2 px-4 cursor-pointer hover:bg-green-500 duration-300"
-                                            >
-                                                <div>Ready</div>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <></>
                                     )}
                                 </div>
                             </div>
@@ -726,70 +744,93 @@ const Room = () => {
                                                         >
                                                             {characterArray.length >
                                                             0 ? (
-                                                                characterArray.map(
-                                                                    (
-                                                                        character,
-                                                                        index
-                                                                    ) => {
-                                                                        if (
-                                                                            index >=
-                                                                                numberOfCharacters *
-                                                                                    (multiplier -
-                                                                                        1) &&
-                                                                            index <=
-                                                                                numberOfCharacters *
-                                                                                    multiplier
-                                                                        )
-                                                                            return (
-                                                                                <p
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                    className={clsx(
-                                                                                        `character${index}  `,
-                                                                                        {
-                                                                                            'text-gray-400':
-                                                                                                index >
-                                                                                                charIndex,
-                                                                                        },
-                                                                                        {
-                                                                                            'text-black':
-                                                                                                index <
-                                                                                                    charIndex ||
-                                                                                                !incorrectChar.includes(
-                                                                                                    index
-                                                                                                ),
-                                                                                        },
-                                                                                        {
-                                                                                            'text-red-500':
-                                                                                                index <
-                                                                                                    charIndex &&
-                                                                                                incorrectChar.includes(
-                                                                                                    index
-                                                                                                ) &&
-                                                                                                !preventIncorrect,
-                                                                                        },
+                                                                // characterArray.map(
+                                                                //     (
+                                                                //         character,
+                                                                //         index
+                                                                //     ) => {
+                                                                //         if (
+                                                                //             index >=
+                                                                //                 numberOfCharacters *
+                                                                //                     (multiplier -
+                                                                //                         1) &&
+                                                                //             index <=
+                                                                //                 numberOfCharacters *
+                                                                //                     multiplier
+                                                                //         )
+                                                                //             return (
+                                                                //                 <p
+                                                                //                     key={
+                                                                //                         index
+                                                                //                     }
+                                                                //                     className={clsx(
+                                                                //                         `character${index}  `,
+                                                                //                         {
+                                                                //                             'text-gray-400':
+                                                                //                                 index >
+                                                                //                                 charIndex,
+                                                                //                         },
+                                                                //                         {
+                                                                //                             'text-black':
+                                                                //                                 index <
+                                                                //                                     charIndex ||
+                                                                //                                 !incorrectChar.includes(
+                                                                //                                     index
+                                                                //                                 ),
+                                                                //                         },
+                                                                //                         {
+                                                                //                             'text-red-500':
+                                                                //                                 index <
+                                                                //                                     charIndex &&
+                                                                //                                 incorrectChar.includes(
+                                                                //                                     index
+                                                                //                                 ) &&
+                                                                //                                 !preventIncorrect,
+                                                                //                         },
 
-                                                                                        {
-                                                                                            'font-bold':
-                                                                                                index ==
-                                                                                                charIndex,
-                                                                                            'text-3xl':
-                                                                                                index ==
-                                                                                                charIndex,
-                                                                                            'text-green-500 cursorIsHere':
-                                                                                                index ==
-                                                                                                charIndex,
-                                                                                        }
-                                                                                    )}
-                                                                                >
-                                                                                    {
-                                                                                        character
-                                                                                    }
-                                                                                </p>
-                                                                            )
+                                                                //                         {
+                                                                //                             'font-bold':
+                                                                //                                 index ==
+                                                                //                                 charIndex,
+                                                                //                             'text-3xl':
+                                                                //                                 index ==
+                                                                //                                 charIndex,
+                                                                //                             'text-green-500 cursorIsHere':
+                                                                //                                 index ==
+                                                                //                                 charIndex,
+                                                                //                         }
+                                                                //                     )}
+                                                                //                 >
+                                                                //                     {
+                                                                //                         character
+                                                                //                     }
+                                                                //                 </p>
+                                                                //             )
+                                                                //     }
+                                                                // )
+                                                                <LobbyText
+                                                                    characterArray={
+                                                                        characterArray
                                                                     }
-                                                                )
+                                                                    charactersToShow={
+                                                                        charactersToShow
+                                                                    }
+                                                                    charIndex={
+                                                                        charIndex
+                                                                    }
+                                                                    numberOfCharacters={
+                                                                        numberOfCharacters
+                                                                    }
+                                                                    multiplier={
+                                                                        multiplier
+                                                                    }
+                                                                    incorrectChar={
+                                                                        incorrectChar
+                                                                    }
+                                                                    isTyping={
+                                                                        isTyping
+                                                                    }
+                                                                />
                                                             ) : (
                                                                 <div className="">
                                                                     <h1 className="moving-text ">
@@ -1023,90 +1064,107 @@ const Room = () => {
                                                     }
                                                 )}
                                             >
-                                                <div
+                                                {/* <div
                                                     // style={{ transform: `translateX(-${progress}%)` }}
                                                     className={clsx(
-                                                        `flex flex-1   flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl relative left-[25%] transition duration-2000 ease-out `,
+                                                        `flex flex-1 flex-wrap w-1/2 font-jetBrainsMono justify-center items-center md:text-2xl lg:text-3xl  transition duration-2000 ease-out`,
                                                         {
                                                             hidden: !isTyping,
                                                         }
                                                     )}
-                                                >
-                                                    {characterArray.length >
-                                                    0 ? (
-                                                        characterArray.map(
-                                                            (
-                                                                character,
-                                                                index
-                                                            ) => {
-                                                                if (
-                                                                    index >=
-                                                                        numberOfCharacters *
-                                                                            (multiplier -
-                                                                                1) &&
-                                                                    index <=
-                                                                        numberOfCharacters *
-                                                                            multiplier
-                                                                )
-                                                                    return (
-                                                                        <p
-                                                                            key={
-                                                                                index
-                                                                            }
-                                                                            className={clsx(
-                                                                                `character${index}  `,
-                                                                                {
-                                                                                    'text-gray-400':
-                                                                                        index >
-                                                                                        charIndex,
-                                                                                },
-                                                                                {
-                                                                                    'text-black':
-                                                                                        index <
-                                                                                            charIndex ||
-                                                                                        !incorrectChar.includes(
-                                                                                            index
-                                                                                        ),
-                                                                                },
-                                                                                {
-                                                                                    'text-red-500':
-                                                                                        index <
-                                                                                            charIndex &&
-                                                                                        incorrectChar.includes(
-                                                                                            index
-                                                                                        ) &&
-                                                                                        !preventIncorrect,
-                                                                                },
+                                                > */}
+                                                {characterArray.length > 0 ? (
+                                                    // characterArray.map(
+                                                    //     (
+                                                    //         character,
+                                                    //         index
+                                                    //     ) => {
+                                                    //         if (
+                                                    //             index >=
+                                                    //                 numberOfCharacters *
+                                                    //                     (multiplier -
+                                                    //                         1) &&
+                                                    //             index <=
+                                                    //                 numberOfCharacters *
+                                                    //                     multiplier
+                                                    //         )
+                                                    //             return (
+                                                    //                 <p
+                                                    //                     key={
+                                                    //                         index
+                                                    //                     }
+                                                    //                     className={clsx(
+                                                    //                         `character${index}  `,
+                                                    //                         {
+                                                    //                             'text-gray-400':
+                                                    //                                 index >
+                                                    //                                 charIndex,
+                                                    //                         },
+                                                    //                         {
+                                                    //                             'text-black':
+                                                    //                                 index <
+                                                    //                                     charIndex ||
+                                                    //                                 !incorrectChar.includes(
+                                                    //                                     index
+                                                    //                                 ),
+                                                    //                         },
+                                                    //                         {
+                                                    //                             'text-red-500':
+                                                    //                                 index <
+                                                    //                                     charIndex &&
+                                                    //                                 incorrectChar.includes(
+                                                    //                                     index
+                                                    //                                 ) &&
+                                                    //                                 !preventIncorrect,
+                                                    //                         },
 
-                                                                                {
-                                                                                    'font-bold':
-                                                                                        index ==
-                                                                                        charIndex,
-                                                                                    'text-3xl':
-                                                                                        index ==
-                                                                                        charIndex,
-                                                                                    'text-green-500 cursorIsHere':
-                                                                                        index ==
-                                                                                        charIndex,
-                                                                                }
-                                                                            )}
-                                                                        >
-                                                                            {
-                                                                                character
-                                                                            }
-                                                                        </p>
-                                                                    )
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <div className="">
-                                                            <h1 className="moving-text ">
-                                                                generating
-                                                            </h1>
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                    //                         {
+                                                    //                             'font-bold':
+                                                    //                                 index ==
+                                                    //                                 charIndex,
+                                                    //                             'text-3xl':
+                                                    //                                 index ==
+                                                    //                                 charIndex,
+                                                    //                             'text-green-500 cursorIsHere':
+                                                    //                                 index ==
+                                                    //                                 charIndex,
+                                                    //                         }
+                                                    //                     )}
+                                                    //                 >
+                                                    //                     {
+                                                    //                         character
+                                                    //                     }
+                                                    //                 </p>
+                                                    //             )
+                                                    //     }
+                                                    // )
+
+                                                    <LobbyText
+                                                        characterArray={
+                                                            characterArray
+                                                        }
+                                                        charactersToShow={
+                                                            charactersToShow
+                                                        }
+                                                        charIndex={charIndex}
+                                                        numberOfCharacters={
+                                                            numberOfCharacters
+                                                        }
+                                                        multiplier={multiplier}
+                                                        incorrectChar={
+                                                            incorrectChar
+                                                        }
+                                                        isTyping={isTyping}
+                                                    />
+                                                ) : (
+                                                    <div className="">
+                                                        <h1 className="moving-text ">
+                                                            generating
+                                                        </h1>
+                                                    </div>
+                                                )}
                                             </div>
+                                            {/* </div> */}
                                         </div>
                                     </>
                                 ) : (
@@ -1119,7 +1177,7 @@ const Room = () => {
                     )}
                 </>
             )}
-        </>
+        </div>
     )
 }
 

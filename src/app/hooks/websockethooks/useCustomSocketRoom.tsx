@@ -137,7 +137,7 @@ const useCustomRoomSocket = ({
         players: [],
         roomId: '',
     })
-
+    const [userRank, setUserRank] = useState(0)
     const [playerControls, setPlayerControls] = useState(false)
     const [isConnected, setIsConnected] = useState(false)
     const [error, setError] = useState('')
@@ -147,6 +147,9 @@ const useCustomRoomSocket = ({
     const [gameState, setGameState] = useState<GameStateValue>(
         GameState.CONNECTING
     )
+    const ResetRank = () => {
+        setUserRank(0)
+    }
     const { user } = useUser()
     // const { ws, setWs } = useWebConnectionHook({ username, roomId })
     useEffect(() => {
@@ -171,8 +174,6 @@ const useCustomRoomSocket = ({
             const URL = `${url}?username=${encodeURIComponent(
                 username
             )}&room_id=${roomId}`
-
-        
 
             const ws = new WebSocket(URL)
             const handleOpen = () => {
@@ -286,12 +287,10 @@ const useCustomRoomSocket = ({
                             break
 
                         case 'ws_final_stat':
-                           
                             setFinalState(message.data)
                             break
 
                         case 'game_finished':
-                           
                             setGameState(message.data.status as GameStateValue)
                             functions.ResetLobby()
                             break
@@ -300,9 +299,13 @@ const useCustomRoomSocket = ({
                             console.log('Game reset')
                             // functions.ResetTimer()
                             setCountDown(0)
+                            ResetRank()
                             // setGameState(GameState.WAITING)
                             break
-
+                        case 'player_rank_update':
+                            console.log(message.data.rank)
+                            setUserRank(message.data.rank)
+                            break
                         case 'reseted_room':
                             setCountDown(0)
                             setGameState(GameState.WAITING)
@@ -413,7 +416,10 @@ const useCustomRoomSocket = ({
     const sendWpmUpdate = useCallback(
         (wpm: number) => {
             console.log('send wpm update-->', wpm)
-            if (connectionRef.current?.readyState === WebSocket.OPEN && !isAdmin) {
+            if (
+                connectionRef.current?.readyState === WebSocket.OPEN &&
+                !isAdmin
+            ) {
                 try {
                     connectionRef.current.send(
                         JSON.stringify({
@@ -477,7 +483,10 @@ const useCustomRoomSocket = ({
 
     const sendFinalStats = useCallback(
         (stats: UserStats[], wpm: number) => {
-            if (connectionRef.current?.readyState === WebSocket.OPEN && !isAdmin) {
+            if (
+                connectionRef.current?.readyState === WebSocket.OPEN &&
+                !isAdmin
+            ) {
                 connectionRef.current.send(
                     JSON.stringify({
                         type: 'final_stats',
@@ -566,7 +575,11 @@ const useCustomRoomSocket = ({
 
     const sendResults = useCallback(
         (data: UserStats[], wpm: number) => {
-            if (connectionRef.current && gameState === GameState.FINISHED && !isAdmin) {
+            if (
+                connectionRef.current &&
+                gameState === GameState.FINISHED &&
+                !isAdmin
+            ) {
                 // console.log(wpm)
                 connectionRef.current.send(
                     JSON.stringify({
@@ -610,6 +623,7 @@ const useCustomRoomSocket = ({
             isAdmin,
             countDown,
             gameState,
+            userRank,
             finalState,
             scoreBoardState,
         },

@@ -61,16 +61,25 @@ const AdminScoreBoard = ({
 
     useEffect(() => {
         // Sort roomData by descending WPM whenever roomData changes
-        const sorted = [...roomData].sort((a, b) => b.wpm - a.wpm)
-        setScoreData(sorted)
+        if (roomData.length > 1) {
+            const sorted = [...roomData].sort((a, b) => b.wpm - a.wpm)
+            setScoreData(sorted)
+        }else{
+            setScoreData(roomData)
+        }
     }, [roomData])
 
     useEffect(() => {
-        const sorted = [...finalState.players].sort((a, b) => b.wpm - a.wpm)
-        setSoretedFinalScoreData((prev) => {
-            return { ...prev, players: sorted }
-        })
-        console.log('sorted -> Admin ->', sorted)
+        if (roomData.length > 1) {
+            const sorted = [...finalState.players].sort((a, b) => b.wpm - a.wpm)
+            setSoretedFinalScoreData((prev) => {
+                return { ...prev, players: sorted }
+            })
+        }else{
+            setSoretedFinalScoreData((prev) => {
+                return { ...prev, players: finalState.players }
+            })
+        }
     }, [finalState.players])
 
     return (
@@ -353,11 +362,16 @@ export const UserScoreBoard = ({
         useState<finalRoomState>({ players: [], roomId: '' })
 
     useEffect(() => {
-        const sorted = [...finalState.players].sort((a, b) => b.wpm - a.wpm)
-        setSoretedFinalScoreData((prev) => {
-            return { ...prev, players: sorted }
-        })
-        console.log('sorted -> ', sorted)
+        if (roomData.length > 1) {
+            const sorted = [...finalState.players].sort((a, b) => b.wpm - a.wpm)
+            setSoretedFinalScoreData((prev) => {
+                return { ...prev, players: sorted }
+            })
+        } else {
+            setSoretedFinalScoreData((prev) => {
+                return { ...prev, players: finalState.players }
+            })
+        }
     }, [finalState.players])
 
     return (

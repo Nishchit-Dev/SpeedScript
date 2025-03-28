@@ -20,7 +20,7 @@ interface finalRoomState {
 }
 
 const getUserRank = (username: string, data: finalRoomState) => {
-    const player = data.players.find((player) => player.username === username) 
+    const player = data.players.find((player) => player.username === username)
     const sorted = data.players.sort((a, b) => b.wpm - a.wpm)
     const rank = sorted.findIndex((p) => p.username === username) + 1
     return { rank: player ? rank : 0, username: username }
@@ -46,7 +46,7 @@ const UserScoreDisplay = ({
 
     return (
         <>
-            <div className='flex flex-col items-center'>
+            <div className="flex flex-col items-center">
                 <GlareCard className="flex flex-1 justify-center items-center hover:text-white/80 ">
                     <div className="w-[600px] h-24 font-jetBrainsMono">
                         <div className="flex flex-col justify-center items-center my-2">
@@ -54,11 +54,14 @@ const UserScoreDisplay = ({
                                 <p>LeaderBoard of Room</p>
                             </div>
                             <div className="text-white/80 flex flex-row justify-center items-center flex-1 gap-3">
-                                <p className="text-6xl font-bold flex justify-center items-center">
-                                    <span className="text-lg">#</span>
-                                    {userData.rank}
+                                <p className="text-6xl  flex justify-center items-center">
+                                    <span className="text-lg ">#</span>
+                                    <span className="font-bold">
+                                        {userData.rank}
+                                    </span>
                                 </p>
-                                <p className="text-xl">{userData.username}</p>
+                                <p className="text-xl">{userData.username}</p>{' '}
+                                <p className="text-xl">of {data.players.length}</p>
                             </div>
                         </div>
                     </div>

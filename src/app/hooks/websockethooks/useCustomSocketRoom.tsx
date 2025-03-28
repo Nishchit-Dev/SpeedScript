@@ -172,7 +172,7 @@ const useCustomRoomSocket = ({
                 username
             )}&room_id=${roomId}`
 
-            console.log(URL)
+        
 
             const ws = new WebSocket(URL)
             const handleOpen = () => {
@@ -299,7 +299,7 @@ const useCustomRoomSocket = ({
                         case 'game_reset':
                             console.log('Game reset')
                             // functions.ResetTimer()
-                            // setCountDown(0)
+                            setCountDown(0)
                             // setGameState(GameState.WAITING)
                             break
 
@@ -413,7 +413,7 @@ const useCustomRoomSocket = ({
     const sendWpmUpdate = useCallback(
         (wpm: number) => {
             console.log('send wpm update-->', wpm)
-            if (connectionRef.current?.readyState === WebSocket.OPEN) {
+            if (connectionRef.current?.readyState === WebSocket.OPEN && !isAdmin) {
                 try {
                     connectionRef.current.send(
                         JSON.stringify({
@@ -477,7 +477,7 @@ const useCustomRoomSocket = ({
 
     const sendFinalStats = useCallback(
         (stats: UserStats[], wpm: number) => {
-            if (connectionRef.current?.readyState === WebSocket.OPEN) {
+            if (connectionRef.current?.readyState === WebSocket.OPEN && !isAdmin) {
                 connectionRef.current.send(
                     JSON.stringify({
                         type: 'final_stats',
@@ -566,7 +566,7 @@ const useCustomRoomSocket = ({
 
     const sendResults = useCallback(
         (data: UserStats[], wpm: number) => {
-            if (connectionRef.current && gameState === GameState.FINISHED) {
+            if (connectionRef.current && gameState === GameState.FINISHED && !isAdmin) {
                 // console.log(wpm)
                 connectionRef.current.send(
                     JSON.stringify({

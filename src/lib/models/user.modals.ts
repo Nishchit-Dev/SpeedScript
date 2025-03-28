@@ -7,15 +7,19 @@ const heatmapEntrySchema = new Schema({
 
 const UserSchema = new Schema({
     clerkId: {
+        required: true,
         type: String,
     },
     email: {
+        required: true,
         type: String,
     },
     username: {
+        required: true,
         type: String,
     },
     Photo: {
+        required: true,
         type: String,
     },
     highestWpm: {

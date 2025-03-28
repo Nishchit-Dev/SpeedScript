@@ -34,9 +34,10 @@ const ShowGraph = ({ data }: { data: any[] }) => {
     if (finalTimeGap.length == 0) return <></>
 
     return (
-        <LineChart
-            height={300}
-            width={innerWidth * 0.6}
+        <div style={{ width: '100%', overflowX: 'auto' }}>
+            <LineChart
+            height={Math.min(innerWidth * 0.9, 200)}
+            width={Math.min(innerWidth * 0.9, 800)} // Adjust width dynamically
             data={finalTimeGap}
             margin={{
                 top: 5,
@@ -44,8 +45,8 @@ const ShowGraph = ({ data }: { data: any[] }) => {
                 left: 0,
                 bottom: 5,
             }}
-            className="flex flex-1 "
-        >
+            className="flex flex-1"
+            >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="data" name="data" />
             <YAxis dataKey="time" name="time" />
@@ -64,7 +65,8 @@ const ShowGraph = ({ data }: { data: any[] }) => {
                 stroke="#EAB308"
                 strokeWidth={2}
             />
-        </LineChart>
+            </LineChart>
+        </div>
     )
 }
 

@@ -256,7 +256,7 @@ const ToggleComponent = ({ profile }: { profile: any }) => {
 
     return (
         <div className="flex flex-col justify-center items-center ">
-            <div className="flex gap-2 mb-4">
+             <div className="flex gap-2 mb-4">
                 <button
                     onClick={() => setFlag(false)}
                     className={`p-2 border rounded ${

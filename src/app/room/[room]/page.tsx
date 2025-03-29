@@ -89,7 +89,25 @@ const Room = () => {
     const route: any = useParams()
     const query = useSearchParams()
     const { user, isSignedIn } = useUser()
-    const { colors } = useRandomColor()
+    // const { colors } = useRandomColor()
+    const tailwind500Colors = [
+        'bg-red-500',
+        'bg-blue-500',
+        'bg-purple-500',
+        'bg-pink-500',
+        'bg-indigo-500',
+        'bg-emerald-500',
+        'bg-teal-500',
+        'bg-cyan-500',
+        'bg-rose-500',
+        'bg-amber-500',
+        'bg-lime-500',
+        'bg-fuchsia-500',
+        'bg-violet-500',
+        'bg-orange-500',
+        'bg-sky-500',
+        'bg-stone-500',
+    ]
     const [charTyped, setCharTyped] = useState([])
     const [typingSentence, setTypingSentence] = useState('')
     const [characterArray, setCharacterArray] = useState<string[]>([])
@@ -264,14 +282,29 @@ const Room = () => {
     useEffect(() => {
         if (gameState === 'waiting') {
             resetGameOptions()
-            // stopTimer()
             resetTimer()
             resetGameInfo()
         }
     }, [gameState])
-    useEffect(() => {
-        console.log(timexwpm)
-    }, [timexwpm])
+
+    if (!isSignedIn)
+        return (
+            <>
+                <div className="flex flex-col items-center justify-center min-h-[60vh] font-jetBrainsMono">
+                    <h1 className="text-2xl font-bold text-gray-800 mb-4">
+                        Please Sign In to Play
+                    </h1>
+                    <button
+                        onClick={() => {
+                            window.location.href = '/sign-in'
+                        }}
+                        className="px-6 py-2 text-white bg-green-500 rounded-full hover:bg-green-600 transition duration-300"
+                    >
+                        Go to Sign-In Page
+                    </button>
+                </div>
+            </>
+        )
 
     return (
         <div className="">
@@ -472,7 +505,14 @@ const Room = () => {
                                                         )}
                                                         <span
                                                             className={clsx(
-                                                                `${colors[index]} w-2 h-7 rounded-full flex `
+                                                                `${
+                                                                    tailwind500Colors[
+                                                                        Math.floor(
+                                                                            Math.random() *
+                                                                                16
+                                                                        )
+                                                                    ]
+                                                                } w-2 h-7 rounded-full flex `
                                                             )}
                                                         ></span>
                                                     </div>

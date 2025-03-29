@@ -2,15 +2,19 @@
 
 import User from '@/lib/models/user.modals'
 import { connect } from '@/lib/db'
+import { sendWelcomeEmail } from './sendEmail/welcome.actions'
 
 export async function createUser(user: any) {
     try {
         const res = await connect()
         const newUser = await User.create(user)
+        if (newUser.email) {
+            // Assuming you have a sendEmail function available
+            await sendWelcomeEmail(newUser.email, newUser.username)
+        }
 
         return newUser
-    } catch (err) {
-    }
+    } catch (err) {}
 }
 
 // Function to get MongoDB ID using clerkId

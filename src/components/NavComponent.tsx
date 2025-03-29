@@ -21,6 +21,7 @@ import { motion } from 'framer-motion'
 const NaivgationComponent = () => {
     const { user, isSignedIn } = useUser()
     const [roomFlag, setRoomFlag] = useState(false)
+    const [roomCode, setRoomCode] = useState('')
 
     const router = useRouter()
     const handleCreateRoom = async ({
@@ -146,15 +147,37 @@ const NaivgationComponent = () => {
                                 <div
                                     onClick={() => {
                                         setRoomFlag(!roomFlag)
+                                        if (roomCode)
+                                            router.push(`/room/${roomCode}`)
                                     }}
                                     className={clsx(
-                                        'absolute transition-all duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-indigo-500 hover:bg-indigo-600 hover:text-white items-center px-4 py-2 rounded-full',
+                                        'absolute transition-all group  duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-indigo-500 hover:bg-indigo-600 hover:text-white items-center px-4 py-2 rounded-full',
                                         { 'flex opacity-100 top-28': roomFlag },
                                         { hidden: !roomFlag }
                                     )}
                                 >
                                     <LogIn size={18} />
-                                    <p>Join</p>
+                                    <div>
+                                        <p>Join</p>
+                                    </div>
+                                    <div className="z-0">
+                                        <input
+                                            type="text"
+                                            placeholder="Enter Room Code"
+                                            className={clsx(
+                                                'absolute transition-all w-0 opacity-0 duration-300 left-0 ease-in-out transform top-0 bg-white text-black border-[1px] border-gray-300 rounded-full px-4 py-2 text-sm',
+                                                {
+                                                    'group-hover:w-[150px] group-hover:opacity-100  group-hover:left-28 z-[-10]':
+                                                        roomFlag,
+                                                }
+                                            )}
+                                            onChange={(e) => {
+                                                setRoomCode(e.target.value)
+                                            }}
+                                            value={roomCode}
+                                            onClick={(e) => e.stopPropagation()}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </>

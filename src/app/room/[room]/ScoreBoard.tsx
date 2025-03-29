@@ -8,6 +8,7 @@ import { useUser } from '@clerk/nextjs'
 import useRandomColor from '@/app/hooks/useRandomColor'
 import { getBadgeImage } from '@/components/BadgeComponent'
 
+
 const GameState = {
     CONNECTING: 'connecting',
     WAITING: 'waiting',
@@ -59,12 +60,23 @@ const AdminScoreBoard = ({
     const [soretedFinalScore, setSoretedFinalScoreData] =
         useState<finalRoomState>({ players: [], roomId: '' })
 
+    const resetScoreData = () => {
+        setScoreData([])
+        setSoretedFinalScoreData({ players: [], roomId: '' })
+    }
+
+    useEffect(() => {
+        if (gameStatus == 'waiting') {
+            resetScoreData()
+        }
+    }, [gameStatus])
+
     useEffect(() => {
         // Sort roomData by descending WPM whenever roomData changes
         if (roomData.length > 1) {
             const sorted = [...roomData].sort((a, b) => b.wpm - a.wpm)
             setScoreData(sorted)
-        }else{
+        } else {
             setScoreData(roomData)
         }
     }, [roomData])
@@ -75,7 +87,7 @@ const AdminScoreBoard = ({
             setSoretedFinalScoreData((prev) => {
                 return { ...prev, players: sorted }
             })
-        }else{
+        } else {
             setSoretedFinalScoreData((prev) => {
                 return { ...prev, players: finalState.players }
             })
@@ -86,7 +98,10 @@ const AdminScoreBoard = ({
         <div className="flex flex-1 flex-col justify-center items-center">
             {gameStatus === 'in_progress' ? (
                 <>
-                    {scoreData.length <= 0 ? null : (
+                    {scoreData.length <= 0 ? (
+                        // <LoadingSpinner />
+                        <p>Loading...</p>
+                    ) : (
                         <div className="m-5 font-jetBrainsMono w-max flex flex-col items-center justify-center gap-2 ">
                             {/* AnimatePresence helps with mount/unmount animations; 
               layout prop helps animate reordering within the list */}
@@ -378,7 +393,9 @@ export const UserScoreBoard = ({
         <div className="flex flex-1 flex-col justify-start items-center overflow-y-auto max-h-screen">
             {gameStatus === 'finished' || gameStatus === 'in_progress' ? (
                 <>
-                    {soretedFinalScore.players.length <= 0 ? null : (
+                    {soretedFinalScore.players.length <= 0 ? (
+                        <p>Loading...</p>
+                    ) : (
                         <div className="mx-5 font-jetBrainsMono w-max flex flex-col items-center justify-center gap-2 ">
                             {/* AnimatePresence helps with mount/unmount animations; 
 layout prop helps animate reordering within the list */}

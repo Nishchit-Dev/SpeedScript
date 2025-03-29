@@ -131,7 +131,7 @@ const NaivgationComponent = () => {
                                         if (user?.username)
                                             handleCreateRoom({
                                                 username: user?.username,
-                                                roomCapacity: 4,
+                                                roomCapacity: 200,
                                             })
                                     }}
                                     className={clsx(

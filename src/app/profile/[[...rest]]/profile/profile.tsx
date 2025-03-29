@@ -263,7 +263,7 @@ const ToggleComponent = ({ profile }: { profile: any }) => {
                         !flag ? 'bg-green-500 text-white' : ''
                     }`}
                 >
-                    Daily Highest WPM
+                    Highest WPM
                 </button>
                 <button
                     onClick={() => setFlag(true)}
@@ -271,13 +271,13 @@ const ToggleComponent = ({ profile }: { profile: any }) => {
                         flag ? 'bg-green-500 text-white' : ''
                     }`}
                 >
-                    Highest WPM
+                    Daily Highest WPM
                 </button>
             </div>
             {flag ? (
-                <HighestWpm profile={profile} />
-            ) : (
                 <DailyHighestWpm profile={profile} />
+            ) : (
+                <HighestWpm profile={profile} />
             )}
         </div>
     )

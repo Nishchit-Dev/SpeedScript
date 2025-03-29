@@ -256,14 +256,14 @@ const ToggleComponent = ({ profile }: { profile: any }) => {
 
     return (
         <div className="flex flex-col justify-center items-center ">
-            <div className="flex gap-2 mb-4">
+             <div className="flex gap-2 mb-4">
                 <button
                     onClick={() => setFlag(false)}
                     className={`p-2 border rounded ${
                         !flag ? 'bg-green-500 text-white' : ''
                     }`}
                 >
-                    Daily Highest WPM
+                    Highest WPM
                 </button>
                 <button
                     onClick={() => setFlag(true)}
@@ -271,13 +271,13 @@ const ToggleComponent = ({ profile }: { profile: any }) => {
                         flag ? 'bg-green-500 text-white' : ''
                     }`}
                 >
-                    Highest WPM
+                    Daily Highest WPM
                 </button>
             </div>
             {flag ? (
-                <HighestWpm profile={profile} />
-            ) : (
                 <DailyHighestWpm profile={profile} />
+            ) : (
+                <HighestWpm profile={profile} />
             )}
         </div>
     )

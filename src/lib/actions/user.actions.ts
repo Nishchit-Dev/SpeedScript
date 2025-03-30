@@ -40,3 +40,21 @@ export async function updateUserWithClerkId(userId: string, clerkId: string) {
     const res = await connect()
     await User.findByIdAndUpdate(userId, { clerkId })
 }
+
+// Function to get clerkId using username
+export async function getClerkIdByUsername(
+    username: string
+): Promise<string | null> {
+    try {
+        const res = await connect()
+        const user = await User.findOne({ username })
+        if (user && user.clerkId) {
+            return user.clerkId
+        } else {
+            return null
+        }
+    } catch (error) {
+        console.error('Error fetching clerkId by username:', error)
+        throw new Error('Could not retrieve clerkId')
+    }
+}

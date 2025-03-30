@@ -5,9 +5,11 @@ import { getBadgeImage, getProfileBadges } from '@/components/BadgeComponent'
 import Counter from '@/components/ui/countingNumberAnimation'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import TimexWpm from '../graph/profileGraph'
-import ShinyText from '../animate/shinyEffect'
+
 import { ProfileTabs } from './profile-tabs'
+import { LoadingAnimation } from '@/app/lottieAnimation'
+
+import { useOthersProfile } from '@/app/hooks/useOtherProfile'
 
 const ProfileComponent = ({
     clerkId,
@@ -16,21 +18,23 @@ const ProfileComponent = ({
     clerkId: string
     children: React.ReactNode
 }) => {
-    const { profile, loading, error } = useProfile(clerkId)
+    const { profile, loading, error } = useOthersProfile(clerkId)
 
     useEffect(() => {
         console.log('Profile:', profile)
     }, [profile])
 
-    if (loading) return <div>Loading profile...</div>
+    if (loading)
+        return (
+            <div>
+                <LoadingAnimation isLoading={true} />
+            </div>
+        )
     if (error) return <div>Error: {error}</div>
     if (!profile) return <div>Profile not found</div>
 
     return (
         <div className="flex flex-col w-full gap-6 ">
-            {/* <div>
-                <p>Hello! {profile.username}</p>
-            </div> */}
             <div className="flex items-start flex-row ">
                 <div className="relative w-[100px] h-[100px] overflow-visible flex justify-center items-center">
                     <Image
@@ -39,12 +43,8 @@ const ProfileComponent = ({
                         height={100}
                         src={profile.Photo}
                         alt="Profile"
-                        style={{
-                            backgroundImage: `url(/throphies/profile-badges/${getProfileBadges(
-                                profile.highestWpm.highestScore30s
-                            )})`,
-                        }}
                     />
+
                     <div
                         className="absolute top-1/2 left-1/2 w-[150px] h-[150px] rounded-full bg-cover bg-center z-10 overflow-visible transform -translate-x-1/2 -translate-y-1/2"
                         style={{
@@ -69,8 +69,7 @@ const ProfileComponent = ({
 
                         <h1 className="text-xl ">{profile.username}</h1>
                     </div>
-
-                    <p className="text-black/60">{profile.email}</p>
+                    <h1 className="text-xl ">{profile.email}</h1>
                 </div>
             </div>
 

@@ -2,7 +2,7 @@
 import { useUser } from '@clerk/nextjs'
 import Heatmap from './Heatmap.tsx/HeatMap'
 import { useEffect, useState } from 'react'
-import ProfileComponent from './profile/profile'
+import ProfileComponent from './profile'
 
 export default function Profile() {
     const { user } = useUser()

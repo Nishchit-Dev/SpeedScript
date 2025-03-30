@@ -1,7 +1,8 @@
-import { getBadgeImage } from "@/components/BadgeComponent";
-import clsx from "clsx";
-import Image from "next/image";
-import { useState, useEffect } from "react";
+import { getBadgeImage } from '@/components/BadgeComponent'
+import { ArrowBottomLeftIcon } from '@radix-ui/react-icons'
+import clsx from 'clsx'
+import Image from 'next/image'
+import { useState, useEffect } from 'react'
 
 const DynamicLeaderBoardComponent = ({
     index,
@@ -31,8 +32,6 @@ const DynamicLeaderBoardComponent = ({
         return userData.username || 'User' // Placeholder implementation
     }
 
-   
-
     const renderComponentForDuration = (duration: string) => {
         // Get the appropriate score property based on duration
         const scoreProp = `highestScore${duration}`
@@ -58,7 +57,7 @@ const DynamicLeaderBoardComponent = ({
 
         setComponent(
             <div className={bgColorClass}>
-                <div className="flex flex-1 justify-between items-center font-jetBrainsMono">
+                <div className="flex group flex-1 justify-between items-center font-jetBrainsMono">
                     <div className="flex justify-center items-center gap-2">
                         {isTopThree ? (
                             <div className="bg-white rounded-full">
@@ -90,6 +89,15 @@ const DynamicLeaderBoardComponent = ({
                         <div className="text-black/80" onClick={() => {}}>
                             {usernameSlicer(data)}
                         </div>
+                        <div
+                            className="rotate-180 cursor-pointer opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 transition-all
+                                                     duration-300 ease-in-out "
+                            onClick={() =>
+                                (window.location.href = `/profile/${data.username}`)
+                            }
+                        >
+                            <ArrowBottomLeftIcon />
+                        </div>
 
                         <div
                             className={clsx('', {
@@ -112,6 +120,5 @@ const DynamicLeaderBoardComponent = ({
 
     return <>{component}</>
 }
-
 
 export default DynamicLeaderBoardComponent

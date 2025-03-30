@@ -40,9 +40,8 @@ export const useProfile = (clerkId: string) => {
                 const response = await fetch(
                     `/api/user/profile?clerkId=${clerkId}`
                 )
-                console.log('Response:', response)
+
                 const data = await response.json()
-                console.log('Data:', data)
 
                 if (!response.ok) {
                     throw new Error(data.error || 'Failed to fetch profile')

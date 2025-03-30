@@ -1,400 +1,14 @@
 'use client'
 
 import { useProfile } from '@/app/hooks/useUserProfile'
-import { getBadgeImage } from '@/components/BadgeComponent'
+import { getBadgeImage, getProfileBadges } from '@/components/BadgeComponent'
 import Counter from '@/components/ui/countingNumberAnimation'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import TimexWpm from '../graph/profileGraph'
 import ShinyText from '../animate/shinyEffect'
+import { ProfileTabs } from './profile-tabs'
 
-const HighestWpm = ({ profile }: { profile: any }) => {
-    return (
-        <div className="flex flex-col flex-wrap gap-5 justify-center items-center ">
-            <div className="flex gap-2 flex-row w-max">
-                <div className="bg-gray-300 flex flex-col items-center  w-full p-5 rounded-md">
-                    <p className="flex flex-col text-3xl justify-center items-center">
-                        <Image
-                            className="rounded-full"
-                            width={200}
-                            height={200}
-                            src={`/throphies/badges/${getBadgeImage(
-                                profile.highestWpm.highestScore10s
-                            )}`}
-                            alt="Profile"
-                        />
-                        <Counter number={profile.highestWpm.highestScore10s} />
-                        WPM
-                    </p>
-                    <div className="flex bg-black/20 w-full h-[1px] my-2"></div>
-                    <div className="bg-gray-700 py-2 px-5 border-[#353535] rounded-full">
-                        <ShinyText
-                            text="10 seconds"
-                            disabled={false}
-                            speed={3}
-                            className="custom-class"
-                        />
-                    </div>
-                </div>
-                <div className="bg-gray-300 flex flex-col items-center w-full p-5 rounded-md">
-                    <p className="flex flex-col text-3xl justify-center items-center">
-                        <Image
-                            className="rounded-full"
-                            width={200}
-                            height={200}
-                            src={`/throphies/badges/${getBadgeImage(
-                                profile.highestWpm.highestScore30s
-                            )}`}
-                            alt="Profile"
-                        />
-                        <Counter number={profile.highestWpm.highestScore30s} />
-                        WPM
-                    </p>
-                    <div className="flex bg-black/20 w-full h-[1px] my-2"></div>
-                    <div className="bg-gray-700 py-2 px-5 border-[#353535] rounded-full">
-                        <ShinyText
-                            text="30 seconds"
-                            disabled={false}
-                            speed={3}
-                            className="custom-class"
-                        />
-                    </div>
-                </div>
-
-                <div className="bg-gray-300 flex flex-col items-center w-full p-5 rounded-md">
-                    <p className="flex flex-col text-3xl justify-center items-center">
-                        <Image
-                            className="rounded-full"
-                            width={200}
-                            height={200}
-                            src={`/throphies/badges/${getBadgeImage(
-                                profile.highestWpm.highestScore60s
-                            )}`}
-                            alt="Profile"
-                        />
-                        <Counter number={profile.highestWpm.highestScore60s} />
-                        WPM
-                    </p>
-                    <div className="flex bg-black/20 w-full h-[1px] my-2"></div>
-                    <div className="bg-gray-700 py-2 px-5 border-[#353535] rounded-full">
-                        <ShinyText
-                            text="60 seconds"
-                            disabled={false}
-                            speed={3}
-                            className="custom-class"
-                        />
-                    </div>
-                </div>
-                <div className="bg-gray-300 flex flex-col items-center w-full p-5  rounded-md ">
-                    <p className="flex flex-col text-3xl justify-center items-center">
-                        <Image
-                            className="rounded-full"
-                            width={200}
-                            height={200}
-                            src={`/throphies/badges/${getBadgeImage(
-                                profile.highestWpm.highestScore120s
-                            )}`}
-                            alt="Profile"
-                        />
-                        <Counter number={profile.highestWpm.highestScore120s} />
-                        WPM
-                    </p>
-                    <div className="flex bg-black/20 w-full h-[1px] my-2"></div>
-                    <div className="bg-gray-700 py-2 px-5 border-[#353535] rounded-full">
-                        <ShinyText
-                            text="120 seconds"
-                            disabled={false}
-                            speed={3}
-                            className="custom-class"
-                        />
-                    </div>
-                </div>
-            </div>
-            <h3 className="text-3xl">
-                <span className="text-green-500 font-bold mr-2">*</span>Highest
-                WPM
-            </h3>
-        </div>
-    )
-}
-
-const DailyHighestWpm = ({ profile }: { profile: any }) => {
-    return (
-        <div className="flex flex-col flex-wrap gap-5 justify-center items-center ">
-            <div className="flex gap-2 flex-row w-max">
-                <div className="bg-gray-300 flex flex-col items-center w-full p-5 rounded-md ">
-                    <p className="flex flex-col text-3xl justify-center items-center">
-                        <Image
-                            className="rounded-full shadow-black "
-                            width={200}
-                            height={200}
-                            src={`/throphies/badges/${getBadgeImage(
-                                profile.dailyHighestWpm.dailyHighestScore10s
-                            )}`}
-                            alt="Profile"
-                        />
-
-                        <>
-                            <Counter
-                                number={
-                                    profile.dailyHighestWpm.dailyHighestScore10s
-                                }
-                            />
-                            WPM
-                        </>
-                    </p>
-                    <div className="flex bg-black/20 w-full h-[1px] my-2"></div>
-                    <div className="bg-gray-700 py-2 px-5 border-[#353535] rounded-full">
-                        <ShinyText
-                            text="10 seconds"
-                            disabled={false}
-                            speed={3}
-                            className="custom-class"
-                        />
-                    </div>
-                </div>
-                <div className="bg-gray-300 flex flex-col items-center w-full p-5 rounded-md ">
-                    <p className="flex flex-col text-3xl justify-center items-center">
-                        <Image
-                            className="rounded-full"
-                            width={200}
-                            height={200}
-                            src={`/throphies/badges/${getBadgeImage(
-                                profile.dailyHighestWpm.dailyHighestScore30s
-                            )}`}
-                            alt="Profile"
-                        />
-                        <>
-                            <Counter
-                                number={
-                                    profile.dailyHighestWpm.dailyHighestScore30s
-                                }
-                            />
-                            WPM
-                        </>
-                    </p>
-                    <div className="flex bg-black/20 w-full h-[1px] my-2"></div>
-                    <div className="bg-gray-700 py-2 px-5 border-[#353535] rounded-full">
-                        <ShinyText
-                            text="30 seconds"
-                            disabled={false}
-                            speed={3}
-                            className="custom-class"
-                        />
-                    </div>
-                </div>
-
-                <div className="bg-gray-300 flex flex-col items-center w-full p-5 rounded-md ">
-                    <p className="flex flex-col text-3xl justify-center items-center">
-                        <Image
-                            className="rounded-full"
-                            width={200}
-                            height={200}
-                            src={`/throphies/badges/${getBadgeImage(
-                                profile.dailyHighestWpm.dailyHighestScore60s
-                            )}`}
-                            alt="Profile"
-                        />
-                        <>
-                            <Counter
-                                number={
-                                    profile.dailyHighestWpm.dailyHighestScore60s
-                                }
-                            />
-                            WPM
-                        </>
-                    </p>
-                    <div className="flex bg-black/20 w-full h-[1px] my-2"></div>
-                    <div className="bg-gray-700 py-2 px-5 border-[#353535] rounded-full">
-                        <ShinyText
-                            text="60 seconds"
-                            disabled={false}
-                            speed={3}
-                            className="custom-class"
-                        />
-                    </div>
-                </div>
-                <div className="bg-gray-300 flex flex-col items-center w-full p-5 rounded-md ">
-                    <p className="flex flex-col text-3xl justify-center items-center">
-                        <Image
-                            className="rounded-full"
-                            width={200}
-                            height={200}
-                            src={`/throphies/badges/${getBadgeImage(
-                                profile.dailyHighestWpm.dailyHighestScore120s
-                            )}`}
-                            alt="Profile"
-                        />
-                        <Counter
-                            number={
-                                profile.dailyHighestWpm.dailyHighestScore120s
-                            }
-                        />
-                        WPM
-                    </p>
-                    <div className="flex bg-black/20 w-full h-[1px] my-2"></div>
-                    <div className="bg-gray-700 py-2 px-5 border-[#353535] rounded-full">
-                        <ShinyText
-                            text="120 seconds"
-                            disabled={false}
-                            speed={3}
-                            className="custom-class"
-                        />
-                    </div>
-                </div>
-            </div>
-            <h3 className="text-3xl">
-                <span className="text-green-500 font-bold mr-2">*</span>Daily
-                Highest WPM
-            </h3>
-        </div>
-    )
-}
-
-const ToggleComponent = ({ profile }: { profile: any }) => {
-    const [flag, setFlag] = useState(false)
-
-    return (
-        <div className="flex flex-col justify-center items-center ">
-             <div className="flex gap-2 mb-4">
-                <button
-                    onClick={() => setFlag(false)}
-                    className={`p-2 border rounded ${
-                        !flag ? 'bg-green-500 text-white' : ''
-                    }`}
-                >
-                    Highest WPM
-                </button>
-                <button
-                    onClick={() => setFlag(true)}
-                    className={`p-2 border rounded ${
-                        flag ? 'bg-green-500 text-white' : ''
-                    }`}
-                >
-                    Daily Highest WPM
-                </button>
-            </div>
-            {flag ? (
-                <DailyHighestWpm profile={profile} />
-            ) : (
-                <HighestWpm profile={profile} />
-            )}
-        </div>
-    )
-}
-
-const GraphComponent = ({ profile }: { profile: any }) => {
-    const [selectedDuration, setSelectedDuration] = useState('10s')
-
-    const handleDurationChange = (
-        event: React.ChangeEvent<HTMLSelectElement>
-    ) => {
-        setSelectedDuration(event.target.value)
-    }
-
-    const [data, setData] = useState([])
-
-    useEffect(() => {
-        let updatedData = []
-        switch (selectedDuration) {
-            case '10s':
-                updatedData = profile.recentWpmScores.scores10s.map(
-                    (score: number, index: number) => ({
-                        time: index,
-                        wpm: score,
-                    })
-                )
-                break
-            case '30s':
-                updatedData = profile.recentWpmScores.scores30s.map(
-                    (score: number, index: number) => ({
-                        time: index,
-                        wpm: score,
-                    })
-                )
-                break
-            case '60s':
-                updatedData = profile.recentWpmScores.scores60s.map(
-                    (score: number, index: number) => ({
-                        time: index,
-                        wpm: score,
-                    })
-                )
-                break
-            case '120s':
-                updatedData = profile.recentWpmScores.scores120s.map(
-                    (score: number, index: number) => ({
-                        time: index,
-                        wpm: score,
-                    })
-                )
-
-                break
-            default:
-                break
-        }
-        if (updatedData.length === 0) {
-            updatedData = [{ time: 0, wpm: 0 }]
-        }
-        setData(updatedData)
-        console.log(updatedData)
-    }, [profile, selectedDuration])
-
-    return (
-        <div className="flex flex-col items-center">
-            <TimexWpm data={data} timer={data.length} />
-            <div className="flex gap-2 mb-4">
-                <button
-                    onClick={() => setSelectedDuration('10s')}
-                    className={`p-2 border rounded ${
-                        selectedDuration === '10s'
-                            ? 'bg-green-500 text-white'
-                            : ''
-                    }`}
-                >
-                    10 seconds
-                </button>
-                <button
-                    onClick={() => setSelectedDuration('30s')}
-                    className={`p-2 border rounded ${
-                        selectedDuration === '30s'
-                            ? 'bg-green-500 text-white'
-                            : ''
-                    }`}
-                >
-                    30 seconds
-                </button>
-                <button
-                    onClick={() => setSelectedDuration('60s')}
-                    className={`p-2 border rounded ${
-                        selectedDuration === '60s'
-                            ? 'bg-green-500 text-white'
-                            : ''
-                    }`}
-                >
-                    60 seconds
-                </button>
-                <button
-                    onClick={() => setSelectedDuration('120s')}
-                    className={`p-2 border rounded ${
-                        selectedDuration === '120s'
-                            ? 'bg-green-500 text-white'
-                            : ''
-                    }`}
-                >
-                    120 seconds
-                </button>
-            </div>
-            <div>
-                {/* Render graph based on selectedDuration */}
-                <p>
-                    Recent 10 Scores of Highest {selectedDuration} WPM duration
-                </p>
-            </div>
-        </div>
-    )
-    return <></>
-}
 const ProfileComponent = ({
     clerkId,
     children,
@@ -413,27 +27,59 @@ const ProfileComponent = ({
     if (!profile) return <div>Profile not found</div>
 
     return (
-        <div className="flex flex-row w-full gap-12">
-            <div className="flex items-center flex-col ">
-                <Image
-                    className="rounded-full"
-                    width={200}
-                    height={200}
-                    src={profile.Photo}
-                    alt="Profile"
-                />
-                <div className="flex items-center flex-col ">
-                    <h1 className="text-3xl font-bold">{profile.username}</h1>
+        <div className="flex flex-col w-full gap-6 ">
+            {/* <div>
+                <p>Hello! {profile.username}</p>
+            </div> */}
+            <div className="flex items-start flex-row ">
+                <div className="relative w-[100px] h-[100px] overflow-visible flex justify-center items-center">
+                    <Image
+                        className="absolute top-0 left-0 w-full h-full rounded-full z-0 bg-cover bg-center"
+                        width={100}
+                        height={100}
+                        src={profile.Photo}
+                        alt="Profile"
+                        style={{
+                            backgroundImage: `url(/throphies/profile-badges/${getProfileBadges(
+                                profile.highestWpm.highestScore30s
+                            )})`,
+                        }}
+                    />
+                    <div
+                        className="absolute top-1/2 left-1/2 w-[150px] h-[150px] rounded-full bg-cover bg-center z-10 overflow-visible transform -translate-x-1/2 -translate-y-1/2"
+                        style={{
+                            backgroundImage: `url(/throphies/profile-badges/${getProfileBadges(
+                                profile.highestWpm.highestScore30s
+                            )})`,
+                        }}
+                    ></div>
+                </div>
+
+                <div className="flex items-start ml-8 flex-col ">
+                    <div className="flex flex-row justify-center items-center">
+                        <Image
+                            className="rounded-full"
+                            width={50}
+                            height={50}
+                            src={`/throphies/badges/${getBadgeImage(
+                                profile.highestWpm.highestScore30s
+                            )}`}
+                            alt="Profile"
+                        />
+
+                        <h1 className="text-xl ">{profile.username}</h1>
+                    </div>
+
                     <p className="text-black/60">{profile.email}</p>
                 </div>
             </div>
-            <div className="bg-black/20 w-[1px] h-[250px]"></div>
 
-            <div className="flex flex-col gap-10 justify-center items-center">
-                <ToggleComponent profile={profile} />
-                <GraphComponent profile={profile} />
-                {children}
+            {/* <div className="bg-black/20 w-[1px] h-[250px]"></div> */}
+
+            <div className="flex flex-col gap-10 justify-center items-center w-max-[984px] transition-all duration-800 ease-out">
+                <ProfileTabs profile={profile} />
             </div>
+            <div>{children}</div>
         </div>
     )
 }

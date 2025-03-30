@@ -14,9 +14,7 @@ interface TimexWpmProps {
     timer: number
 }
 
-const TimexWpm = ({ data, timer }: TimexWpmProps) => {
-    console.log(data)
-
+const TimexWpm = ({ data , timer }: TimexWpmProps) => {
     if (data.length === 0) return <></>
 
     return (
@@ -51,7 +49,7 @@ const TimexWpm = ({ data, timer }: TimexWpmProps) => {
             <Tooltip />
             <Legend />
             <Brush
-                endIndex={timer -1}
+                endIndex={timer - 1}
                 dataKey="time"
                 height={30}
                 stroke="#4ADE80"

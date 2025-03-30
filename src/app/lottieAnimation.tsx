@@ -20,7 +20,7 @@ export const LoadingAnimation = ({ isLoading }: { isLoading: boolean }) => {
                         src="/animation/Loading.lottie"
                         loop
                         autoplay
-                        className="w-[25%] h-[25%]"
+                        className=""
                     />
                 </div>
             ) : (

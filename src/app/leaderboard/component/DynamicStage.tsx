@@ -1,7 +1,9 @@
-import clsx from "clsx"
-import { User } from "lucide-react"
-import Image from "next/image"
-import { useState, useEffect } from "react"
+import { ArrowBottomLeftIcon } from '@radix-ui/react-icons'
+import clsx from 'clsx'
+import { User } from 'lucide-react'
+import Image from 'next/image'
+
+import { useState, useEffect } from 'react'
 
 interface data {
     username: string
@@ -69,11 +71,20 @@ const DynamicStage = ({
                             }
                         </p>
                     </div>
-                    <div className="flex flex-row gap-2 font-jetBrainsMono bg-white/80 px-3 py-2 rounded-full justify-center items-center">
+                    <div className="flex group flex-row gap-2 font-jetBrainsMono bg-white/80 px-3 py-2 rounded-full justify-center items-center">
                         <div className="bg-slate-400 rounded-full p-[2px]">
                             <User />
                         </div>
                         <p>{usernameSlicer(data)}</p>
+                        <div
+                            className="rotate-180 w-0 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 transition-all
+                             duration-300 ease-in-out group-hover:w-max"
+                            onClick={() =>
+                                (window.location.href = `/profile/${data.username}`)
+                            }
+                        >
+                            <ArrowBottomLeftIcon />
+                        </div>
                     </div>
                 </div>
             </div>

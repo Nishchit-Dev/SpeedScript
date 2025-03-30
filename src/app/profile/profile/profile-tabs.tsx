@@ -264,6 +264,7 @@ const GraphComponent = ({ profile }: { profile: any }) => {
         let updatedData = []
         switch (selectedDuration) {
             case '10s':
+                if(profile.recentWpmScores?.scores10s?.length > 0)
                 updatedData = profile.recentWpmScores.scores10s.map(
                     (score: number, index: number) => ({
                         time: index,
@@ -272,6 +273,7 @@ const GraphComponent = ({ profile }: { profile: any }) => {
                 )
                 break
             case '30s':
+                if(profile.recentWpmScores?.scores30s?.length > 0)
                 updatedData = profile.recentWpmScores.scores30s.map(
                     (score: number, index: number) => ({
                         time: index,
@@ -280,6 +282,7 @@ const GraphComponent = ({ profile }: { profile: any }) => {
                 )
                 break
             case '60s':
+                if(profile.recentWpmScores?.scores60s?.length > 0)
                 updatedData = profile.recentWpmScores.scores60s.map(
                     (score: number, index: number) => ({
                         time: index,
@@ -288,6 +291,7 @@ const GraphComponent = ({ profile }: { profile: any }) => {
                 )
                 break
             case '120s':
+                if(profile.recentWpmScores?.scores120s?.length > 0)
                 updatedData = profile.recentWpmScores.scores120s.map(
                     (score: number, index: number) => ({
                         time: index,

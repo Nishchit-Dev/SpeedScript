@@ -26,7 +26,7 @@ interface ProfileData {
     }
 }
 
-export const useProfile = (clerkId: string) => {
+export const useOthersProfile = (clerkId: string) => {
     const [profile, setProfile] = useState<ProfileData | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -38,7 +38,7 @@ export const useProfile = (clerkId: string) => {
                 setError(null)
 
                 const response = await fetch(
-                    `/api/user/profile?clerkId=${clerkId}`
+                    `/api/user/username?clerkId=${clerkId}`
                 )
 
                 const data = await response.json()

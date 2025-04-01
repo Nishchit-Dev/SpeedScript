@@ -8,10 +8,12 @@ import { useEffect } from 'react'
 import { ProfileTabs } from './profile/profile-tabs'
 import { LoadingAnimation } from '@/app/lottieAnimation'
 import {
+    CircleCheck,
     Share,
     SquareArrowOutUpLeft,
     SquareArrowOutUpRight,
 } from 'lucide-react'
+import { toast } from 'sonner'
 
 const ProfileComponent = ({
     clerkId,
@@ -80,6 +82,14 @@ const ProfileComponent = ({
                                     ).toString()
 
                                     navigator.clipboard.writeText(link)
+                                    toast(
+                                        <div className="font-jetBrainsMono ">
+                                            <span className="flex flex-1 w-max  gap-2 text-center justify-center items-center">
+                                                URL copied{' '}
+                                                <CircleCheck className="bg-green-400 rounded-full text-white" />
+                                            </span>
+                                        </div>
+                                    )
                                 }}
                             >
                                 <SquareArrowOutUpRight

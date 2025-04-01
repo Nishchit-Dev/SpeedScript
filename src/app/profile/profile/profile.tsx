@@ -10,7 +10,10 @@ import { ProfileTabs } from './profile-tabs'
 import { LoadingAnimation } from '@/app/lottieAnimation'
 
 import { useOthersProfile } from '@/app/hooks/useOtherProfile'
-import { SquareArrowOutUpRight } from 'lucide-react'
+import { CircleCheck, SquareArrowOutUpRight } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import { ToastAction } from '@/components/ui/toast'
+import { toast } from 'sonner'
 
 const ProfileComponent = ({
     clerkId,
@@ -71,13 +74,22 @@ const ProfileComponent = ({
                         <h1 className="text-xl ">{profile.username}</h1>
                         <div className="ml-3 ">
                             <div
-                                className="cursor-pointer"
+                                className="cursor-pointer font-jetBrainsMono"
                                 onClick={() => {
                                     const link = new URL(
                                         '/profile/' + profile.username,
                                         window.location.origin
                                     ).toString()
                                     navigator.clipboard.writeText(link)
+
+                                    toast(
+                                        <div className="font-jetBrainsMono ">
+                                            <span className="flex flex-1 w-max  gap-2 text-center justify-center items-center">
+                                                URL copied{' '}
+                                                <CircleCheck className="bg-green-400 rounded-full text-white" />
+                                            </span>
+                                        </div>
+                                    )
                                 }}
                             >
                                 <SquareArrowOutUpRight

@@ -7,6 +7,11 @@ import { useEffect } from 'react'
 
 import { ProfileTabs } from './profile/profile-tabs'
 import { LoadingAnimation } from '@/app/lottieAnimation'
+import {
+    Share,
+    SquareArrowOutUpLeft,
+    SquareArrowOutUpRight,
+} from 'lucide-react'
 
 const ProfileComponent = ({
     clerkId,
@@ -65,6 +70,24 @@ const ProfileComponent = ({
                         />
 
                         <h1 className="text-xl ">{profile.username}</h1>
+                        <div className="ml-3 ">
+                            <div
+                                className="cursor-pointer"
+                                onClick={() => {
+                                    const link = new URL(
+                                        '/profile/' + profile.username,
+                                        window.location.origin
+                                    ).toString()
+
+                                    navigator.clipboard.writeText(link)
+                                }}
+                            >
+                                <SquareArrowOutUpRight
+                                    size={18}
+                                    className="text-black/60 font-bold"
+                                />
+                            </div>
+                        </div>
                     </div>
                     <h1 className="text-sm text-black/70">{profile.email}</h1>
                 </div>

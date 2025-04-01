@@ -19,8 +19,10 @@ const TimexWpm = ({ data , timer }: TimexWpmProps) => {
 
     return (
         <LineChart
+        className="flex flex-1 w-max"
+
             height={250}
-            width={innerWidth * 0.4}
+            width={0.7 * innerWidth}
             data={data}
             margin={{
                 top: 5,
@@ -28,7 +30,6 @@ const TimexWpm = ({ data , timer }: TimexWpmProps) => {
                 left: 0,
                 bottom: 5,
             }}
-            className="flex flex-1"
         >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis

@@ -12,6 +12,7 @@ import NaivgationComponent from '@/components/NavComponent'
 
 import WhatsNewInUpdates from '@/components/WhatsNewInUpdate'
 import Footer from '@/components/Footer'
+import { Toaster } from 'sonner'
 
 const jetBrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -149,6 +150,7 @@ export default function RootLayout({
                     </div>
                     <div className="py-10  ">{children}</div>
                     {/* <Footer /> */}
+                    <Toaster position='top-right'/>
                 </body>
             </html>
         </ClerkProvider>

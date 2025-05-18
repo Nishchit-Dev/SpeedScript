@@ -1,48 +1,40 @@
-import { getBadgeImage } from "@/components/BadgeComponent";
-import clsx from "clsx";
-import Image from "next/image";
-import { useState, useEffect } from "react";
+import { getBadgeImage } from '@/components/BadgeComponent'
+import clsx from 'clsx'
+import Image from 'next/image'
+import { useState, useEffect } from 'react'
 
 const DynamicDailyLeaderboardComponent = ({
     index,
     data,
     duration,
-    user
+    user,
 }: {
-    index: number;
-    data: any;
-    duration: string;
-    user:any
+    index: number
+    data: any
+    duration: string
+    user: any
 }) => {
-    const [component, setComponent] = useState<React.ReactNode>(null);
+    const [component, setComponent] = useState<React.ReactNode>(null)
 
     useEffect(() => {
-        setComponent(null);
-        renderComponentForDuration(duration);
-    }, [duration]);
+        setComponent(null)
+        renderComponentForDuration(duration)
+    }, [duration])
 
     const usernameSlicer = (userData: any) => {
-        return userData.username || 'User'; // Placeholder implementation
-    };
-
+        return userData.username || 'User' // Placeholder implementation
+    }
 
     const renderComponentForDuration = (duration: string) => {
-        const scoreKey = `dailyHighestScore${duration}`;
-        const score = data.dailyHighestWpm?.[scoreKey] || 0;
+        const scoreKey = `dailyHighestScore${duration}`
+        const score = data.dailyHighestWpm?.[scoreKey] || 0
 
-        if (score <= 0) return;
+        if (score <= 0) return
 
-        const isTopThree = index < 3;
-        const position = index + 1;
+        const position = index + 1
+        const isTopThree = position < 3
 
-        let bgColorClass = '';
-        if (index === 0)
-            bgColorClass = 'bg-yellow-400 p-3 px-10 min-w-[512px] text-2xl';
-        else if (index === 1)
-            bgColorClass = 'bg-yellow-300 p-3 px-10 min-w-[462px] text-xl';
-        else if (index === 2)
-            bgColorClass = 'bg-yellow-200 p-3 px-10 min-w-[412px] text-lg';
-        else bgColorClass = 'p-3 px-10 min-w-[412px]';
+        let bgColorClass = 'p-3 px-10 min-w-[412px]'
 
         setComponent(
             <div className={bgColorClass}>
@@ -51,7 +43,9 @@ const DynamicDailyLeaderboardComponent = ({
                         {isTopThree ? (
                             <div className="bg-white rounded-full">
                                 <Image
-                                    src={`/throphies/LeaderboardRank${index + 1}.svg`}
+                                    src={`/throphies/LeaderboardRank${
+                                        index + 1
+                                    }.svg`}
                                     alt=""
                                     height={60}
                                     width={60}
@@ -62,7 +56,9 @@ const DynamicDailyLeaderboardComponent = ({
                                 <div>{position}</div>
                                 <div>
                                     <Image
-                                        src={`/throphies/badges/${getBadgeImage(score)}`}
+                                        src={`/throphies/badges/${getBadgeImage(
+                                            score
+                                        )}`}
                                         alt=""
                                         width={50}
                                         height={50}
@@ -91,10 +87,10 @@ const DynamicDailyLeaderboardComponent = ({
                     </div>
                 </div>
             </div>
-        );
-    };
+        )
+    }
 
-    return <>{component}</>;
-};
+    return <>{component}</>
+}
 
-export default DynamicDailyLeaderboardComponent;
+export default DynamicDailyLeaderboardComponent

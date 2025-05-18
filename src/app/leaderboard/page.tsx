@@ -203,7 +203,9 @@ const DailyLeaderboardContent = ({
         <>
             {currentPage === 1 && (
                 <div className="flex flex-row h-80 mb-28">
-                    {paginatedDailyLeaderboard.slice(0, 3).map((data, index) => (
+                    {paginatedDailyLeaderboard
+                        .slice(0, 3)
+                        .map((data, index) => (
                             <DynamicStage
                                 flag={flag}
                                 duration={ActiveDuration}
@@ -215,15 +217,27 @@ const DailyLeaderboardContent = ({
                 </div>
             )}
             <div className="bg-white rounded-lg">
-                {paginatedDailyLeaderboard.slice(3).map((data, index) => (
-                    <DynamicDailyLeaderboardComponent
-                        duration={ActiveDuration}
-                        user={user}
-                        data={data}
-                        index={index + 3}
-                        key={`daily-board-${data._id}-${index}`}
-                    />
-                ))}
+                {currentPage === 1
+                    ? paginatedDailyLeaderboard
+                          .slice(3)
+                          .map((data, index) => (
+                              <DynamicDailyLeaderboardComponent
+                                  duration={ActiveDuration}
+                                  user={user}
+                                  data={data}
+                                  index={index + 3}
+                                  key={`daily-board-${data._id}-${index}`}
+                              />
+                          ))
+                    : paginatedDailyLeaderboard.map((data, index) => (
+                          <DynamicDailyLeaderboardComponent
+                              duration={ActiveDuration}
+                              user={user}
+                              data={data}
+                              index={index + 3}
+                              key={`daily-board-${data._id}-${index}`}
+                          />
+                      ))}
             </div>
         </>
     )
@@ -260,18 +274,33 @@ const LeaderboardContent = ({
                 </div>
             )}
             <div className="bg-white rounded-lg">
-                {paginatedLeaderboard.slice(3).map((data, index) => (
-                    <DynamicLeaderBoardComponent
-                        duration={ActiveDuration}
-                        user={user}
-                        data={data}
-                        index={index + 3}
-                        flag={flag}
-                        currentPage={currentPage}
-                        itemsPerPage={itemsPerPage}
-                        key={`board-${data._id}-${index}`}
-                    />
-                ))}
+                {currentPage === 1
+                    ? paginatedLeaderboard
+                          .slice(3)
+                          .map((data, index) => (
+                              <DynamicLeaderBoardComponent
+                                  duration={ActiveDuration}
+                                  user={user}
+                                  data={data}
+                                  index={index + 3}
+                                  flag={flag}
+                                  currentPage={currentPage}
+                                  itemsPerPage={itemsPerPage}
+                                  key={`board-${data._id}-${index}`}
+                              />
+                          ))
+                    : paginatedLeaderboard.map((data, index) => (
+                          <DynamicLeaderBoardComponent
+                              duration={ActiveDuration}
+                              user={user}
+                              data={data}
+                              index={index}
+                              flag={flag}
+                              currentPage={currentPage}
+                              itemsPerPage={itemsPerPage}
+                              key={`board-${data._id}-${index}`}
+                          />
+                      ))}
             </div>
         </>
     )
@@ -376,7 +405,8 @@ const LeaderBoard = () => {
                         ActiveDuration={ActiveDuration}
                         user={user}
                         flag={flag}
-                        itemsPerPage={itemsPerPage} />
+                        itemsPerPage={itemsPerPage}
+                    />
                 </>
             )}
 

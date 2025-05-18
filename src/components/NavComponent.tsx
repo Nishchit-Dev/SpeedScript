@@ -115,75 +115,7 @@ const NaivgationComponent = () => {
                             <p>Leaderboard</p>
                         </div>
                     </Link>
-                    {isSignedIn ? (
-                        <>
-                            <div
-                                onClick={() => {
-                                    setRoomFlag(!roomFlag)
-                                }}
-                                className="w-full font-jetBrainsMono gap-2 duration-300 transition flex flex-row text-sm justify-center  bg-yellow-500 hover:bg-yellow-600 hover:text-white items-center px-4 py-2  rounded-full"
-                            >
-                                <Castle size={18} />
-                                <p>Room</p>
-                                <ArrowDown size={18} />
-                                <div
-                                    onClick={() => {
-                                        setRoomFlag(!roomFlag)
-                                        if (user?.username)
-                                            handleCreateRoom({
-                                                username: user?.username,
-                                                roomCapacity: 200,
-                                            })
-                                    }}
-                                    className={clsx(
-                                        'absolute opacity-0 transition-all duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-green-500 hover:bg-green-600 hover:text-white items-center px-4 py-2 rounded-full',
-                                        { 'flex opacity-100 top-16': roomFlag },
-                                        { hidden: !roomFlag }
-                                    )}
-                                >
-                                    <DoorOpen size={18} />
-                                    <p>Create</p>
-                                </div>
-                                <div
-                                    onClick={() => {
-                                        setRoomFlag(!roomFlag)
-                                        if (roomCode)
-                                            router.push(`/room/${roomCode}`)
-                                    }}
-                                    className={clsx(
-                                        'absolute transition-all group  duration-300 ease-in-out transform top-0 font-jetBrainsMono gap-2 flex-row text-sm justify-center bg-indigo-500 hover:bg-indigo-600 hover:text-white items-center px-4 py-2 rounded-full',
-                                        { 'flex opacity-100 top-28': roomFlag },
-                                        { hidden: !roomFlag }
-                                    )}
-                                >
-                                    <LogIn size={18} />
-                                    <div>
-                                        <p>Join</p>
-                                    </div>
-                                    <div className="z-0">
-                                        <input
-                                            type="text"
-                                            placeholder="Enter Room Code"
-                                            className={clsx(
-                                                'absolute transition-all w-0 opacity-0 duration-300 left-0 ease-in-out transform top-0 bg-white text-black border-[1px] border-gray-300 rounded-full px-4 py-2 text-sm',
-                                                {
-                                                    'group-hover:w-[150px] group-hover:opacity-100  group-hover:left-28 z-[-10]':
-                                                        roomFlag,
-                                                }
-                                            )}
-                                            onChange={(e) => {
-                                                setRoomCode(e.target.value)
-                                            }}
-                                            value={roomCode}
-                                            onClick={(e) => e.stopPropagation()}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        <></>
-                    )}
+                  
                 </div>
                 {isSignedIn ? (
                     <>
